@@ -16,8 +16,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_admin import Admin, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from flask_wtf import FlaskForm
-# Updated WTForms imports
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField
 from wtforms.validators import DataRequired, EqualTo, Length, Optional
 import markdown
 from weasyprint import HTML, CSS
@@ -61,29 +60,40 @@ def load_user(user_id):
 def create_db_command(): _create_db_and_seed()
 
 def _create_db_and_seed():
-    # ... (seeding logic remains the same) ...
+    """Helper function for database creation and seeding."""
     with app.app_context():
         database = db or current_app.extensions['sqlalchemy'].db
         database.create_all()
         print("Database tables created.")
         if not User.query.first():
             print("Seeding initial users and Maslaks...")
-            admin_user = User( username='admin', password=generate_password_hash('adminpassword', method='pbkdf2:sha256'), is_admin=True)
+            # Keep admin user
+            admin_user = User(
+                username='admin',
+                password=generate_password_hash('adminpassword', method='pbkdf2:sha256'),
+                is_admin=True
+            )
             database.session.add(admin_user)
-            new_users = ['ahmed_a', 'ahmed_s', 'hakim', 'jawhar', 'mohamed', 'yassine']
+
+            # Add new specified users - INCLUDING mohamed and yassine
+            new_users = ['ahmed_a', 'ahmed_s', 'hakim', 'jawhar', 'mohamed', 'yassine'] # <<< ADDED USERS HERE
             user_objects = {}
             for username in new_users:
-                password = f"{username}2023"; hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+                password = f"{username}2023"
+                hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
                 new_user = User(username=username, password=hashed_password, is_admin=False);
                 user_objects[username] = new_user
                 database.session.add(new_user)
                 print(f"  Added user: {username} (password: {password})")
+
+            # Seed Maslaks
             maslak1 = Maslak(name="المسلك الأول: الأساسيات")
             maslak2 = Maslak(name="المسلك الثاني: المتقدم")
             database.session.add_all([maslak1, maslak2])
             print("  Added Maslaks.")
-            database.session.commit()
-            print("Initial users and Maslaks seeded.")
+
+            database.session.commit() # Commit users and maslaks
+            print(f"Initial users (admin + {len(new_users)}) and Maslaks seeded.") # Updated print message
         else: print("Database already contains data.")
 
 # --- Custom Admin Forms ---
@@ -93,10 +103,8 @@ class UserForm(FlaskForm):
     confirm_password = PasswordField('تأكيد كلمة المرور')
     is_admin = BooleanField('مسؤول؟')
 
-# --- NEW: Explicit Form for Maslak ---
 class MaslakForm(FlaskForm):
     name = StringField('اسم المسلك', validators=[DataRequired(), Length(max=100)])
-# --- End Maslak Form ---
 
 # --- Flask-Admin Setup ---
 class MyAdminIndexView(AdminIndexView):
@@ -127,22 +135,17 @@ class EpisodeAdminView(SecureModelView):
     column_display_pk = True
     column_sortable_list = ('id', 'title', 'maslak.name', 'last_updated', 'display_order')
 
-# --- Admin View for Maslak ---
 class MaslakAdminView(SecureModelView):
-    # --- Use the explicit form ---
     form = MaslakForm
-
     column_list = ('id', 'name', 'episodes')
-    # form_columns = ('name',) # Remove, as form defines fields now
     column_searchable_list = ('name',)
     column_display_pk = True
-    form_excluded_columns = ('episodes',) # Keep excluding relationship
-# --- End Maslak Admin View ---
+    form_excluded_columns = ('episodes',)
 
 admin = Admin(app, name='صالح - الكراسة الحمراء 📕', template_mode='bootstrap4', url='/admin', index_view=MyAdminIndexView())
 admin.add_view(UserAdminView(User, db.session, name='المستخدمون'))
 admin.add_view(EpisodeAdminView(Episode, db.session, name='الحلقات'))
-admin.add_view(MaslakAdminView(Maslak, db.session, name='المسالك')) # Added Maslak view
+admin.add_view(MaslakAdminView(Maslak, db.session, name='المسالك'))
 # --- End Flask-Admin Setup ---
 
 # --- Routes ---
@@ -223,6 +226,26 @@ def delete_episode(episode_id):
     except Exception as e: db.session.rollback(); flash(f'خطأ في حذف الحلقة: {e}', 'danger'); print(f"Error: {e}")
     return redirect(url_for('dashboard'))
 
+@app.route('/episode/<int:episode_id>/change_maslak', methods=['POST'])
+@login_required
+def change_episode_maslak(episode_id):
+    episode = Episode.query.get_or_404(episode_id)
+    new_maslak_id = request.form.get('new_maslak_id', type=int)
+    is_assigned = Assignment.query.filter_by(user_id=current_user.id, episode_id=episode.id).count() > 0
+    user_is_admin = hasattr(current_user, 'is_admin') and current_user.is_admin
+    if not is_assigned and not user_is_admin: flash('فقط المستخدمون المعينون أو المسؤولون يمكنهم تغيير المسلك.', 'danger'); return redirect(url_for('view_episode', episode_id=episode_id))
+    if not new_maslak_id: flash('لم يتم اختيار مسلك جديد.', 'warning'); return redirect(url_for('view_episode', episode_id=episode_id))
+    new_maslak = Maslak.query.get(new_maslak_id)
+    if not new_maslak: flash('المسلك الجديد المحدد غير صالح.', 'danger'); return redirect(url_for('view_episode', episode_id=episode_id))
+    if episode.maslak_id == new_maslak_id: flash('الحلقة موجودة بالفعل في هذا المسلك.', 'info'); return redirect(url_for('view_episode', episode_id=episode_id))
+    try:
+        old_maslak_name = episode.maslak.name if episode.maslak else 'غير محدد'
+        episode.maslak_id = new_maslak_id
+        db.session.add(episode); db.session.commit()
+        flash(f'تم نقل الحلقة "{episode.title}" من مسلك "{old_maslak_name}" إلى مسلك "{new_maslak.name}" بنجاح.', 'success')
+    except Exception as e: db.session.rollback(); flash(f'حدث خطأ أثناء تغيير المسلك: {e}', 'danger'); app.logger.error(f"Error changing maslak for episode {episode_id}: {e}", exc_info=True)
+    return redirect(url_for('view_episode', episode_id=episode_id))
+
 @app.route('/api/update_episode_order', methods=['POST'])
 @login_required
 def update_episode_order():
@@ -282,9 +305,10 @@ def delete_comment(comment_id):
 @app.route('/episode/<int:episode_id>', methods=['GET'])
 @login_required
 def view_episode(episode_id):
-    episode = Episode.query.options(joinedload(Episode.assignees)).get_or_404(episode_id)
+    episode = Episode.query.options(joinedload(Episode.assignees), joinedload(Episode.maslak)).get_or_404(episode_id)
     current_user_is_assigned = any(assignee.id == current_user.id for assignee in episode.assignees)
     all_users = User.query.order_by(User.username).all()
+    all_maslaks = Maslak.query.order_by(Maslak.name).all()
     comments_query = episode.comments.options(subqueryload(Comment.author))
     comments = comments_query.order_by(Comment.block_index, Comment.timestamp).all()
     comments_by_block = {}
@@ -295,7 +319,7 @@ def view_episode(episode_id):
         author_id = comment.author.id if comment.author else None
         comments_by_block[block_idx].append({'id': comment.id, 'text': comment.text, 'author': author_username, 'author_id': author_id, 'timestamp': comment.timestamp.strftime('%Y-%m-%d %H:%M')})
     user_is_admin = hasattr(current_user, 'is_admin') and current_user.is_admin
-    return render_template('episode.html', episode=episode, comments_by_block=comments_by_block, is_assigned=current_user_is_assigned, all_users=all_users, user_is_admin=user_is_admin)
+    return render_template('episode.html', episode=episode, comments_by_block=comments_by_block, is_assigned=current_user_is_assigned, all_users=all_users, all_maslaks=all_maslaks, user_is_admin=user_is_admin)
 
 @app.route('/episode/<int:episode_id>/update', methods=['POST'])
 @login_required
@@ -349,3 +373,4 @@ if __name__ == '__main__':
             print("Database file not found. Creating tables and seeding data...")
             _create_db_and_seed()
     app.run(debug=True)
+

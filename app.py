@@ -70,7 +70,7 @@ def _create_db_and_seed():
             print("Seeding initial users and Maslaks...")
             admin_user = User( username='admin', password=generate_password_hash('adminpassword', method='pbkdf2:sha256'), is_admin=True)
             database.session.add(admin_user)
-            new_users = ['ahmed_a', 'ahmed_s', 'hakim', 'jawhar']
+            new_users = ['ahmed_a', 'ahmed_s', 'hakim', 'jawhar', 'mohamed', 'yassine']
             user_objects = {}
             for username in new_users:
                 password = f"{username}2023"; hashed_password = generate_password_hash(password, method='pbkdf2:sha256')

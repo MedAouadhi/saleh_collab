@@ -26,13 +26,26 @@
                 <ul id="episode-list" class="space-y-4">
                     {% for episode in all_episodes %}
                         {% set current_user_assigned = current_user in episode.assignees %}
+                        {# --- Calculate Maslak Color Class --- #}
+                        {% set color_class = 'maslak-color-default' %} {# Default background #}
+                        {% if episode.maslak %}
+                            {% set color_index = (episode.maslak.id % 6) %} {# Cycle through 6 colors #}
+                            {% set color_class = 'maslak-color-' + color_index|string %}
+                        {% endif %}
+
                         <li data-episode-id="{{ episode.id }}"
-                            class="episode-item border rounded hover:shadow-md transition duration-150 {% if current_user_assigned %} border-r-4 border-r-blue-500 bg-blue-50 {% else %} border-gray-200 {% endif %}">
-                            <div class="p-4 text-right flex items-start justify-between">
-                                {# Drag Handle #}
-                                <span class="drag-handle flex-shrink-0 mr-2" title="اسحب للتغيير الترتيب">⠿</span>
+                            class="episode-item border border-gray-200 rounded-lg shadow-md hover:shadow-xl hover:scale-[1.01] transition-all duration-200 ease-in-out cursor-default
+                                   {{ color_class }} {# Apply calculated Maslak color class #}
+                                   {# --- Conditional Border Styling for assigned --- #}
+                                   {% if current_user_assigned %}
+                                       border-r-4 border-r-blue-600 {# Keep blue border for assigned #}
+                                   {% endif %}">
+                            {# --- Use items-center for better vertical alignment --- #}
+                            <div class="p-4 text-right flex items-center justify-between">
+                                {# Drag Handle - styled slightly larger #}
+                                <span class="drag-handle flex-shrink-0 mr-3 text-lg text-gray-400 hover:text-gray-600" title="اسحب للتغيير الترتيب">⠿</span>
                                 {# Content Div #}
-                                <div class="flex-grow">
+                                <div class="flex-grow mx-2"> {# Added horizontal margin #}
                                     {# Episode Title Link #}
                                     <a href="{{ url_for('view_episode', episode_id=episode.id) }}" class="text-blue-700 hover:text-blue-900 font-semibold text-lg block {% if current_user_assigned %}font-bold{% endif %}">
                                         {{ episode.title }}
@@ -40,13 +53,12 @@
                                             <span class="mr-2 text-xs bg-blue-200 text-blue-800 font-medium px-2 py-0.5 rounded-full align-middle">معينة لك</span>
                                         {% endif %}
                                     </a>
-                                    {# --- NEW: Display Maslak Name --- #}
+                                    {# Display Maslak Name #}
                                     {% if episode.maslak %}
                                     <p class="text-xs text-gray-500 mt-1 mb-2">
                                         <span class="font-semibold">المسلك:</span> {{ episode.maslak.name }}
                                     </p>
                                     {% endif %}
-                                    {# --- End Display Maslak Name --- #}
 
                                     {# Assigned Users #}
                                     <div class="mb-1">
@@ -63,7 +75,7 @@
                                     </div>
                                 </div>
                                 {# Delete Button Div #}
-                                <div class="flex-shrink-0 ml-4">
+                                <div class="flex-shrink-0 ml-2"> {# Adjusted margin side for RTL handle #}
                                     {% if current_user_assigned or current_user.is_admin %}
                                         <form action="{{ url_for('delete_episode', episode_id=episode.id) }}" method="POST" class="delete-episode-form" style="display: inline;">
                                             <button type="submit" class="bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-2 rounded focus:outline-none focus:shadow-outline btn-hover-effect" data-episode-title="{{ episode.title }}"> حذف </button>

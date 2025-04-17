@@ -1,21 +1,22 @@
 {% extends 'base.html' %}
 
-{% block title %}تسجيل الدخول - كاتب السيناريو{% endblock %}
+{# Updated Title #}
+{% block title %}تسجيل الدخول - صالح - الكراسة الحمراء 📕{% endblock %}
 
 {% block content %}
 <div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md mt-10">
     <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">تسجيل الدخول</h2>
     <form method="POST" action="{{ url_for('login') }}">
         <div class="mb-4">
-            <label for="username" class="block text-gray-700 text-sm font-bold mb-2 text-right">اسم المستخدم</label> {# Text align right #}
+            <label for="username" class="block text-gray-700 text-sm font-bold mb-2 text-right">اسم المستخدم</label>
             <input type="text" id="username" name="username" required
-                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 text-right" {# Text align right #}
+                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 text-right"
                    placeholder="أدخل اسم المستخدم الخاص بك">
         </div>
         <div class="mb-6">
-            <label for="password" class="block text-gray-700 text-sm font-bold mb-2 text-right">كلمة المرور</label> {# Text align right #}
+            <label for="password" class="block text-gray-700 text-sm font-bold mb-2 text-right">كلمة المرور</label>
             <input type="password" id="password" name="password" required
-                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" {# Password field directionality is usually handled by browser #}
+                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
                    placeholder="******************">
             </div>
         <div class="flex items-center justify-center">

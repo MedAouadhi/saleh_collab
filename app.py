@@ -72,12 +72,9 @@ def create_db_command(): _create_db_and_seed()
 def _create_db_and_seed():
     """Helper function for database creation and seeding."""
     with app.app_context():
-        # Ensure using the correct db instance tied to the app context
         database = db or current_app.extensions['sqlalchemy'].db
         database.create_all()
         print("Database tables created.")
-
-        # Seed initial data (optional, for demonstration)
         if not User.query.first():
             print("Seeding initial users...")
             # Keep admin user
@@ -87,32 +84,14 @@ def _create_db_and_seed():
                 is_admin=True
             )
             database.session.add(admin_user)
-
             # Add new specified users
-            new_users = ['ahmed_a', 'ahmed_s', 'hakim', 'jawhar', 'mohamed', 'yassine']
+            new_users = ['ahmed_a', 'ahmed_s', 'hakim', 'jawhar']
             for username in new_users:
                 password = f"{username}2023"
                 hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
                 new_user = User(username=username, password=hashed_password, is_admin=False)
                 database.session.add(new_user)
-                print(f"  Added user: {username} (password: {password})") # Log for confirmation
-
-            # --- REMOVED Default Episode Creation ---
-            # ep1 = Episode(...)
-            # ep2 = Episode(...)
-            # ep3 = Episode(...)
-            # database.session.add_all([ep1, ep2, ep3])
-            # database.session.commit() # Commit users and episodes first to get IDs
-
-            # --- REMOVED Default Assignment Creation ---
-            # assign1 = Assignment(...)
-            # ...
-            # database.session.add_all([...])
-
-            # --- REMOVED Default Comment Creation ---
-            # comment1 = Comment(...)
-            # database.session.add(comment1)
-
+                print(f"  Added user: {username} (password: {password})")
             database.session.commit() # Commit users
             print("Initial users seeded. No default episodes/assignments/comments were added.")
         else: print("Database already contains data.")
@@ -150,7 +129,10 @@ class EpisodeAdminView(SecureModelView):
     form_excluded_columns = ('comments', 'assignees')
     column_display_pk = True
 
-admin = Admin(app, name='لوحة تحكم السناريو', template_mode='bootstrap4', url='/admin', index_view=MyAdminIndexView())
+# Initialize Flask-Admin with updated name
+admin = Admin(app, name='صالح - الكراسة الحمراء 📕', template_mode='bootstrap4', url='/admin', index_view=MyAdminIndexView()) # <<< UPDATED NAME
+
+# Add administrative views
 admin.add_view(UserAdminView(User, db.session, name='المستخدمون'))
 admin.add_view(EpisodeAdminView(Episode, db.session, name='الحلقات'))
 # --- End Flask-Admin Setup ---

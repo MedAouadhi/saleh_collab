@@ -1,15 +1,21 @@
-# Collaborative Scenario Writer
+# صالح - الكراسة الحمراء 📕
 
-A Flask web application allowing multiple users to collaborate on writing scenarios for different episodes of an educational mobile app.
+A Flask web application allowing multiple users to collaborate on writing scenarios for different episodes of an educational mobile app. Fully localized in Arabic with RTL support.
 
 ## Features
 
-* User login (basic implementation).
-* Dashboard displaying assigned episodes and other collaborators.
-* Episode page with separate sections for 'Plan' and 'Scenario'.
-* Ability to edit and save Plan and Scenario content.
-* Clickable scenario lines to add and view comments.
-* Modern, responsive frontend using Tailwind CSS.
+* User login (with hashed passwords).
+* Admin panel (`/admin`) for managing Users and Episodes (requires login as 'admin' user).
+* Dashboard displaying all episodes, highlighting assigned ones.
+* Episode page with separate, toggleable View/Edit sections for 'Plan' and 'Scenario'.
+* Markdown support for Plan and Scenario content.
+* Block-based commenting on the Scenario section.
+* Ability for users/admins to assign users to episodes.
+* Ability for users to unassign themselves.
+* Ability for comment authors and admins to delete comments.
+* Ability for assigned users and admins to delete episodes (from dashboard or admin panel).
+* Server-side PDF export for Plan and Scenario content.
+* Arabic interface with RTL layout.
 
 ## Project Structure
 
@@ -36,74 +42,65 @@ collaborative-scenario-writer/
 
 ## Setup and Installation
 
-1.  **Clone the Repository:**
+1.  **Prerequisites (for PDF Export):**
+    * Install WeasyPrint system dependencies. This varies by OS:
+        * **Debian/Ubuntu:** `sudo apt-get update && sudo apt-get install libpango-1.0-0 libcairo2 libpangoft2-1.0-0 libgdk-pixbuf2.0-0 libffi-dev shared-mime-info`
+        * **macOS (Homebrew):** `brew install pango cairo libffi gdk-pixbuf`
+        * **Windows:** See WeasyPrint documentation for installing GTK+ dependencies.
+
+2.  **Clone the Repository:**
     ```bash
     git clone <your-repository-url> # Or download the files
     cd collaborative-scenario-writer
     ```
 
-2.  **Create a Virtual Environment:**
-    It's highly recommended to use a virtual environment to manage dependencies.
+3.  **Create a Virtual Environment:**
     ```bash
     python -m venv venv
+    # Activate:
+    # Windows: .\venv\Scripts\activate
+    # macOS/Linux: source venv/bin/activate
     ```
-    Activate the environment:
-    * Windows: `.\venv\Scripts\activate`
-    * macOS/Linux: `source venv/bin/activate`
 
-3.  **Install Dependencies:**
+4.  **Install Python Dependencies:**
     ```bash
     pip install -r requirements.txt
     ```
 
-4.  **Create a `.env` file:** (Optional but recommended for `SECRET_KEY`)
+5.  **Create a `.env` file:** (Optional but recommended for `SECRET_KEY`)
     Create a file named `.env` in the project root directory and add a secret key:
     ```
     SECRET_KEY='a_very_strong_and_random_secret_key_please_change_me'
-    # Replace with a real random key (e.g., generated using os.urandom(24).hex())
     ```
 
-5.  **Initialize the Database:**
+6.  **Initialize/Recreate the Database:**
+    **(Important: If you previously had an `instance/app.db` file, delete it first to apply new seeding/model changes).**
     Run the following command in your terminal (make sure your virtual environment is active):
     ```bash
     flask create-db
     ```
-    This will create the `instance/app.db` SQLite database file, create the necessary tables, and seed some initial user and episode data for demonstration purposes (users: alice/password1, bob/password2, charlie/password3).
+    This will create the `instance/app.db` SQLite database file, create the necessary tables, and seed the initial users (`admin`, `ahmed_a`, `ahmed_s`, `hakim`, `jawhar`) with hashed passwords.
 
 ## Running the Application
 
-1.  **Make sure your virtual environment is activated.**
-
-2.  **Run the Flask development server:**
+1.  Make sure your virtual environment is activated.
+2.  Run the Flask development server:
     ```bash
     flask run
+    # Or: python app.py
     ```
-    Or, you can run the `app.py` script directly (which also calls `flask run` with debug mode):
-    ```bash
-    python app.py
-    ```
-
-3.  **Access the Application:**
-    Open your web browser and navigate to `http://127.0.0.1:5000` (or the address provided in the terminal output).
-
+3.  Access the Application: Open `http://127.0.0.1:5000`.
 4.  **Login:**
-    Use one of the seeded usernames and passwords (e.g., `alice` / `password1`).
+    * Admin: `admin` / `adminpassword`
+    * Normal Users: e.g., `ahmed_a` / `ahmed_a2023`
+5.  **Access Admin Panel:** Log in as `admin` and go to `http://127.0.0.1:5000/admin`.
 
 ## Development Notes
 
-* **Authentication:** The current implementation uses plain text passwords for demonstration ONLY. **Never use this in production.** Implement proper password hashing (e.g., using `werkzeug.security.generate_password_hash` and `check_password_hash`) and a more robust user management system.
-* **Real-time Collaboration:** For true real-time updates (seeing changes and comments instantly without refreshing), consider integrating Flask-SocketIO.
-* **Commenting:** The current comment system links comments to line numbers. If the scenario text is heavily edited, the line numbers might shift, potentially misaligning comments. More robust solutions might involve anchoring comments to specific text content or using differential synchronization libraries.
-* **Error Handling:** Basic error handling is included, but more comprehensive logging and user feedback can be added.
-* **Styling:** Tailwind CSS is used via CDN. For production, consider setting up a build process to bundle and purge unused styles. Custom CSS can be added in `static/css/style.css`.
-* **Database:** SQLite is used for simplicity. For production, switch to a more robust database like PostgreSQL or MySQL and update the `SQLALCHEMY_DATABASE_URI` configuration.
+* **Authentication:** Uses Flask-Login with password hashing (pbkdf2:sha256).
+* **Authorization:** Basic admin check via `is_admin` flag on User model. Episode/comment actions check assignment or ownership.
+* **Admin:** Uses Flask-Admin with basic customization and access control.
+* **PDF Export:** Uses WeasyPrint server-side. Requires system dependencies. PDF styling is basic and defined in `app.py`.
+* **Frontend:** Uses Tailwind CSS (via CDN), Alpine.js (via CDN), Marked.js (via CDN), custom JavaScript (`static/js/script.js`).
+* **Language/Direction:** Set to Arabic / RTL. Styling uses Tailwind's RTL modifiers where possible, with some CSS overrides.
 
-## Future Enhancements
-
-* Implement real-time updates using WebSockets (Flask-SocketIO).
-* Add user roles and permissions.
-* Improve comment anchoring to handle text edits more robustly.
-* Add features for episode creation, deletion, and user assignment via the UI.
-* Implement proper password hashing and user registration.
-* Add notifications for new comments or updates.
-* Enhance microanimations and UI polish.

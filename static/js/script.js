@@ -1,4 +1,4 @@
-// static/js/script.js (Arabic Version - Inline Title Edit)
+// static/js/script.js (Arabic Version - Auto-Submit Filters)
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log('DOM fully loaded and parsed - Main script.js running.');
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const commentStatus = document.getElementById('comment-status');
   const noCommentsMsg = document.getElementById('no-comments-msg');
 
-  // --- NEW: Title Edit Elements ---
+  // Title Edit Elements
   const episodeTitleDisplay = document.getElementById('episode-title-display');
   const editTitleBtn = document.getElementById('edit-title-btn');
   const titleEditArea = document.getElementById('title-edit-area');
@@ -59,17 +59,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const saveTitleBtn = document.getElementById('save-title-btn');
   const cancelTitleBtn = document.getElementById('cancel-title-btn');
   const titleStatus = document.getElementById('title-status');
-  let originalTitle = episodeTitleDisplay ? episodeTitleDisplay.textContent :
-                                            '';  // Store original title
+  let originalTitle =
+      episodeTitleDisplay ? episodeTitleDisplay.textContent : '';
 
   // Dashboard Elements
   const episodeList = document.getElementById('episode-list');
+  // --- NEW: Filter Form Elements ---
+  const filterForm = document.getElementById('filter-form');
+  const filterMaslakSelect = document.getElementById('filter_maslak_id');
+  const filterStatusSelect = document.getElementById('filter_status');
+
 
   let currentEditingBlock = null;
 
   // --- Initialize SortableJS on Dashboard ---
   if (episodeList && typeof Sortable !== 'undefined') {
-    // ... (SortableJS init remains the same) ...
     console.log('Initializing SortableJS for episode list.');
     new Sortable(episodeList, {
       animation: 150,
@@ -78,19 +82,28 @@ document.addEventListener('DOMContentLoaded', () => {
       handle: '.drag-handle',
       onEnd: function(evt) {
         const items = evt.target.querySelectorAll('.episode-item');
-        const orderedIds = [];
-        items.forEach(item => {
-          const episodeId = item.dataset.episodeId;
-          if (episodeId) {
-            orderedIds.push(episodeId);
-          }
-        });
+        const orderedIds = Array.from(items)
+                               .map(item => item.dataset.episodeId)
+                               .filter(id => id);
         console.log('New episode order:', orderedIds);
         saveEpisodeOrder(orderedIds);
       },
     });
   } else if (episodeList) {
     console.warn('SortableJS library not found, drag-and-drop disabled.');
+  }
+
+  // --- NEW: Initialize Auto-Submit Filters on Dashboard ---
+  if (filterForm && filterMaslakSelect && filterStatusSelect) {
+    console.log('Initializing auto-submit for filters.');
+    filterMaslakSelect.addEventListener('change', () => {
+      console.log('Maslak filter changed, submitting form.');
+      filterForm.submit();
+    });
+    filterStatusSelect.addEventListener('change', () => {
+      console.log('Status filter changed, submitting form.');
+      filterForm.submit();
+    });
   }
 
   // Function to save the new order via fetch
@@ -130,14 +143,11 @@ document.addEventListener('DOMContentLoaded', () => {
       renderScenario(INITIAL_SCENARIO);
     if (typeof INITIAL_COMMENTS_BY_BLOCK !== 'undefined')
       renderComments(INITIAL_COMMENTS_BY_BLOCK);
-
-    // Initial view modes
     if (planEditorWrapper) planEditorWrapper.classList.add('hidden');
     if (planDisplay) planDisplay.classList.remove('hidden');
     if (scenarioEditorWrapper) scenarioEditorWrapper.classList.add('hidden');
     if (scenarioDisplay) scenarioDisplay.classList.remove('hidden');
     if (commentInstruction) commentInstruction.style.display = 'block';
-
 
     // --- Event Listeners ---
     // ... (Save Plan/Scenario, Plan/Scenario Toggles remain the same) ...
@@ -212,33 +222,25 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-
-    // --- NEW: Title Edit Listeners ---
+    // --- Title Edit Listeners ---
     if (editTitleBtn && titleEditArea && episodeTitleDisplay && titleInput &&
         saveTitleBtn && cancelTitleBtn) {
       editTitleBtn.addEventListener('click', () => {
-        // Store original title in case of cancel
         originalTitle = episodeTitleDisplay.textContent;
-        titleInput.value = originalTitle;  // Set input value
-        // Hide display, show edit area
+        titleInput.value = originalTitle;
         episodeTitleDisplay.classList.add('hidden');
         editTitleBtn.classList.add('hidden');
         titleEditArea.classList.remove('hidden');
-        titleInput.focus();            // Focus the input field
-        titleInput.select();           // Select the text
-        titleStatus.textContent = '';  // Clear status
+        titleInput.focus();
+        titleInput.select();
+        titleStatus.textContent = '';
       });
-
       cancelTitleBtn.addEventListener('click', () => {
-        // Hide edit area, show display
         titleEditArea.classList.add('hidden');
         episodeTitleDisplay.classList.remove('hidden');
         editTitleBtn.classList.remove('hidden');
-        titleStatus.textContent = '';  // Clear status
-        // Optional: Reset input value to original
-        // titleInput.value = originalTitle;
+        titleStatus.textContent = '';
       });
-
       saveTitleBtn.addEventListener('click', async () => {
         const newTitle = titleInput.value.trim();
         if (!newTitle) {
@@ -247,49 +249,35 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
         if (newTitle === originalTitle) {
-          // No change, just cancel edit mode
           cancelTitleBtn.click();
           return;
         }
-
         titleStatus.textContent = 'جارٍ الحفظ...';
         titleStatus.className = 'text-sm text-gray-500 mr-2';
         saveTitleBtn.disabled = true;
         cancelTitleBtn.disabled = true;
-
         try {
           const response =
               await fetch(`/api/episode/${EPISODE_ID}/update_title`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
-                  // Add CSRF token header if needed
                 },
                 body: JSON.stringify({new_title: newTitle})
               });
           const data = await response.json();
-
           if (!response.ok || !data.success) {
             throw new Error(data.message || 'فشل تحديث العنوان');
           }
-
-          // Success
-          episodeTitleDisplay.textContent =
-              data.new_title;  // Update displayed title
-          document.title =
-              `${data.new_title} - صالح - الكراسة الحمراء 📕`;  // Update page
-                                                                // title
-          originalTitle = data.new_title;  // Update original title tracking
+          episodeTitleDisplay.textContent = data.new_title;
+          document.title = `${data.new_title} - صالح - الكراسة الحمراء 📕`;
+          originalTitle = data.new_title;
           titleStatus.textContent = 'تم الحفظ!';
           titleStatus.className = 'text-sm text-green-600 mr-2';
-          // Hide edit area, show display
           titleEditArea.classList.add('hidden');
           episodeTitleDisplay.classList.remove('hidden');
           editTitleBtn.classList.remove('hidden');
-          setTimeout(
-              () => titleStatus.textContent = '',
-              3000);  // Clear status after 3s
-
+          setTimeout(() => titleStatus.textContent = '', 3000);
         } catch (error) {
           console.error('Error saving title:', error);
           titleStatus.textContent = `خطأ: ${error.message}`;
@@ -300,10 +288,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }
-    // --- End Title Edit Listeners ---
 
-
-    // --- Commenting Logic (Scenario Display Click, Submit, Cancel, Delete) ---
+    // --- Commenting Logic ---
     // ... (Existing commenting logic remains here, unchanged) ...
     if (IS_ASSIGNED && scenarioDisplay) {
       scenarioDisplay.addEventListener('click', (event) => {
@@ -340,11 +326,6 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(data => {
               if (data.success && data.comment) {
                 addCommentToDisplay(data.comment);
-                const blockElement = scenarioDisplay.querySelector(
-                    `.commentable-block[data-block-index="${blockIndex}"]`);
-                if (blockElement) {
-                  blockElement.classList.add('highlighted-comment-block');
-                }
                 closeCommentForm();
               } else {
                 commentStatus.textContent =
@@ -421,10 +402,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- Helper Functions ---
-    // ... (saveContent, renderPlanMarkdown, renderScenario, renderComments,
-    // addCommentToDisplay, createCommentElement, clearCommentsDisplay,
-    // openCommentForm, closeCommentForm remain the same) ...
-    async function saveContent(type, content, statusElement) { /* ... */
+    async function saveContent(
+        type, content, statusElement) { /* ... unchanged ... */
       statusElement.textContent = 'جارٍ الحفظ...';
       statusElement.classList.remove('text-green-600', 'text-red-600');
       statusElement.classList.add('text-gray-500');
@@ -459,7 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return false;
       }
     }
-    function renderPlanMarkdown(planText) { /* ... */
+    function renderPlanMarkdown(planText) { /* ... unchanged ... */
       if (!planDisplay || typeof marked === 'undefined') {
         console.error('Plan display area not found or Marked.js not loaded.');
         return;
@@ -473,7 +452,7 @@ document.addEventListener('DOMContentLoaded', () => {
         planDisplay.textContent = planText;
       }
     }
-    function renderScenario(scenarioText) { /* ... */
+    function renderScenario(scenarioText) { /* ... unchanged ... */
       if (!scenarioDisplay || typeof marked === 'undefined') {
         console.error(
             'Scenario display area not found or Marked.js not loaded.');
@@ -515,7 +494,7 @@ document.addEventListener('DOMContentLoaded', () => {
         scenarioDisplay.textContent = scenarioText;
       }
     }
-    function renderComments(commentsByBlock) { /* ... */
+    function renderComments(commentsByBlock) { /* ... unchanged ... */
       if (!commentDisplayArea) return;
       clearCommentsDisplay();
       let hasAnyComments = false;
@@ -555,7 +534,7 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log(
           `Rendered comments by block. Has comments: ${hasAnyComments}`);
     }
-    function addCommentToDisplay(comment) { /* ... */
+    function addCommentToDisplay(comment) { /* ... unchanged ... */
       if (!commentDisplayArea || comment.block_index === undefined) return;
       if (noCommentsMsg && noCommentsMsg.style.display !== 'none') {
         noCommentsMsg.style.display = 'none';
@@ -602,7 +581,7 @@ document.addEventListener('DOMContentLoaded', () => {
       commentElement.classList.add('comment-item');
       blockCommentsContainer.appendChild(commentElement);
     }
-    function createCommentElement(comment) { /* ... */
+    function createCommentElement(comment) { /* ... unchanged ... */
       const div = document.createElement('div');
       div.classList.add(
           'comment-item', 'bg-gray-50', 'p-2', 'rounded', 'text-sm', 'mb-1',
@@ -621,7 +600,7 @@ document.addEventListener('DOMContentLoaded', () => {
           comment.author}</span> - ${comment.timestamp} </p> `;
       return div;
     }
-    function clearCommentsDisplay() { /* ... */
+    function clearCommentsDisplay() { /* ... unchanged ... */
       if (commentDisplayArea) {
         const groups = commentDisplayArea.querySelectorAll('.comment-group');
         groups.forEach(group => group.remove());
@@ -636,7 +615,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     }
-    function openCommentForm(blockIndex) { /* ... */
+    function openCommentForm(blockIndex) { /* ... unchanged ... */
       currentEditingBlock = blockIndex;
       if (commentBlockIndexSpan)
         commentBlockIndexSpan.textContent = blockIndex + 1;
@@ -646,7 +625,7 @@ document.addEventListener('DOMContentLoaded', () => {
       commentText.focus();
       console.log(`Opened comment form for block index ${blockIndex}`);
     }
-    function closeCommentForm() { /* ... */
+    function closeCommentForm() { /* ... unchanged ... */
       commentFormContainer.classList.add('hidden');
       currentEditingBlock = null;
       commentText.value = '';

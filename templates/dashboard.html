@@ -7,124 +7,66 @@
 
     <div class="md:col-span-2 space-y-6">
 
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2 text-right">📊 نظرة عامة على التقدم</h2>
-            {# Adjusted grid columns for fewer items #}
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-                {# Total Episodes #}
-                <div class="p-3 bg-gray-50 rounded sm:col-span-1"> {# Span 1 column #}
-                    <div class="text-2xl font-bold text-indigo-600">{{ metrics.total_episodes or 0 }}</div>
-                    <div class="text-sm text-gray-500 mt-1">إجمالي الحلقات</div>
+        {# ... (remains same) ... #}
+        <div class="bg-white p-6 rounded-lg shadow-md"> <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2 text-right">📊 نظرة عامة على التقدم</h2> <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center"> <div class="p-3 bg-gray-50 rounded sm:col-span-1"> <div class="text-2xl font-bold text-indigo-600">{{ metrics.total_episodes or 0 }}</div> <div class="text-sm text-gray-500 mt-1">إجمالي الحلقات (بالعرض الحالي)</div> </div> <div class="p-3 bg-gray-100 rounded sm:col-span-1"> <div class="text-2xl font-bold text-gray-700">{{ metrics.draft_episodes or 0 }}</div> <div class="text-sm text-gray-500 mt-1">لم يبدأ</div> </div> <div class="p-3 bg-yellow-100 rounded sm:col-span-1"> <div class="text-2xl font-bold text-yellow-800">{{ metrics.review_episodes or 0 }}</div> <div class="text-sm text-yellow-600 mt-1">للمراجعة</div> </div> <div class="p-3 bg-green-100 rounded sm:col-span-1"> <div class="text-2xl font-bold text-green-800">{{ metrics.complete_episodes or 0 }}</div> <div class="text-sm text-green-600 mt-1">مكتمل</div> </div> </div> </div>
+
+        {# ... (remains same) ... #}
+         <div class="bg-white p-6 rounded-lg shadow-md"> <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2 text-right">إنشاء حلقة جديدة</h2> <form action="{{ url_for('create_episode') }}" method="POST" class="space-y-3"> <div> <label for="maslak_id" class="block text-sm font-medium text-gray-700 text-right">اختر المسلك <span class="text-red-500">*</span></label> <select name="maslak_id" id="maslak_id" required class="mt-1 block w-full shadow-sm border border-gray-300 rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-transparent transition duration-200"> <option value="" disabled selected>-- اختر مسلك --</option> {% for maslak in all_maslaks %} <option value="{{ maslak.id }}">{{ maslak.name }}</option> {% else %} <option value="" disabled>لا توجد مسالك، يرجى إضافتها من لوحة التحكم.</option> {% endfor %} </select> </div> <div> <label for="title" class="block text-sm font-medium text-gray-700 text-right">عنوان الحلقة <span class="text-red-500">*</span></label> <input type="text" name="title" id="title" required class="mt-1 w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 text-right" placeholder="أدخل عنوان الحلقة الجديدة..."> </div> <div> <button type="submit" class="w-full md:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline btn-hover-effect whitespace-nowrap flex-shrink-0"> إنشاء حلقة </button> </div> </form> </div>
+
+        <div class="bg-white p-4 rounded-lg shadow-md">
+             {# --- ADDED id="filter-form" --- #}
+            <form method="GET" action="{{ url_for('dashboard') }}" id="filter-form" class="flex flex-col sm:flex-row sm:items-end gap-4">
+                {# Maslak Filter Dropdown #}
+                <div class="flex-grow">
+                    <label for="filter_maslak_id" class="block text-sm font-medium text-gray-700 text-right mb-1">تصفية حسب المسلك:</label>
+                    <select name="maslak" id="filter_maslak_id"
+                            class="filter-select block w-full shadow-sm border border-gray-300 rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-transparent transition duration-200"> {# Added filter-select class #}
+                        <option value="">-- الكل --</option>
+                        {% for maslak in all_maslaks %}
+                            <option value="{{ maslak.id }}" {% if selected_maslak_id == maslak.id %}selected{% endif %}>
+                                {{ maslak.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
                 </div>
-                 {# Draft Status #}
-                <div class="p-3 bg-gray-100 rounded sm:col-span-1"> {# status-draft color #}
-                    <div class="text-2xl font-bold text-gray-700">{{ metrics.draft_episodes or 0 }}</div>
-                    <div class="text-sm text-gray-500 mt-1">لم يبدأ</div>
+                {# Status Filter Dropdown #}
+                <div class="flex-grow">
+                     <label for="filter_status" class="block text-sm font-medium text-gray-700 text-right mb-1">تصفية حسب الحالة:</label>
+                     <select name="status" id="filter_status"
+                             class="filter-select block w-full shadow-sm border border-gray-300 rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-transparent transition duration-200"> {# Added filter-select class #}
+                         <option value="">-- كل الحالات --</option>
+                         {% for status_value, status_display in status_filter_options %}
+                             <option value="{{ status_value }}" {% if selected_status == status_value %}selected{% endif %}>
+                                 {{ status_display }}
+                             </option>
+                         {% endfor %}
+                     </select>
                 </div>
-                 {# Review Status #}
-                 <div class="p-3 bg-yellow-100 rounded sm:col-span-1"> {# status-review color #}
-                    <div class="text-2xl font-bold text-yellow-800">{{ metrics.review_episodes or 0 }}</div>
-                    <div class="text-sm text-yellow-600 mt-1">للمراجعة</div>
+                 {# Clear Button Only #}
+                <div class="flex items-center flex-shrink-0">
+                     {# --- REMOVED Filter Button --- #}
+                    {# <button type="submit" class="...">تصفية</button> #}
+                    <a href="{{ url_for('dashboard') }}" class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline btn-hover-effect no-underline w-full sm:w-auto">
+                        مسح الفلاتر
+                    </a>
                 </div>
-                 {# Complete Status #}
-                 <div class="p-3 bg-green-100 rounded sm:col-span-1"> {# status-complete color #}
-                    <div class="text-2xl font-bold text-green-800">{{ metrics.complete_episodes or 0 }}</div>
-                    <div class="text-sm text-green-600 mt-1">مكتمل</div>
-                </div>
-                {# Removed Total Maslaks and Total Comments divs #}
-            </div>
+            </form>
         </div>
-        <div class="bg-white p-6 rounded-lg shadow-md"> <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2 text-right">إنشاء حلقة جديدة</h2> <form action="{{ url_for('create_episode') }}" method="POST" class="space-y-3"> <div> <label for="maslak_id" class="block text-sm font-medium text-gray-700 text-right">اختر المسلك <span class="text-red-500">*</span></label> <select name="maslak_id" id="maslak_id" required class="mt-1 block w-full shadow-sm border border-gray-300 rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-transparent transition duration-200"> <option value="" disabled selected>-- اختر مسلك --</option> {% for maslak in all_maslaks %} <option value="{{ maslak.id }}">{{ maslak.name }}</option> {% else %} <option value="" disabled>لا توجد مسالك، يرجى إضافتها من لوحة التحكم.</option> {% endfor %} </select> </div> <div> <label for="title" class="block text-sm font-medium text-gray-700 text-right">عنوان الحلقة <span class="text-red-500">*</span></label> <input type="text" name="title" id="title" required class="mt-1 w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 text-right" placeholder="أدخل عنوان الحلقة الجديدة..."> </div> <div> <button type="submit" class="w-full md:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline btn-hover-effect whitespace-nowrap flex-shrink-0"> إنشاء حلقة </button> </div> </form> </div>
-
-        <div class="bg-white p-4 rounded-lg shadow-md"> <h3 class="text-lg font-semibold text-gray-700 mb-3 text-right">تصفية حسب المسلك:</h3> <div class="flex flex-wrap gap-2 justify-end"> <a href="{{ url_for('dashboard') }}" class="px-3 py-1 text-sm rounded font-medium transition duration-150 ease-in-out {% if selected_maslak_id is none %} bg-indigo-600 text-white shadow-sm {% else %} bg-gray-200 text-gray-700 hover:bg-gray-300 {% endif %}"> الكل </a> {% for maslak in all_maslaks %} <a href="{{ url_for('dashboard', maslak=maslak.id) }}" class="px-3 py-1 text-sm rounded font-medium transition duration-150 ease-in-out {% if selected_maslak_id == maslak.id %} bg-indigo-600 text-white shadow-sm {% else %} bg-gray-200 text-gray-700 hover:bg-gray-300 {% endif %}"> {{ maslak.name }} </a> {% endfor %} </div> </div>
-
-
         <div class="bg-white p-6 rounded-lg shadow-md">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2 text-right">
-                {% if selected_maslak_id %}
-                    حلقات المسلك المحدد
-                {% else %}
-                    جميع الحلقات
-                {% endif %}
-            </h2>
+             {# ... (Heading remains same) ... #}
+             <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2 text-right"> {% if selected_maslak_id %} حلقات المسلك المحدد {% else %} جميع الحلقات {% endif %} {% if selected_status %} ({{ selected_status }}) {% endif %} </h2>
+
             {% if all_episodes %}
                 <ul id="episode-list" class="space-y-4">
                     {% for episode in all_episodes %}
-                        {% set current_user_assigned = current_user in episode.assignees %}
-                        {# Determine Status Class #}
-                        {% set status_class = 'status-default' %}
-                        {% if episode.status == 'لم يبدأ' %}
-                            {% set status_class = 'status-draft' %}
-                        {% elif episode.status == 'للمراجعة' %}
-                            {% set status_class = 'status-review' %}
-                        {% elif episode.status == 'مكتمل' %}
-                            {% set status_class = 'status-complete' %}
-                        {% endif %}
-
-                        <li data-episode-id="{{ episode.id }}"
-                            class="episode-item border border-gray-200 rounded-lg shadow-md hover:shadow-xl hover:scale-[1.01] transition-all duration-200 ease-in-out cursor-default
-                                   {{ status_class }} {# Apply status background class #}
-                                   {% if current_user_assigned %}
-                                       border-r-4 border-r-blue-600 {# Keep blue border for assigned #}
-                                   {% endif %}">
-                            <div class="p-4 text-right flex items-center justify-between">
-                                {# Drag Handle #}
-                                <span class="drag-handle flex-shrink-0 mr-3 text-lg text-gray-400 hover:text-gray-600" title="اسحب للتغيير الترتيب">⠿</span>
-                                {# Content Div #}
-                                <div class="flex-grow mx-2">
-                                    {# Episode Title Link #}
-                                    <a href="{{ url_for('view_episode', episode_id=episode.id) }}" class="text-blue-700 hover:text-blue-900 font-semibold text-lg block {% if current_user_assigned %}font-bold{% endif %}">
-                                        {{ episode.title }}
-                                        {# Show Status Badge #}
-                                        <span class="mr-2 text-xs font-medium px-2 py-0.5 rounded-full align-middle
-                                            {% if episode.status == 'لم يبدأ' %} bg-gray-200 text-gray-600
-                                            {% elif episode.status == 'للمراجعة' %} bg-yellow-200 text-yellow-800
-                                            {% elif episode.status == 'مكتمل' %} bg-green-200 text-green-800
-                                            {% else %} bg-gray-200 text-gray-600 {% endif %}">
-                                            {{ episode.status }}
-                                        </span>
-                                        {% if current_user_assigned %}
-                                            <span class="mr-1 text-xs bg-blue-200 text-blue-800 font-medium px-2 py-0.5 rounded-full align-middle">معينة لك</span>
-                                        {% endif %}
-                                    </a>
-                                    {# Display Maslak Name #}
-                                    {% if episode.maslak %}
-                                    <p class="text-xs text-gray-500 mt-1 mb-2">
-                                        <span class="font-semibold">المسلك:</span> {{ episode.maslak.name }}
-                                    </p>
-                                    {% endif %}
-                                    {# Assigned Users #}
-                                    <div class="mb-1">
-                                        <p class="text-sm font-medium text-gray-600">المستخدمون المعينون:</p>
-                                        {% if episode.assignees %}
-                                            <div class="flex flex-wrap gap-1 mt-1 justify-start">
-                                                {% for user in episode.assignees %}
-                                                    <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded"> {{ user.username }} </span>
-                                                {% endfor %}
-                                            </div>
-                                        {% else %}
-                                            <p class="text-sm text-gray-500 italic mt-1">لا يوجد مستخدمون معينون بعد.</p>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                {# Delete Button Div #}
-                                <div class="flex-shrink-0 ml-2">
-                                    {% if current_user_assigned or current_user.is_admin %}
-                                        <form action="{{ url_for('delete_episode', episode_id=episode.id) }}" method="POST" class="delete-episode-form" style="display: inline;">
-                                            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-2 rounded focus:outline-none focus:shadow-outline btn-hover-effect" data-episode-title="{{ episode.title }}"> حذف </button>
-                                        </form>
-                                    {% else %}
-                                         <div class="w-10"></div> {# Placeholder #}
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </li>
+                        {# ... (li element and content remains the same) ... #}
+                         {% set current_user_assigned = current_user in episode.assignees %} {% set status_class = 'status-default' %} {% if episode.status == 'لم يبدأ' %} {% set status_class = 'status-draft' %} {% elif episode.status == 'للمراجعة' %} {% set status_class = 'status-review' %} {% elif episode.status == 'مكتمل' %} {% set status_class = 'status-complete' %} {% endif %} <li data-episode-id="{{ episode.id }}" class="episode-item border border-gray-200 rounded-lg shadow-md hover:shadow-xl hover:scale-[1.01] transition-all duration-200 ease-in-out cursor-default {{ status_class }} {% if current_user_assigned %} border-r-4 border-r-blue-600 {% endif %}"> <div class="p-4 text-right flex items-center justify-between"> <span class="drag-handle flex-shrink-0 mr-3 text-lg text-gray-400 hover:text-gray-600" title="اسحب للتغيير الترتيب">⠿</span> <div class="flex-grow mx-2"> <a href="{{ url_for('view_episode', episode_id=episode.id) }}" class="text-blue-700 hover:text-blue-900 font-semibold text-lg block {% if current_user_assigned %}font-bold{% endif %}"> {{ episode.title }} <span class="mr-2 text-xs font-medium px-2 py-0.5 rounded-full align-middle {% if episode.status == 'لم يبدأ' %} bg-gray-200 text-gray-600 {% elif episode.status == 'للمراجعة' %} bg-yellow-200 text-yellow-800 {% elif episode.status == 'مكتمل' %} bg-green-200 text-green-800 {% else %} bg-gray-200 text-gray-600 {% endif %}"> {{ episode.status }} </span> {% if current_user_assigned %} <span class="mr-1 text-xs bg-blue-200 text-blue-800 font-medium px-2 py-0.5 rounded-full align-middle">معينة لك</span> {% endif %} </a> {% if episode.maslak %} <p class="text-xs text-gray-500 mt-1 mb-2"> <span class="font-semibold">المسلك:</span> {{ episode.maslak.name }} </p> {% endif %} <div class="mb-1"> <p class="text-sm font-medium text-gray-600">المستخدمون المعينون:</p> {% if episode.assignees %} <div class="flex flex-wrap gap-1 mt-1 justify-start"> {% for user in episode.assignees %} <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded"> {{ user.username }} </span> {% endfor %} </div> {% else %} <p class="text-sm text-gray-500 italic mt-1">لا يوجد مستخدمون معينون بعد.</p> {% endif %} </div> </div> <div class="flex-shrink-0 ml-2"> {% if current_user_assigned or current_user.is_admin %} <form action="{{ url_for('delete_episode', episode_id=episode.id) }}" method="POST" class="delete-episode-form" style="display: inline;"> <button type="submit" class="bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-2 rounded focus:outline-none focus:shadow-outline btn-hover-effect" data-episode-title="{{ episode.title }}"> حذف </button> </form> {% else %} <div class="w-10"></div> {% endif %} </div> </div> </li>
                     {% endfor %}
                 </ul>
             {% else %}
                 <p class="text-gray-600 text-right">
-                    {% if selected_maslak_id %}
-                        لا توجد حلقات في هذا المسلك.
+                    {% if selected_maslak_id or selected_status %}
+                        لا توجد حلقات تطابق معايير التصفية المحددة.
                     {% else %}
                         لم يتم إنشاء أي حلقات بعد.
                     {% endif %}
@@ -134,6 +76,7 @@
 
     </div>
 
+    {# ... (remains same) ... #}
     <div class="md:col-span-1 bg-white p-6 rounded-lg shadow-md"> <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2 text-right">المتعاونون</h2> {% if collaborators %} <ul class="space-y-4"> {% for collaborator in collaborators %} <li class="border-r-4 border-r-indigo-300 pr-3 text-right"> <p class="font-medium text-gray-700">{{ collaborator.username }}</p> </li> {% endfor %} </ul> {% else %} <p class="text-gray-600 text-right">لم يتم العثور على متعاونين آخرين.</p> {% endif %} </div>
 
 </div>

@@ -8,18 +8,22 @@ from flask import (Flask, render_template, request, redirect, url_for, flash,
                    jsonify, session, abort, current_app, send_file)
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-# Import models including Maslak
-from models import db, User, Episode, Assignment, Comment, Maslak
+# Import models including Maslak and Status Constants
+from models import (db, User, Episode, Assignment, Comment, Maslak,
+                    EPISODE_STATUS_DRAFT, EPISODE_STATUS_REVIEW, EPISODE_STATUS_COMPLETE,
+                    EPISODE_STATUS_CHOICES) # <<< Import Choices
 from dotenv import load_dotenv
 from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_admin import Admin, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField
+# Updated WTForms imports
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField
 from wtforms.validators import DataRequired, EqualTo, Length, Optional
 import markdown
 from weasyprint import HTML, CSS
+from flask_migrate import Migrate # Keep Migrate import
 
 # Load environment variables
 load_dotenv()
@@ -37,6 +41,7 @@ app.config['FLASK_ADMIN_SWATCH'] = 'cerulean'
 
 # --- Extensions Initialization ---
 db.init_app(app)
+migrate = Migrate(app, db) # Keep Migrate init
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -85,6 +90,7 @@ def _create_db_and_seed():
             print(f"Initial users (admin + {len(new_users)}) and Maslaks seeded.")
         else: print("Database already contains data.")
 
+
 # --- Custom Admin Forms ---
 class UserForm(FlaskForm):
     username = StringField('اسم المستخدم', validators=[DataRequired(), Length(min=3, max=80)])
@@ -116,13 +122,24 @@ class UserAdminView(SecureModelView):
         elif is_created and not model.password: flash('كلمة المرور مطلوبة للمستخدمين الجدد.', 'error'); raise ValueError("Password required")
 
 class EpisodeAdminView(SecureModelView):
-    column_list = ('id', 'title', 'maslak', 'display_order', 'last_updated', 'assignees')
-    column_searchable_list = ('title', 'plan', 'scenario', 'maslak.name')
-    column_filters = ('maslak',)
-    form_columns = ('title', 'maslak', 'plan', 'scenario', 'display_order')
+    column_list = ('id', 'title', 'maslak', 'status', 'display_order', 'last_updated', 'assignees')
+    column_searchable_list = ('title', 'plan', 'scenario', 'maslak.name', 'status') # Added status
+    column_filters = ('maslak', 'status')
+    form_columns = ('title', 'maslak', 'status', 'plan', 'scenario', 'display_order')
     form_excluded_columns = ('comments', 'assignees')
     column_display_pk = True
-    column_sortable_list = ('id', 'title', 'maslak.name', 'last_updated', 'display_order')
+    column_sortable_list = ('id', 'title', 'maslak.name', 'status', 'last_updated', 'display_order')
+
+    # Configure Status Field as Dropdown
+    form_overrides = {
+        'status': SelectField
+    }
+    form_args = {
+        'status': {
+            'label': 'الحالة',
+            'choices': EPISODE_STATUS_CHOICES # Use choices defined in models.py
+        }
+    }
 
 class MaslakAdminView(SecureModelView):
     form = MaslakForm
@@ -138,7 +155,7 @@ admin.add_view(MaslakAdminView(Maslak, db.session, name='المسالك'))
 # --- End Flask-Admin Setup ---
 
 # --- Routes ---
-# ... (Login, Logout, Dashboard, Test routes remain the same) ...
+# ... (Login, Logout, Test routes remain the same) ...
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated: return redirect(url_for('dashboard'))
@@ -166,16 +183,46 @@ def dashboard():
     app.logger.info(f"Accessing dashboard route for user: {current_user.username}")
     try:
         selected_maslak_id = request.args.get('maslak', type=int)
-        episode_query = Episode.query.options(joinedload(Episode.assignees)).order_by(Episode.display_order, Episode.id)
+        episode_query = Episode.query.options(joinedload(Episode.assignees)) # Removed order here
+
         if selected_maslak_id:
             maslak_exists = Maslak.query.get(selected_maslak_id)
             if maslak_exists: episode_query = episode_query.filter(Episode.maslak_id == selected_maslak_id); app.logger.info(f"Filtering episodes by Maslak ID: {selected_maslak_id}")
             else: app.logger.warning(f"Maslak ID {selected_maslak_id} not found, showing all."); selected_maslak_id = None
-        filtered_episodes = episode_query.all()
+
+        # Apply ordering after filtering
+        filtered_episodes = episode_query.order_by(Episode.display_order, Episode.id).all()
+
+        # Calculate Metrics
+        total_episodes = Episode.query.count()
+        draft_episodes = Episode.query.filter_by(status=EPISODE_STATUS_DRAFT).count()
+        review_episodes = Episode.query.filter_by(status=EPISODE_STATUS_REVIEW).count()
+        complete_episodes = Episode.query.filter_by(status=EPISODE_STATUS_COMPLETE).count()
+        # Removed unnecessary metrics
+        # total_maslaks = Maslak.query.count()
+        # total_comments = Comment.query.count()
+
+        metrics = {
+            'total_episodes': total_episodes,
+            'draft_episodes': draft_episodes,
+            'review_episodes': review_episodes,
+            'complete_episodes': complete_episodes,
+            # 'total_maslaks': total_maslaks, # Removed
+            # 'total_comments': total_comments # Removed
+        }
+
         all_maslaks = Maslak.query.order_by(Maslak.name).all()
         collaborators = User.query.filter(User.id != current_user.id).order_by(User.username).all()
-        return render_template('dashboard.html', all_episodes=filtered_episodes, all_maslaks=all_maslaks, selected_maslak_id=selected_maslak_id, collaborators=collaborators)
-    except Exception as e: app.logger.error(f"Error in dashboard route: {e}", exc_info=True); abort(500)
+
+        return render_template('dashboard.html',
+                               all_episodes=filtered_episodes,
+                               all_maslaks=all_maslaks,
+                               selected_maslak_id=selected_maslak_id,
+                               collaborators=collaborators,
+                               metrics=metrics)
+    except Exception as e:
+        app.logger.error(f"Error in dashboard route: {e}", exc_info=True); abort(500)
+
 
 @app.route('/test')
 @login_required
@@ -197,7 +244,7 @@ def create_episode():
     try:
         last_episode_in_maslak = Episode.query.filter_by(maslak_id=maslak_id).order_by(Episode.display_order.desc()).first()
         initial_order = (last_episode_in_maslak.display_order + 1) if last_episode_in_maslak else 0
-        new_episode = Episode(title=title, maslak_id=maslak_id, display_order=initial_order)
+        new_episode = Episode(title=title, maslak_id=maslak_id, display_order=initial_order) # Status defaults in model
         db.session.add(new_episode); db.session.flush()
         assignment = Assignment(user_id=current_user.id, episode_id=new_episode.id); db.session.add(assignment)
         db.session.commit(); flash(f'تم إنشاء الحلقة "{title}" بنجاح في مسلك "{maslak.name}" وتم تعيينك لها.', 'success')
@@ -241,47 +288,44 @@ def change_episode_maslak(episode_id):
     except Exception as e: db.session.rollback(); flash(f'حدث خطأ أثناء تغيير المسلك: {e}', 'danger'); app.logger.error(f"Error changing maslak for episode {episode_id}: {e}", exc_info=True)
     return redirect(url_for('view_episode', episode_id=episode_id))
 
-
-# --- NEW: API Route to Update Title ---
-@app.route('/api/episode/<int:episode_id>/update_title', methods=['POST'])
+# --- NEW: Route to Change Episode Status ---
+@app.route('/episode/<int:episode_id>/change_status', methods=['POST'])
 @login_required
-def update_episode_title(episode_id):
-    """Handles AJAX request to update episode title."""
+def change_episode_status(episode_id):
+    """Changes the status for a given episode."""
     episode = Episode.query.get_or_404(episode_id)
-    data = request.get_json()
-
-    if not data or 'new_title' not in data:
-        return jsonify({'success': False, 'message': 'بيانات غير صالحة'}), 400
-
-    new_title = data['new_title'].strip()
-    if not new_title:
-        return jsonify({'success': False, 'message': 'العنوان لا يمكن أن يكون فارغًا'}), 400
+    new_status = request.form.get('new_status')
 
     # Permission Check: Allow if user is assigned OR is admin
     is_assigned = Assignment.query.filter_by(user_id=current_user.id, episode_id=episode.id).count() > 0
     user_is_admin = hasattr(current_user, 'is_admin') and current_user.is_admin
     if not is_assigned and not user_is_admin:
-        return jsonify({'success': False, 'message': 'غير مصرح لك بتعديل هذا العنوان'}), 403
+        flash('فقط المستخدمون المعينون أو المسؤولون يمكنهم تغيير الحالة.', 'danger')
+        return redirect(url_for('view_episode', episode_id=episode_id))
 
-    # Optional: Check for title uniqueness within the Maslak
-    existing = Episode.query.filter(
-        Episode.maslak_id == episode.maslak_id,
-        Episode.title == new_title,
-        Episode.id != episode_id # Exclude self
-    ).first()
-    if existing:
-         return jsonify({'success': False, 'message': f'عنوان الحلقة "{new_title}" مستخدم بالفعل في هذا المسلك.'}), 400
+    # Validate Status
+    valid_statuses = [choice[0] for choice in EPISODE_STATUS_CHOICES]
+    if not new_status or new_status not in valid_statuses:
+        flash('الحالة المحددة غير صالحة.', 'warning')
+        return redirect(url_for('view_episode', episode_id=episode_id))
+
+    if episode.status == new_status:
+        flash('الحلقة لديها هذه الحالة بالفعل.', 'info')
+        return redirect(url_for('view_episode', episode_id=episode_id))
 
     try:
-        episode.title = new_title
+        episode.status = new_status
+        db.session.add(episode)
         db.session.commit()
-        app.logger.info(f"Updated title for episode {episode_id} to '{new_title}' by user {current_user.username}")
-        return jsonify({'success': True, 'message': 'تم تحديث العنوان بنجاح', 'new_title': new_title})
+        flash(f'تم تغيير حالة الحلقة "{episode.title}" إلى "{new_status}" بنجاح.', 'success')
     except Exception as e:
         db.session.rollback()
-        app.logger.error(f"Error updating title for episode {episode_id}: {e}", exc_info=True)
-        return jsonify({'success': False, 'message': 'حدث خطأ أثناء تحديث العنوان'}), 500
-# --- End Update Title Route ---
+        flash(f'حدث خطأ أثناء تغيير الحالة: {e}', 'danger')
+        app.logger.error(f"Error changing status for episode {episode_id}: {e}", exc_info=True)
+
+    return redirect(url_for('view_episode', episode_id=episode_id))
+# --- End Change Status Route ---
+
 
 @app.route('/api/update_episode_order', methods=['POST'])
 @login_required
@@ -346,10 +390,11 @@ def delete_comment(comment_id):
     except Exception as e: db.session.rollback(); print(f"Error: {e}"); return jsonify({'success': False, 'message': 'حدث خطأ أثناء حذف التعليق.'}), 500
 
 # --- Episode View/Edit/Comment Routes ---
+# --- UPDATED: view_episode to pass EPISODE_STATUS_CHOICES ---
 @app.route('/episode/<int:episode_id>', methods=['GET'])
 @login_required
 def view_episode(episode_id):
-    # ... (view_episode logic remains the same - already passes all_maslaks) ...
+    """Displays the episode plan, scenario, comments, and assignment controls."""
     episode = Episode.query.options(joinedload(Episode.assignees), joinedload(Episode.maslak)).get_or_404(episode_id)
     current_user_is_assigned = any(assignee.id == current_user.id for assignee in episode.assignees)
     all_users = User.query.order_by(User.username).all()
@@ -364,7 +409,15 @@ def view_episode(episode_id):
         author_id = comment.author.id if comment.author else None
         comments_by_block[block_idx].append({'id': comment.id, 'text': comment.text, 'author': author_username, 'author_id': author_id, 'timestamp': comment.timestamp.strftime('%Y-%m-%d %H:%M')})
     user_is_admin = hasattr(current_user, 'is_admin') and current_user.is_admin
-    return render_template('episode.html', episode=episode, comments_by_block=comments_by_block, is_assigned=current_user_is_assigned, all_users=all_users, all_maslaks=all_maslaks, user_is_admin=user_is_admin)
+
+    return render_template('episode.html',
+                           episode=episode,
+                           comments_by_block=comments_by_block,
+                           is_assigned=current_user_is_assigned,
+                           all_users=all_users,
+                           all_maslaks=all_maslaks,
+                           user_is_admin=user_is_admin,
+                           status_choices=EPISODE_STATUS_CHOICES) # <<< Pass status choices
 
 
 @app.route('/episode/<int:episode_id>/update', methods=['POST'])
@@ -381,6 +434,26 @@ def update_episode(episode_id):
          except Exception as e: db.session.rollback(); print(f"Error: {e}"); return jsonify({'success': False, 'message': 'خطأ في تحديث الحلقة'}), 500
      else: return jsonify({'success': True, 'message': 'لم يتم اكتشاف أي تغييرات'})
 
+
+@app.route('/api/episode/<int:episode_id>/update_title', methods=['POST'])
+@login_required
+def update_episode_title(episode_id):
+    # ... (update_episode_title logic remains the same) ...
+    episode = Episode.query.get_or_404(episode_id)
+    data = request.get_json()
+    if not data or 'new_title' not in data: return jsonify({'success': False, 'message': 'بيانات غير صالحة'}), 400
+    new_title = data['new_title'].strip()
+    if not new_title: return jsonify({'success': False, 'message': 'العنوان لا يمكن أن يكون فارغًا'}), 400
+    is_assigned = Assignment.query.filter_by(user_id=current_user.id, episode_id=episode.id).count() > 0
+    user_is_admin = hasattr(current_user, 'is_admin') and current_user.is_admin
+    if not is_assigned and not user_is_admin: return jsonify({'success': False, 'message': 'غير مصرح لك بتعديل هذا العنوان'}), 403
+    existing = Episode.query.filter(Episode.maslak_id == episode.maslak_id, Episode.title == new_title, Episode.id != episode_id).first()
+    if existing: return jsonify({'success': False, 'message': f'عنوان الحلقة "{new_title}" مستخدم بالفعل في هذا المسلك.'}), 400
+    try:
+        episode.title = new_title; db.session.commit()
+        app.logger.info(f"Updated title for episode {episode_id} to '{new_title}' by user {current_user.username}")
+        return jsonify({'success': True, 'message': 'تم تحديث العنوان بنجاح', 'new_title': new_title})
+    except Exception as e: db.session.rollback(); app.logger.error(f"Error updating title for episode {episode_id}: {e}", exc_info=True); return jsonify({'success': False, 'message': 'حدث خطأ أثناء تحديث العنوان'}), 500
 
 @app.route('/episode/<int:episode_id>/comments', methods=['POST'])
 @login_required

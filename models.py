@@ -40,17 +40,27 @@ DEFAULT_PLAN_MARKDOWN = """## ✅ مؤشرات نجاح الحلقة
 ---"""
 # --- End Default Template ---
 
-# --- NEW: Maslak (Chapter/Category) Model ---
+# --- NEW: Define Episode Status Choices ---
+EPISODE_STATUS_DRAFT = 'لم يبدأ'
+EPISODE_STATUS_REVIEW = 'للمراجعة'
+EPISODE_STATUS_COMPLETE = 'مكتمل'
+EPISODE_STATUS_CHOICES = [
+    (EPISODE_STATUS_DRAFT, 'لم يبدأ / Draft'),
+    (EPISODE_STATUS_REVIEW, 'للمراجعة / Review'),
+    (EPISODE_STATUS_COMPLETE, 'مكتمل / Complete')
+]
+# --- End Status Choices ---
+
+
+# Maslak (Chapter/Category) Model
 class Maslak(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
 
     def __repr__(self):
         return f'<Maslak {self.name}>'
-# --- End Maslak Model ---
 
-
-# User model: Represents users who can log in and contribute.
+# User model
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -61,7 +71,7 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return f'<User {self.username}>'
 
-# Episode model: Represents an individual episode scenario.
+# Episode model
 class Episode(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(150), nullable=False)
@@ -70,10 +80,12 @@ class Episode(db.Model):
     last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     display_order = db.Column(db.Integer, nullable=False, default=0, index=True)
 
-    # --- NEW: Foreign Key and Relationship to Maslak ---
+    # --- NEW: Status Column ---
+    status = db.Column(db.String(50), nullable=False, default=EPISODE_STATUS_DRAFT, index=True)
+    # --- End Status Column ---
+
     maslak_id = db.Column(db.Integer, db.ForeignKey('maslak.id'), nullable=False)
     maslak = db.relationship('Maslak', backref=db.backref('episodes', lazy='dynamic', order_by='Episode.display_order'))
-    # --- End Maslak Relationship ---
 
     assignees = db.relationship('User', secondary='assignment', back_populates='assigned_episodes')
     comments = db.relationship('Comment', backref='episode', lazy='dynamic', cascade="all, delete-orphan")
@@ -81,7 +93,7 @@ class Episode(db.Model):
     def __repr__(self):
         return f'<Episode {self.title}>'
 
-# Assignment model: Many-to-many relationship between Users and Episodes.
+# Assignment model
 class Assignment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
@@ -89,7 +101,7 @@ class Assignment(db.Model):
     __table_args__ = (db.UniqueConstraint('user_id', 'episode_id', name='_user_episode_uc'),)
 
 
-# Comment model: Represents comments made on specific blocks of an episode's scenario.
+# Comment model
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     episode_id = db.Column(db.Integer, db.ForeignKey('episode.id', ondelete='CASCADE'), nullable=False)
@@ -101,4 +113,3 @@ class Comment(db.Model):
 
     def __repr__(self):
         return f'<Comment by User {self.user_id} on Episode {self.episode_id} Block {self.block_index}>'
-

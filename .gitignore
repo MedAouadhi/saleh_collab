@@ -1,0 +1,43 @@
+.idea/
+.vscode/
+.venv*/
+venv*/
+__pycache__/
+dist/
+.coverage*
+htmlcov/
+.tox/
+docs/_build/
+*.egg-info/
+*.egg
+*.whl
+*.mypy_cache/
+*.pytest_cache/
+*.coverage
+*.pdb
+*.log
+__pycache__/
+*.sqlite3
+*.db
+.env
+.env.*
+*.DS_Store
+Thumbs.db
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Ignore data files
+data/
+data/*
+!data/.gitkeep
+
+# Ignore test files and folders
+tests/
+test_*
+!tests/.gitkeep
+
+# Ignore coverage reports
+coverage.xml
+coverage_html_report/
+.coverage.*

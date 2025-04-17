@@ -1,0 +1,10 @@
+Flask>=2.0
+Flask-SQLAlchemy>=2.5
+Flask-Login>=0.5
+python-dotenv>=0.19
+Flask-Admin>=1.6.0
+Flask-WTF>=1.0.0
+Werkzeug>=2.0
+WTForms>=3.0
+WeasyPrint>=55.0 # Or latest version
+Markdown>=3.3.0 # For converting Markdown to HTML

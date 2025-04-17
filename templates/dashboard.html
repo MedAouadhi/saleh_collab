@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}لوحة التحكم - كاتب السيناريو{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+    <div class="md:col-span-2 space-y-6">
+
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2 text-right">إنشاء حلقة جديدة</h2> {# Text align right #}
+            <form action="{{ url_for('create_episode') }}" method="POST" class="flex items-center space-x-reverse space-x-3"> {# Use space-x-reverse for RTL #}
+                <input type="text" name="title" required
+                       class="flex-grow shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 text-right" {# Text align right #}
+                       placeholder="أدخل عنوان الحلقة الجديدة...">
+                <button type="submit"
+                        class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline btn-hover-effect whitespace-nowrap">
+                    إنشاء حلقة
+                </button>
+            </form>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2 text-right">جميع الحلقات</h2> {# Text align right #}
+            {% if all_episodes %}
+                <ul class="space-y-4">
+                    {% for episode in all_episodes %}
+                        {# Check if the current user is assigned to this episode #}
+                        {% set current_user_assigned = current_user in episode.assignees %}
+                        <li class="border rounded hover:shadow-md transition duration-150
+                                   {% if current_user_assigned %} border-r-4 border-r-blue-500 bg-blue-50 {% else %} border-gray-200 {% endif %}"> {# Changed border-l to border-r #}
+                            <div class="p-4 text-right flex items-start justify-between"> {# Added flex items-start justify-between #}
+                                {# Delete button now comes first in the flex container for RTL (appears left) #}
+                                {% if current_user_assigned %}
+                                    <form action="{{ url_for('delete_episode', episode_id=episode.id) }}" method="POST" class="delete-episode-form flex-shrink-0 ml-4" style="display: inline;"> {# Added ml-4 for spacing #}
+                                        <button type="submit"
+                                                class="bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-2 rounded focus:outline-none focus:shadow-outline btn-hover-effect"
+                                                data-episode-title="{{ episode.title }}">
+                                            حذف
+                                        </button>
+                                    </form>
+                                {% else %}
+                                     {# Optional: Add a placeholder div to maintain alignment if needed, or adjust padding #}
+                                     <div class="w-12 flex-shrink-0 ml-4"></div> {# Placeholder with approx width of button+margin #}
+                                {% endif %}
+
+                                {# Div for Title and Assignees - takes remaining space #}
+                                <div class="flex-grow">
+                                    <a href="{{ url_for('view_episode', episode_id=episode.id) }}"
+                                       class="text-blue-700 hover:text-blue-900 font-semibold text-lg block mb-2 {% if current_user_assigned %}font-bold{% endif %}"> {# Added mb-2 #}
+                                        {{ episode.title }}
+                                        {% if current_user_assigned %}
+                                            <span class="mr-2 text-xs bg-blue-200 text-blue-800 font-medium px-2 py-0.5 rounded-full align-middle">معينة لك</span> {# Changed ml-2 to mr-2 #}
+                                        {% endif %}
+                                    </a>
+
+                                    <div class="mb-1">
+                                        <p class="text-sm font-medium text-gray-600">المستخدمون المعينون:</p>
+                                        {% if episode.assignees %}
+                                            <div class="flex flex-wrap gap-1 mt-1 justify-end"> {# Added justify-end #}
+                                                {% for user in episode.assignees %}
+                                                    <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                                                        {{ user.username }}
+                                                    </span>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            <p class="text-sm text-gray-500 italic mt-1">لا يوجد مستخدمون معينون بعد.</p>
+                                        {% endif %}
+                                    </div>
+                                </div> {# End flex-grow div #}
+
+                            </div> {# End flex container #}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-gray-600 text-right">لم يتم إنشاء أي حلقات بعد.</p> {# Text align right #}
+            {% endif %}
+        </div>
+
+    </div>
+
+    <div class="md:col-span-1 bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2 text-right">المتعاونون</h2> {# Text align right #}
+        {% if collaborators %}
+            <ul class="space-y-4">
+                {% for collaborator in collaborators %}
+                    <li class="border-r-4 border-r-indigo-300 pr-3 text-right"> {# Changed border-l to border-r, pl to pr #}
+                        <p class="font-medium text-gray-700">{{ collaborator.username }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-600 text-right">لم يتم العثور على متعاونين آخرين.</p> {# Text align right #}
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }} <script>
+    // Add event listener for delete confirmation after the main script runs
+    document.addEventListener('DOMContentLoaded', () => {
+        // Check if the main script already added the listener
+        if (!document.body.dataset.deleteListenerAdded) {
+             console.log("Adding delete confirmation listener from dashboard.html");
+             // Use event delegation on the body or a container element
+             document.body.addEventListener('submit', function(event) {
+                 // Check if the submitted form is for deleting an episode
+                 if (event.target.classList.contains('delete-episode-form')) {
+                     const button = event.target.querySelector('button[type="submit"]');
+                     const episodeTitle = button ? button.dataset.episodeTitle : 'هذه الحلقة';
+                     // Use the browser's native confirm dialog - Translate confirmation text
+                     const confirmed = confirm(`هل أنت متأكد أنك تريد حذف الحلقة "${episodeTitle}"؟ لا يمكن التراجع عن هذا الإجراء.`);
+
+                     if (!confirmed) {
+                         event.preventDefault(); // Stop form submission if not confirmed
+                         console.log("Episode deletion cancelled by user.");
+                     } else {
+                         console.log(`User confirmed deletion for episode: ${episodeTitle}`);
+                     }
+                 }
+             });
+             document.body.dataset.deleteListenerAdded = 'true'; // Mark listener as added
+        }
+    });
+</script>
+{% endblock %}

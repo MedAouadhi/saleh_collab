@@ -8,19 +8,51 @@ from datetime import datetime
 # Initialize SQLAlchemy extension
 db = SQLAlchemy()
 
+# --- Default Markdown Template for Plan ---
+DEFAULT_PLAN_MARKDOWN = """## ✅ مؤشرات نجاح الحلقة
+(أدخل مؤشرات النجاح هنا)
+
+---
+
+## 📝 التكليف
+(أدخل تفاصيل التكليف هنا)
+
+---
+
+## 🧑‍💻 تصور عملي تقريبي للحلقة (تجربة المستخدم)
+(صف تجربة المستخدم هنا)
+
+---
+
+## 📖 المراجع من القرآن والسنّة
+(أدخل الآيات أو الأحاديث المرتبطة بالحلقة)
+
+---
+
+## 🎯 الهدف من الحلقة (SMART Goal)
+(حدّد الهدف بشكل واضح وقابل للقياس)
+
+---
+
+## 💬 مواضيع الحلقة
+(أدرج المواضيع التي ستتم مناقشتها)
+
+---"""
+# --- End Default Template ---
+
+
 # User model: Represents users who can log in and contribute.
 # Inherits from UserMixin for Flask-Login compatibility.
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
-    # In a real app, store hashed passwords, not plain text!
     password = db.Column(db.String(120), nullable=False) # Stores the hashed password
     is_admin = db.Column(db.Boolean, nullable=False, default=False) # Admin flag
 
     # Relationship to episodes assigned to this user
     assigned_episodes = db.relationship('Episode', secondary='assignment', back_populates='assignees')
     # Relationship defining comments made by the user (backref defined in Comment)
-    # comments = defined by backref
+    # Cascade delete for comments is now handled by the backref below
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -29,7 +61,8 @@ class User(UserMixin, db.Model):
 class Episode(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(150), nullable=False)
-    plan = db.Column(db.Text, nullable=True, default='') # Section for the episode plan
+    # Set the default value for the plan column
+    plan = db.Column(db.Text, nullable=True, default=DEFAULT_PLAN_MARKDOWN) # <<< UPDATED DEFAULT
     scenario = db.Column(db.Text, nullable=True, default='') # Section for the scenario script
     last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     # Relationship to users assigned to this episode
@@ -62,7 +95,8 @@ class Comment(db.Model):
     text = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     # Relationship to the user who made the comment
-    author = db.relationship('User', backref='comments')
+    # Added cascade='all, delete-orphan' to the backref for 'comments' on the User model
+    author = db.relationship('User', backref=db.backref('comments', cascade='all, delete-orphan', lazy='dynamic'))
 
     def __repr__(self):
         return f'<Comment by User {self.user_id} on Episode {self.episode_id} Block {self.block_index}>'

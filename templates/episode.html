@@ -93,37 +93,27 @@
 {% endblock %}
 
 {% block scripts %}
-{{ super() }} {# Good practice to include, though base has no inline scripts now #}
+{{ super() }}
 <script>
-    // Ensure these are defined even if episode data isn't fully loaded or applicable
     const EPISODE_ID = {{ episode.id | default('null') | tojson }};
-    // Add initial plan text
     const INITIAL_PLAN = {{ episode.plan | default('') | tojson }};
-    const INITIAL_SCENARIO = {{ episode.scenario | default('') | tojson }}; // Pass scenario safely
-    // Pass comments by block index now
+    const INITIAL_SCENARIO = {{ episode.scenario | default('') | tojson }};
     const INITIAL_COMMENTS_BY_BLOCK = {{ comments_by_block | default({}) | tojson }};
     const IS_ASSIGNED = {{ is_assigned | default(false) | tojson }};
-    const CURRENT_USER_ID = {{ current_user.id | default('null') | tojson }}; // Pass current user ID
-    // Pass episode title for PDF filename
+    const CURRENT_USER_ID = {{ current_user.id | default('null') | tojson }};
     const EPISODE_TITLE = {{ episode.title | tojson }};
+    // Pass admin status to JS
+    const IS_ADMIN = {{ user_is_admin | default(false) | tojson }};
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // This listener now correctly runs *after* the main script.js
         const unassignForms = document.querySelectorAll('.unassign-self-form');
         unassignForms.forEach(form => {
             form.addEventListener('submit', function(event) {
-                // Translate confirmation text
                 const confirmed = confirm('هل أنت متأكد أنك تريد إلغاء تعيين نفسك من هذه الحلقة؟');
-                if (!confirmed) {
-                    event.preventDefault(); // Stop form submission
-                    console.log('Self-unassignment cancelled.');
-                } else {
-                    console.log('Self-unassignment confirmed.');
-                }
+                if (!confirmed) { event.preventDefault(); }
             });
         });
-        // Confirmation for comment deletion is handled in script.js
     });
 </script>
 {% endblock %}

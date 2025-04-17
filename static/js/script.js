@@ -1,7 +1,30 @@
-// static/js/script.js (Arabic Version - Removed jsPDF Logic)
+// static/js/script.js (Arabic Version - Multi-Color Highlighting)
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log('DOM fully loaded and parsed - Main script.js running.');
+
+  // --- Color Palette for Highlights ---
+  const highlightColors = [
+    'highlight-color-0',  // yellow-50
+    'highlight-color-1',  // blue-50
+    'highlight-color-2',  // green-50
+    'highlight-color-3',  // red-50
+    'highlight-color-4',  // violet-50
+    'highlight-color-5',  // orange-50
+  ];
+  const numHighlightColors = highlightColors.length;
+
+  // Helper function to get color class based on index
+  const getColorClassForIndex = (index) => {
+    if (index === null || index < 0) return '';  // No color if index is invalid
+    return highlightColors[index % numHighlightColors];
+  };
+  // Helper function to remove all highlight classes from an element
+  const removeHighlightClasses = (element) => {
+    if (element) {
+      highlightColors.forEach(cls => element.classList.remove(cls));
+    }
+  };
 
   // --- Elements ---
   const planArea = document.getElementById('plan-area');
@@ -34,15 +57,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const commentStatus = document.getElementById('comment-status');
   const noCommentsMsg = document.getElementById('no-comments-msg');
 
-  // Removed PDF Export button reference
-  // const exportPdfBtn = document.getElementById('export-pdf-btn');
-
   let currentEditingBlock = null;
 
   // Check if we are on the episode page
   if (typeof EPISODE_ID !== 'undefined' && EPISODE_ID !== null &&
-      typeof CURRENT_USER_ID !== 'undefined') {
+      typeof CURRENT_USER_ID !== 'undefined' &&
+      typeof IS_ADMIN !== 'undefined') {
     console.log('Episode page detected. Initializing episode features.');
+    console.log(`User ID: ${CURRENT_USER_ID}, Is Admin: ${IS_ADMIN}`);
 
     // --- Initial Setup ---
     if (planDisplay && typeof INITIAL_PLAN !== 'undefined')
@@ -61,8 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- Event Listeners ---
-
-    // Save Plan Button
+    // ... (Save buttons, Toggle buttons remain the same) ...
     if (savePlanBtn && IS_ASSIGNED) {
       savePlanBtn.addEventListener('click', () => {
         saveContent('plan', planArea.value, planStatus).then(success => {
@@ -70,8 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       });
     }
-
-    // Save Scenario Button
     if (saveScenarioBtn && IS_ASSIGNED) {
       saveScenarioBtn.addEventListener('click', () => {
         const newScenario = scenarioArea.value;
@@ -80,15 +99,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       });
     }
-
-    // --- Plan View/Edit Mode Toggle ---
     if (viewPlanBtn && editPlanBtn && planDisplay && planEditorWrapper &&
         IS_ASSIGNED) {
       viewPlanBtn.addEventListener('click', () => {
         planEditorWrapper.classList.add('hidden');
         planDisplay.classList.remove('hidden');
         renderPlanMarkdown(planArea.value);
-        // Update button styles
         viewPlanBtn.classList.add(
             'active', 'bg-indigo-100', 'text-indigo-700', 'font-medium');
         viewPlanBtn.classList.remove('text-gray-600', 'hover:bg-gray-100');
@@ -99,7 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
       editPlanBtn.addEventListener('click', () => {
         planDisplay.classList.add('hidden');
         planEditorWrapper.classList.remove('hidden');
-        // Update button styles
         editPlanBtn.classList.add(
             'active', 'bg-indigo-100', 'text-indigo-700', 'font-medium');
         editPlanBtn.classList.remove('text-gray-600', 'hover:bg-gray-100');
@@ -109,8 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
         planArea.focus();
       });
     }
-
-    // --- Scenario View/Edit Mode Toggle ---
     if (viewScenarioBtnActual && editScenarioBtnActual && scenarioDisplay &&
         scenarioEditorWrapper && IS_ASSIGNED) {
       viewScenarioBtnActual.addEventListener('click', () => {
@@ -118,7 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
         scenarioDisplay.classList.remove('hidden');
         if (commentInstruction) commentInstruction.style.display = 'block';
         renderScenario(scenarioArea.value);
-        // Update button styles
         viewScenarioBtnActual.classList.add(
             'active', 'bg-indigo-100', 'text-indigo-700', 'font-medium');
         viewScenarioBtnActual.classList.remove(
@@ -132,7 +144,6 @@ document.addEventListener('DOMContentLoaded', () => {
         scenarioDisplay.classList.add('hidden');
         scenarioEditorWrapper.classList.remove('hidden');
         if (commentInstruction) commentInstruction.style.display = 'none';
-        // Update button styles
         editScenarioBtnActual.classList.add(
             'active', 'bg-indigo-100', 'text-indigo-700', 'font-medium');
         editScenarioBtnActual.classList.remove(
@@ -145,11 +156,10 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // --- REMOVED PDF Export Button Listener ---
-    // if (exportPdfBtn) { ... }
 
-    // --- Commenting Logic (Scenario Display Click, Submit, Cancel, Delete) ---
-    // ... (Existing commenting logic remains here, unchanged) ...
+    // --- Commenting Logic ---
+
+    // Scenario Display Click (Add Comment)
     if (IS_ASSIGNED && scenarioDisplay) {
       scenarioDisplay.addEventListener('click', (event) => {
         if (scenarioDisplay.classList.contains('hidden')) return;
@@ -162,6 +172,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }
+
+    // Submit Comment Button
     if (submitCommentBtn && IS_ASSIGNED) {
       submitCommentBtn.addEventListener('click', () => {
         const blockIndex = currentEditingBlock;
@@ -184,10 +196,8 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(response => response.json())
             .then(data => {
               if (data.success && data.comment) {
-                addCommentToDisplay(data.comment);
-                const blockElement = scenarioDisplay.querySelector(
-                    `.commentable-block[data-block-index="${blockIndex}"]`);
-                if (blockElement) blockElement.classList.add('has-comments');
+                addCommentToDisplay(
+                    data.comment);  // This will handle highlighting
                 closeCommentForm();
               } else {
                 commentStatus.textContent =
@@ -204,21 +214,28 @@ document.addEventListener('DOMContentLoaded', () => {
             });
       });
     }
+
+    // Cancel Comment Button
     if (cancelCommentBtn) {
       cancelCommentBtn.addEventListener('click', () => {
         closeCommentForm();
       });
     }
+
+    // Comment Deletion (Event Delegation)
     if (commentDisplayArea) {
       commentDisplayArea.addEventListener('click', function(event) {
         const deleteButton = event.target.closest('.delete-comment-btn');
         if (deleteButton) {
           const commentElement = deleteButton.closest('.comment-item');
           const commentId = deleteButton.dataset.commentId;
-          const lineGroup =
+          const commentGroup =
               commentElement ? commentElement.closest('.comment-group') : null;
-          const blockIndex = lineGroup ? lineGroup.dataset.blockIndex : null;
-          if (commentId && commentElement) {
+          const blockIndex = commentGroup ?
+              parseInt(commentGroup.dataset.blockIndex, 10) :
+              null;  // Get block index
+
+          if (commentId && commentElement && blockIndex !== null) {
             const confirmed = confirm('هل أنت متأكد أنك تريد حذف هذا التعليق؟');
             if (confirmed) {
               fetch(
@@ -231,25 +248,22 @@ document.addEventListener('DOMContentLoaded', () => {
                       commentElement.style.opacity = '0';
                       setTimeout(() => {
                         commentElement.remove();
-                        if (lineGroup &&
-                            !lineGroup.querySelector('.comment-item')) {
-                          lineGroup.remove();
-                          if (blockIndex !== null) {
-                            const blockElement = scenarioDisplay.querySelector(
-                                `.commentable-block[data-block-index="${
-                                    blockIndex}"]`);
-                            const otherCommentsExist =
-                                INITIAL_COMMENTS_BY_BLOCK[blockIndex] &&
-                                INITIAL_COMMENTS_BY_BLOCK[blockIndex].some(
-                                    c => c.id !== parseInt(commentId));
-                            const otherDynamicCommentsExist =
-                                lineGroup.querySelector('.comment-item');
-                            if (blockElement && !otherCommentsExist &&
-                                !otherDynamicCommentsExist) {
-                              blockElement.classList.remove('has-comments');
-                            }
+                        // Check if the block group is now empty
+                        if (commentGroup &&
+                            !commentGroup.querySelector('.comment-item')) {
+                          commentGroup.remove();  // Remove the group
+                          // Remove highlight from the corresponding scenario
+                          // block
+                          const blockElement = scenarioDisplay.querySelector(
+                              `.commentable-block[data-block-index="${
+                                  blockIndex}"]`);
+                          if (blockElement) {
+                            removeHighlightClasses(
+                                blockElement);  // Use helper to remove all
+                                                // color classes
                           }
                         }
+                        // Check if any comment groups left
                         if (!commentDisplayArea.querySelector(
                                 '.comment-group')) {
                           if (noCommentsMsg)
@@ -269,11 +283,10 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-
     // --- Helper Functions ---
 
     async function saveContent(type, content, statusElement) {
-      // ... (saveContent logic updated to re-render markdown) ...
+      // ... (saveContent logic remains the same) ...
       statusElement.textContent = 'جارٍ الحفظ...';
       statusElement.classList.remove('text-green-600', 'text-red-600');
       statusElement.classList.add('text-gray-500');
@@ -325,8 +338,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
+    /**
+     * Renders the SCENARIO text as Markdown and makes blocks commentable.
+     * Adds cycling highlight class to blocks with comments.
+     * @param {string} scenarioText - The full scenario text.
+     */
     function renderScenario(scenarioText) {
-      // ... (renderScenario remains the same) ...
       if (!scenarioDisplay || typeof marked === 'undefined') {
         console.error(
             'Scenario display area not found or Marked.js not loaded.');
@@ -342,9 +359,14 @@ document.addEventListener('DOMContentLoaded', () => {
           blockElement.dataset.blockIndex = i;
           blockElement.classList.add('commentable-block');
           hasCommentableBlocks = true;
+          // Remove any previous highlight first
+          removeHighlightClasses(blockElement);
+          // Add highlight class if comments exist for this block index
           if (typeof INITIAL_COMMENTS_BY_BLOCK !== 'undefined' &&
               INITIAL_COMMENTS_BY_BLOCK[i]) {
-            blockElement.classList.add('has-comments');
+            const colorClass =
+                getColorClassForIndex(i);  // Get color based on index
+            if (colorClass) blockElement.classList.add(colorClass);
           }
         }
         if (!hasCommentableBlocks && scenarioText && scenarioText.trim()) {
@@ -353,40 +375,59 @@ document.addEventListener('DOMContentLoaded', () => {
                   scenarioDisplay.innerHTML}</div>`;
           if (typeof INITIAL_COMMENTS_BY_BLOCK !== 'undefined' &&
               INITIAL_COMMENTS_BY_BLOCK[0]) {
-            scenarioDisplay.firstChild.classList.add('has-comments');
+            const colorClass = getColorClassForIndex(0);
+            if (colorClass)
+              scenarioDisplay.firstChild.classList.add(colorClass);
           }
         }
-        console.log(`Rendered scenario as Markdown, added indices to ${
-            children.length} blocks.`);
+        console.log(
+            `Rendered scenario as Markdown, added indices and highlights to ${
+                children.length} blocks.`);
       } catch (e) {
         console.error('Error during scenario Markdown rendering:', e);
         scenarioDisplay.textContent = scenarioText;
       }
     }
 
+
+    /**
+     * Renders comments grouped by block index.
+     * Adds cycling highlight class to comment groups.
+     * @param {object} commentsByBlock - Object keyed by block_index.
+     */
     function renderComments(commentsByBlock) {
-      // ... (renderComments remains the same) ...
       if (!commentDisplayArea) return;
       clearCommentsDisplay();
+
       let hasAnyComments = false;
       if (commentsByBlock && typeof commentsByBlock === 'object') {
         Object.keys(commentsByBlock)
             .sort((a, b) => parseInt(a, 10) - parseInt(b, 10))
-            .forEach(blockIndex => {
+            .forEach(blockIndexStr => {
+              const blockIndex =
+                  parseInt(blockIndexStr, 10);  // Ensure it's a number
               const comments = commentsByBlock[blockIndex];
               if (comments && comments.length > 0) {
                 hasAnyComments = true;
                 const blockCommentsContainer = document.createElement('div');
+                const colorClass =
+                    getColorClassForIndex(blockIndex);  // Get color class
+                // Add highlight class to the comment group itself
                 blockCommentsContainer.classList.add(
-                    'comment-group', 'mb-3', 'border-r-4', 'border-blue-200',
-                    'pr-3', 'text-right');
+                    'comment-group', 'mb-3', 'border-r-4', 'pr-3',
+                    'text-right');
+                if (colorClass)
+                  blockCommentsContainer.classList.add(
+                      colorClass);  // Add the specific color class
                 blockCommentsContainer.dataset.blockIndex = blockIndex;
+
                 const blockHeader = document.createElement('h4');
                 blockHeader.classList.add(
                     'text-sm', 'font-semibold', 'text-gray-600', 'mb-1');
                 blockHeader.textContent =
-                    `تعليقات للفقرة رقم ${parseInt(blockIndex, 10) + 1}`;
+                    `تعليقات للفقرة رقم ${blockIndex + 1}`;
                 blockCommentsContainer.appendChild(blockHeader);
+
                 comments.forEach(comment => {
                   const commentElement = createCommentElement(comment);
                   blockCommentsContainer.appendChild(commentElement);
@@ -395,6 +436,7 @@ document.addEventListener('DOMContentLoaded', () => {
               }
             });
       }
+
       if (noCommentsMsg) {
         noCommentsMsg.style.display = hasAnyComments ? 'none' : 'block';
       }
@@ -402,26 +444,49 @@ document.addEventListener('DOMContentLoaded', () => {
           `Rendered comments by block. Has comments: ${hasAnyComments}`);
     }
 
+    /**
+     * Adds a single new comment to the display area, grouped by block index.
+     * Ensures the group and scenario block are highlighted with the correct
+     * color.
+     * @param {object} comment - Comment object including block_index.
+     */
     function addCommentToDisplay(comment) {
-      // ... (addCommentToDisplay remains the same) ...
       if (!commentDisplayArea || comment.block_index === undefined) return;
       if (noCommentsMsg && noCommentsMsg.style.display !== 'none') {
         noCommentsMsg.style.display = 'none';
       }
+
       const blockIndex = comment.block_index;
+      const colorClass = getColorClassForIndex(blockIndex);  // Get color class
       let blockCommentsContainer = commentDisplayArea.querySelector(
           `.comment-group[data-block-index="${blockIndex}"]`);
+
+      // Ensure scenario block is highlighted with the correct color
+      const blockElement = scenarioDisplay.querySelector(
+          `.commentable-block[data-block-index="${blockIndex}"]`);
+      if (blockElement) {
+        removeHighlightClasses(blockElement);  // Remove old colors if any
+        if (colorClass)
+          blockElement.classList.add(colorClass);  // Add correct color
+      }
+
       if (!blockCommentsContainer) {
         blockCommentsContainer = document.createElement('div');
+        // Add highlight class when creating the group
         blockCommentsContainer.classList.add(
-            'comment-group', 'mb-3', 'border-r-4', 'border-blue-200', 'pr-3',
-            'text-right');
+            'comment-group', 'mb-3', 'border-r-4', 'pr-3', 'text-right');
+        if (colorClass)
+          blockCommentsContainer.classList.add(
+              colorClass);  // Add correct color
         blockCommentsContainer.dataset.blockIndex = blockIndex;
+
         const blockHeader = document.createElement('h4');
         blockHeader.classList.add(
             'text-sm', 'font-semibold', 'text-gray-600', 'mb-1');
         blockHeader.textContent = `تعليقات للفقرة رقم ${blockIndex + 1}`;
         blockCommentsContainer.appendChild(blockHeader);
+
+        // Insert sorted
         const existingGroups =
             commentDisplayArea.querySelectorAll('.comment-group');
         let inserted = false;
@@ -435,21 +500,27 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!inserted) {
           commentDisplayArea.appendChild(blockCommentsContainer);
         }
+      } else {
+        // Ensure existing group also has the correct highlight
+        removeHighlightClasses(blockCommentsContainer);
+        if (colorClass) blockCommentsContainer.classList.add(colorClass);
       }
+
       const commentElement = createCommentElement(comment);
       commentElement.classList.add('comment-item');
       blockCommentsContainer.appendChild(commentElement);
     }
 
     function createCommentElement(comment) {
-      // ... (createCommentElement remains the same) ...
+      // ... (createCommentElement logic remains the same) ...
       const div = document.createElement('div');
       div.classList.add(
           'comment-item', 'bg-gray-50', 'p-2', 'rounded', 'text-sm', 'mb-1',
           'border', 'border-gray-200', 'text-right', 'relative');
       div.dataset.commentId = comment.id;
       let deleteButtonHTML = '';
-      if (CURRENT_USER_ID !== null && comment.author_id === CURRENT_USER_ID) {
+      if (CURRENT_USER_ID !== null &&
+          (comment.author_id === CURRENT_USER_ID || IS_ADMIN)) {
         deleteButtonHTML =
             ` <button class="delete-comment-btn absolute top-1 left-1" data-comment-id="${
                 comment.id}" title="حذف التعليق"> 🗑️ </button> `;
@@ -498,8 +569,6 @@ document.addEventListener('DOMContentLoaded', () => {
       commentStatus.textContent = '';
       console.log('Closed comment form.');
     }
-
-    // --- REMOVED generatePdf function ---
 
   } else {
     console.log('Not on episode page, or required JS variables not defined.');

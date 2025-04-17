@@ -50,6 +50,7 @@ class User(UserMixin, db.Model):
     is_admin = db.Column(db.Boolean, nullable=False, default=False) # Admin flag
 
     # Relationship to episodes assigned to this user
+    # REMOVED lazy='dynamic'
     assigned_episodes = db.relationship('Episode', secondary='assignment', back_populates='assignees')
     # Relationship defining comments made by the user (backref defined in Comment)
     # Cascade delete for comments is now handled by the backref below
@@ -61,42 +62,39 @@ class User(UserMixin, db.Model):
 class Episode(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(150), nullable=False)
-    # Set the default value for the plan column
-    plan = db.Column(db.Text, nullable=True, default=DEFAULT_PLAN_MARKDOWN) # <<< UPDATED DEFAULT
-    scenario = db.Column(db.Text, nullable=True, default='') # Section for the scenario script
+    plan = db.Column(db.Text, nullable=True, default=DEFAULT_PLAN_MARKDOWN)
+    scenario = db.Column(db.Text, nullable=True, default='')
     last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    display_order = db.Column(db.Integer, nullable=False, default=0, index=True)
+
     # Relationship to users assigned to this episode
+    # REMOVED lazy='dynamic'
     assignees = db.relationship('User', secondary='assignment', back_populates='assigned_episodes')
     # Relationship to comments made on this episode
-    # Keep lazy='dynamic' if filtering/complex queries on comments are needed later
-    comments = db.relationship('Comment', backref='episode', lazy='dynamic', cascade="all, delete-orphan")
+    comments = db.relationship('Comment', backref='episode', lazy='dynamic', cascade="all, delete-orphan") # Keep dynamic for comments
 
     def __repr__(self):
         return f'<Episode {self.title}>'
 
 # Assignment model: Many-to-many relationship between Users and Episodes.
-# This table links users to the episodes they are assigned to work on.
 class Assignment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    episode_id = db.Column(db.Integer, db.ForeignKey('episode.id'), nullable=False)
-
-    # Define composite unique constraint to prevent duplicate assignments
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+    episode_id = db.Column(db.Integer, db.ForeignKey('episode.id', ondelete='CASCADE'), nullable=False)
     __table_args__ = (db.UniqueConstraint('user_id', 'episode_id', name='_user_episode_uc'),)
 
 
 # Comment model: Represents comments made on specific blocks of an episode's scenario.
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    episode_id = db.Column(db.Integer, db.ForeignKey('episode.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    # Changed from line_number to block_index
-    block_index = db.Column(db.Integer, nullable=False) # Index of the block (paragraph, heading, etc.)
+    episode_id = db.Column(db.Integer, db.ForeignKey('episode.id', ondelete='CASCADE'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+    block_index = db.Column(db.Integer, nullable=False)
     text = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     # Relationship to the user who made the comment
-    # Added cascade='all, delete-orphan' to the backref for 'comments' on the User model
-    author = db.relationship('User', backref=db.backref('comments', cascade='all, delete-orphan', lazy='dynamic'))
+    # Keep lazy='dynamic' on comments backref if needed for filtering user's comments later
+    author = db.relationship('User', backref=db.backref('comments', lazy='dynamic'))
 
     def __repr__(self):
         return f'<Comment by User {self.user_id} on Episode {self.episode_id} Block {self.block_index}>'

@@ -7,36 +7,26 @@
 
     <div class="md:col-span-2 space-y-6">
 
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2 text-right">إنشاء حلقة جديدة</h2> {# Text align right #}
-            {# Form stacks vertically by default, becomes flex row on medium screens+ #}
-            <form action="{{ url_for('create_episode') }}" method="POST" class="space-y-3 md:space-y-0 md:flex md:items-center md:space-x-reverse md:space-x-3">
-                <input type="text" name="title" required
-                       class="w-full md:flex-grow shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 text-right" {# Text align right #}
-                       placeholder="أدخل عنوان الحلقة الجديدة...">
-                <button type="submit"
-                        class="w-full md:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline btn-hover-effect whitespace-nowrap flex-shrink-0"> {# Added flex-shrink-0 #}
-                    إنشاء حلقة
-                </button>
-            </form>
-        </div>
+        {# ... (remains same) ... #}
+         <div class="bg-white p-6 rounded-lg shadow-md"> <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2 text-right">إنشاء حلقة جديدة</h2> <form action="{{ url_for('create_episode') }}" method="POST" class="space-y-3 md:space-y-0 md:flex md:items-center md:space-x-reverse md:space-x-3"> <input type="text" name="title" required class="w-full md:flex-grow shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 text-right" placeholder="أدخل عنوان الحلقة الجديدة..."> <button type="submit" class="w-full md:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline btn-hover-effect whitespace-nowrap flex-shrink-0"> إنشاء حلقة </button> </form> </div>
 
-        {# ... (All episodes section remains the same) ... #}
         <div class="bg-white p-6 rounded-lg shadow-md">
             <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2 text-right">جميع الحلقات</h2>
             {% if all_episodes %}
-                <ul class="space-y-4">
+                {# --- ADDED id="episode-list" --- #}
+                <ul id="episode-list" class="space-y-4">
                     {% for episode in all_episodes %}
                         {% set current_user_assigned = current_user in episode.assignees %}
-                        <li class="border rounded hover:shadow-md transition duration-150 {% if current_user_assigned %} border-r-4 border-r-blue-500 bg-blue-50 {% else %} border-gray-200 {% endif %}">
+                        {# --- ADDED data-episode-id attribute --- #}
+                        <li data-episode-id="{{ episode.id }}"
+                            class="episode-item border rounded hover:shadow-md transition duration-150 {% if current_user_assigned %} border-r-4 border-r-blue-500 bg-blue-50 {% else %} border-gray-200 {% endif %}">
+                            {# --- Use flex to align handle, content, delete button --- #}
                             <div class="p-4 text-right flex items-start justify-between">
-                                {% if current_user_assigned %}
-                                    <form action="{{ url_for('delete_episode', episode_id=episode.id) }}" method="POST" class="delete-episode-form flex-shrink-0 ml-4" style="display: inline;">
-                                        <button type="submit" class="bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-2 rounded focus:outline-none focus:shadow-outline btn-hover-effect" data-episode-title="{{ episode.title }}"> حذف </button>
-                                    </form>
-                                {% else %}
-                                     <div class="w-12 flex-shrink-0 ml-4"></div>
-                                {% endif %}
+
+                                {# --- ADDED Drag Handle --- #}
+                                <span class="drag-handle flex-shrink-0 mr-2" title="اسحب للتغيير الترتيب">⠿</span>
+
+                                {# Content Div #}
                                 <div class="flex-grow">
                                     <a href="{{ url_for('view_episode', episode_id=episode.id) }}" class="text-blue-700 hover:text-blue-900 font-semibold text-lg block mb-2 {% if current_user_assigned %}font-bold{% endif %}">
                                         {{ episode.title }}
@@ -57,6 +47,18 @@
                                         {% endif %}
                                     </div>
                                 </div>
+
+                                {# Delete Button Div #}
+                                <div class="flex-shrink-0 ml-4"> {# Adjusted margin side for RTL handle #}
+                                    {% if current_user_assigned %}
+                                        <form action="{{ url_for('delete_episode', episode_id=episode.id) }}" method="POST" class="delete-episode-form" style="display: inline;">
+                                            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-2 rounded focus:outline-none focus:shadow-outline btn-hover-effect" data-episode-title="{{ episode.title }}"> حذف </button>
+                                        </form>
+                                    {% else %}
+                                         <div class="w-10"></div> {# Placeholder to maintain alignment #}
+                                    {% endif %}
+                                </div>
+
                             </div>
                         </li>
                     {% endfor %}
@@ -69,50 +71,14 @@
     </div>
 
     {# ... (Collaborators section remains the same) ... #}
-    <div class="md:col-span-1 bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2 text-right">المتعاونون</h2>
-        {% if collaborators %}
-            <ul class="space-y-4">
-                {% for collaborator in collaborators %}
-                    <li class="border-r-4 border-r-indigo-300 pr-3 text-right">
-                        <p class="font-medium text-gray-700">{{ collaborator.username }}</p>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p class="text-gray-600 text-right">لم يتم العثور على متعاونين آخرين.</p>
-        {% endif %}
-    </div>
+    <div class="md:col-span-1 bg-white p-6 rounded-lg shadow-md"> <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2 text-right">المتعاونون</h2> {% if collaborators %} <ul class="space-y-4"> {% for collaborator in collaborators %} <li class="border-r-4 border-r-indigo-300 pr-3 text-right"> <p class="font-medium text-gray-700">{{ collaborator.username }}</p> </li> {% endfor %} </ul> {% else %} <p class="text-gray-600 text-right">لم يتم العثور على متعاونين آخرين.</p> {% endif %} </div>
 
 </div>
 {% endblock %}
 
 {% block scripts %}
 {{ super() }} <script>
-    // Add event listener for delete confirmation after the main script runs
-    document.addEventListener('DOMContentLoaded', () => {
-        // Check if the main script already added the listener
-        if (!document.body.dataset.deleteListenerAdded) {
-             console.log("Adding delete confirmation listener from dashboard.html");
-             // Use event delegation on the body or a container element
-             document.body.addEventListener('submit', function(event) {
-                 // Check if the submitted form is for deleting an episode
-                 if (event.target.classList.contains('delete-episode-form')) {
-                     const button = event.target.querySelector('button[type="submit"]');
-                     const episodeTitle = button ? button.dataset.episodeTitle : 'هذه الحلقة';
-                     // Use the browser's native confirm dialog - Translate confirmation text
-                     const confirmed = confirm(`هل أنت متأكد أنك تريد حذف الحلقة "${episodeTitle}"؟ لا يمكن التراجع عن هذا الإجراء.`);
-
-                     if (!confirmed) {
-                         event.preventDefault(); // Stop form submission if not confirmed
-                         console.log("Episode deletion cancelled by user.");
-                     } else {
-                         console.log(`User confirmed deletion for episode: ${episodeTitle}`);
-                     }
-                 }
-             });
-             document.body.dataset.deleteListenerAdded = 'true'; // Mark listener as added
-        }
-    });
+    // ... (Delete confirmation script remains same) ...
+    document.addEventListener('DOMContentLoaded', () => { if (!document.body.dataset.deleteListenerAdded) { console.log("Adding delete confirmation listener from dashboard.html"); document.body.addEventListener('submit', function(event) { if (event.target.classList.contains('delete-episode-form')) { const button = event.target.querySelector('button[type="submit"]'); const episodeTitle = button ? button.dataset.episodeTitle : 'هذه الحلقة'; const confirmed = confirm(`هل أنت متأكد أنك تريد حذف الحلقة "${episodeTitle}"؟ لا يمكن التراجع عن هذا الإجراء.`); if (!confirmed) { event.preventDefault(); console.log("Episode deletion cancelled by user."); } else { console.log(`User confirmed deletion for episode: ${episodeTitle}`); } } }); document.body.dataset.deleteListenerAdded = 'true'; } });
 </script>
 {% endblock %}

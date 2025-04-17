@@ -1,25 +1,18 @@
-// static/js/script.js (Arabic Version - Multi-Color Highlighting)
+// static/js/script.js (Arabic Version - Drag and Drop)
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log('DOM fully loaded and parsed - Main script.js running.');
 
   // --- Color Palette for Highlights ---
   const highlightColors = [
-    'highlight-color-0',  // yellow-50
-    'highlight-color-1',  // blue-50
-    'highlight-color-2',  // green-50
-    'highlight-color-3',  // red-50
-    'highlight-color-4',  // violet-50
-    'highlight-color-5',  // orange-50
+    'highlight-color-0', 'highlight-color-1', 'highlight-color-2',
+    'highlight-color-3', 'highlight-color-4', 'highlight-color-5'
   ];
   const numHighlightColors = highlightColors.length;
-
-  // Helper function to get color class based on index
   const getColorClassForIndex = (index) => {
-    if (index === null || index < 0) return '';  // No color if index is invalid
+    if (index === null || index < 0) return '';
     return highlightColors[index % numHighlightColors];
   };
-  // Helper function to remove all highlight classes from an element
   const removeHighlightClasses = (element) => {
     if (element) {
       highlightColors.forEach(cls => element.classList.remove(cls));
@@ -39,10 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const saveScenarioBtn = document.getElementById('save-scenario-btn');
   const scenarioStatus = document.getElementById('scenario-status');
   const scenarioDisplay = document.getElementById('scenario-display');
-  const viewScenarioBtnActual =
-      document.getElementById('view-scenario-btn');  // Corrected ID
-  const editScenarioBtnActual =
-      document.getElementById('edit-scenario-btn');  // Corrected ID
+  const viewScenarioBtnActual = document.getElementById('view-scenario-btn');
+  const editScenarioBtnActual = document.getElementById('edit-scenario-btn');
   const scenarioEditorWrapper =
       document.getElementById('scenario-editor-wrapper');
   const commentInstruction = document.getElementById('comment-instruction');
@@ -57,9 +48,74 @@ document.addEventListener('DOMContentLoaded', () => {
   const commentStatus = document.getElementById('comment-status');
   const noCommentsMsg = document.getElementById('no-comments-msg');
 
+  // --- Dashboard Elements ---
+  const episodeList =
+      document.getElementById('episode-list');  // Target the episode list UL
+
   let currentEditingBlock = null;
 
-  // Check if we are on the episode page
+  // --- Initialize SortableJS on Dashboard ---
+  if (episodeList && typeof Sortable !== 'undefined') {
+    console.log('Initializing SortableJS for episode list.');
+    new Sortable(episodeList, {
+      animation: 150,  // ms, animation speed moving items when sorting, `0` —
+                       // without animation
+      ghostClass: 'sortable-ghost',    // Class name for the drop placeholder
+      chosenClass: 'sortable-chosen',  // Class name for the chosen item
+      handle: '.drag-handle',  // Restrict drag start to the handle element
+      onEnd: function(evt) {
+        // evt.oldIndex;  // element's old index within parent
+        // evt.newIndex;  // element's new index within parent
+
+        const items = evt.target.querySelectorAll(
+            '.episode-item');  // Get all items in the list
+        const orderedIds = [];
+        items.forEach(item => {
+          const episodeId = item.dataset.episodeId;
+          if (episodeId) {
+            orderedIds.push(episodeId);
+          }
+        });
+
+        console.log('New episode order:', orderedIds);
+
+        // Send the new order to the backend
+        saveEpisodeOrder(orderedIds);
+      },
+    });
+  } else if (episodeList) {
+    console.warn('SortableJS library not found, drag-and-drop disabled.');
+  }
+
+  // Function to save the new order via fetch
+  async function saveEpisodeOrder(orderedIds) {
+    try {
+      const response = await fetch('/api/update_episode_order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Add CSRF token header if needed
+        },
+        body: JSON.stringify({ordered_ids: orderedIds})
+      });
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'فشل حفظ الترتيب');
+      }
+      console.log('Episode order saved successfully.');
+      // Optional: Show a success message to the user (e.g., using a flash-like
+      // mechanism) alert('تم حفظ ترتيب الحلقات.'); // Simple alert
+
+    } catch (error) {
+      console.error('Error saving episode order:', error);
+      // Optional: Show an error message to the user
+      alert(`خطأ في حفظ الترتيب: ${error.message}`);
+    }
+  }
+
+
+  // --- Episode Page Specific Logic ---
   if (typeof EPISODE_ID !== 'undefined' && EPISODE_ID !== null &&
       typeof CURRENT_USER_ID !== 'undefined' &&
       typeof IS_ADMIN !== 'undefined') {
@@ -83,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- Event Listeners ---
-    // ... (Save buttons, Toggle buttons remain the same) ...
+    // ... (Save buttons, Toggle buttons, Commenting Logic remain the same) ...
     if (savePlanBtn && IS_ASSIGNED) {
       savePlanBtn.addEventListener('click', () => {
         saveContent('plan', planArea.value, planStatus).then(success => {
@@ -99,8 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       });
     }
-    if (viewPlanBtn && editPlanBtn && planDisplay && planEditorWrapper &&
-        IS_ASSIGNED) {
+    if (viewPlanBtn && editPlanBtn && planDisplay && planEditorWrapper) {
       viewPlanBtn.addEventListener('click', () => {
         planEditorWrapper.classList.add('hidden');
         planDisplay.classList.remove('hidden');
@@ -125,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
     if (viewScenarioBtnActual && editScenarioBtnActual && scenarioDisplay &&
-        scenarioEditorWrapper && IS_ASSIGNED) {
+        scenarioEditorWrapper) {
       viewScenarioBtnActual.addEventListener('click', () => {
         scenarioEditorWrapper.classList.add('hidden');
         scenarioDisplay.classList.remove('hidden');
@@ -155,11 +210,6 @@ document.addEventListener('DOMContentLoaded', () => {
         scenarioArea.focus();
       });
     }
-
-
-    // --- Commenting Logic ---
-
-    // Scenario Display Click (Add Comment)
     if (IS_ASSIGNED && scenarioDisplay) {
       scenarioDisplay.addEventListener('click', (event) => {
         if (scenarioDisplay.classList.contains('hidden')) return;
@@ -172,8 +222,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }
-
-    // Submit Comment Button
     if (submitCommentBtn && IS_ASSIGNED) {
       submitCommentBtn.addEventListener('click', () => {
         const blockIndex = currentEditingBlock;
@@ -196,8 +244,12 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(response => response.json())
             .then(data => {
               if (data.success && data.comment) {
-                addCommentToDisplay(
-                    data.comment);  // This will handle highlighting
+                addCommentToDisplay(data.comment);
+                const blockElement = scenarioDisplay.querySelector(
+                    `.commentable-block[data-block-index="${blockIndex}"]`);
+                if (blockElement) {
+                  blockElement.classList.add('highlighted-comment-block');
+                }
                 closeCommentForm();
               } else {
                 commentStatus.textContent =
@@ -214,15 +266,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
       });
     }
-
-    // Cancel Comment Button
     if (cancelCommentBtn) {
       cancelCommentBtn.addEventListener('click', () => {
         closeCommentForm();
       });
     }
-
-    // Comment Deletion (Event Delegation)
     if (commentDisplayArea) {
       commentDisplayArea.addEventListener('click', function(event) {
         const deleteButton = event.target.closest('.delete-comment-btn');
@@ -233,8 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
               commentElement ? commentElement.closest('.comment-group') : null;
           const blockIndex = commentGroup ?
               parseInt(commentGroup.dataset.blockIndex, 10) :
-              null;  // Get block index
-
+              null;
           if (commentId && commentElement && blockIndex !== null) {
             const confirmed = confirm('هل أنت متأكد أنك تريد حذف هذا التعليق؟');
             if (confirmed) {
@@ -248,22 +295,16 @@ document.addEventListener('DOMContentLoaded', () => {
                       commentElement.style.opacity = '0';
                       setTimeout(() => {
                         commentElement.remove();
-                        // Check if the block group is now empty
                         if (commentGroup &&
                             !commentGroup.querySelector('.comment-item')) {
-                          commentGroup.remove();  // Remove the group
-                          // Remove highlight from the corresponding scenario
-                          // block
+                          commentGroup.remove();
                           const blockElement = scenarioDisplay.querySelector(
                               `.commentable-block[data-block-index="${
                                   blockIndex}"]`);
                           if (blockElement) {
-                            removeHighlightClasses(
-                                blockElement);  // Use helper to remove all
-                                                // color classes
+                            removeHighlightClasses(blockElement);
                           }
                         }
-                        // Check if any comment groups left
                         if (!commentDisplayArea.querySelector(
                                 '.comment-group')) {
                           if (noCommentsMsg)
@@ -283,10 +324,10 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // --- Helper Functions ---
 
-    async function saveContent(type, content, statusElement) {
-      // ... (saveContent logic remains the same) ...
+    // --- Helper Functions ---
+    async function saveContent(
+        type, content, statusElement) { /* ... unchanged ... */
       statusElement.textContent = 'جارٍ الحفظ...';
       statusElement.classList.remove('text-green-600', 'text-red-600');
       statusElement.classList.add('text-gray-500');
@@ -321,9 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return false;
       }
     }
-
-    function renderPlanMarkdown(planText) {
-      // ... (renderPlanMarkdown remains the same) ...
+    function renderPlanMarkdown(planText) { /* ... unchanged ... */
       if (!planDisplay || typeof marked === 'undefined') {
         console.error('Plan display area not found or Marked.js not loaded.');
         return;
@@ -337,13 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
         planDisplay.textContent = planText;
       }
     }
-
-    /**
-     * Renders the SCENARIO text as Markdown and makes blocks commentable.
-     * Adds cycling highlight class to blocks with comments.
-     * @param {string} scenarioText - The full scenario text.
-     */
-    function renderScenario(scenarioText) {
+    function renderScenario(scenarioText) { /* ... unchanged ... */
       if (!scenarioDisplay || typeof marked === 'undefined') {
         console.error(
             'Scenario display area not found or Marked.js not loaded.');
@@ -359,13 +392,10 @@ document.addEventListener('DOMContentLoaded', () => {
           blockElement.dataset.blockIndex = i;
           blockElement.classList.add('commentable-block');
           hasCommentableBlocks = true;
-          // Remove any previous highlight first
           removeHighlightClasses(blockElement);
-          // Add highlight class if comments exist for this block index
           if (typeof INITIAL_COMMENTS_BY_BLOCK !== 'undefined' &&
               INITIAL_COMMENTS_BY_BLOCK[i]) {
-            const colorClass =
-                getColorClassForIndex(i);  // Get color based on index
+            const colorClass = getColorClassForIndex(i);
             if (colorClass) blockElement.classList.add(colorClass);
           }
         }
@@ -388,46 +418,32 @@ document.addEventListener('DOMContentLoaded', () => {
         scenarioDisplay.textContent = scenarioText;
       }
     }
-
-
-    /**
-     * Renders comments grouped by block index.
-     * Adds cycling highlight class to comment groups.
-     * @param {object} commentsByBlock - Object keyed by block_index.
-     */
-    function renderComments(commentsByBlock) {
+    function renderComments(commentsByBlock) { /* ... unchanged ... */
       if (!commentDisplayArea) return;
       clearCommentsDisplay();
-
       let hasAnyComments = false;
       if (commentsByBlock && typeof commentsByBlock === 'object') {
         Object.keys(commentsByBlock)
             .sort((a, b) => parseInt(a, 10) - parseInt(b, 10))
             .forEach(blockIndexStr => {
-              const blockIndex =
-                  parseInt(blockIndexStr, 10);  // Ensure it's a number
+              const blockIndex = parseInt(blockIndexStr, 10);
               const comments = commentsByBlock[blockIndex];
               if (comments && comments.length > 0) {
                 hasAnyComments = true;
                 const blockCommentsContainer = document.createElement('div');
-                const colorClass =
-                    getColorClassForIndex(blockIndex);  // Get color class
-                // Add highlight class to the comment group itself
+                const colorClass = getColorClassForIndex(blockIndex);
                 blockCommentsContainer.classList.add(
                     'comment-group', 'mb-3', 'border-r-4', 'pr-3',
                     'text-right');
                 if (colorClass)
-                  blockCommentsContainer.classList.add(
-                      colorClass);  // Add the specific color class
+                  blockCommentsContainer.classList.add(colorClass);
                 blockCommentsContainer.dataset.blockIndex = blockIndex;
-
                 const blockHeader = document.createElement('h4');
                 blockHeader.classList.add(
                     'text-sm', 'font-semibold', 'text-gray-600', 'mb-1');
                 blockHeader.textContent =
                     `تعليقات للفقرة رقم ${blockIndex + 1}`;
                 blockCommentsContainer.appendChild(blockHeader);
-
                 comments.forEach(comment => {
                   const commentElement = createCommentElement(comment);
                   blockCommentsContainer.appendChild(commentElement);
@@ -436,57 +452,38 @@ document.addEventListener('DOMContentLoaded', () => {
               }
             });
       }
-
       if (noCommentsMsg) {
         noCommentsMsg.style.display = hasAnyComments ? 'none' : 'block';
       }
       console.log(
           `Rendered comments by block. Has comments: ${hasAnyComments}`);
     }
-
-    /**
-     * Adds a single new comment to the display area, grouped by block index.
-     * Ensures the group and scenario block are highlighted with the correct
-     * color.
-     * @param {object} comment - Comment object including block_index.
-     */
-    function addCommentToDisplay(comment) {
+    function addCommentToDisplay(comment) { /* ... unchanged ... */
       if (!commentDisplayArea || comment.block_index === undefined) return;
       if (noCommentsMsg && noCommentsMsg.style.display !== 'none') {
         noCommentsMsg.style.display = 'none';
       }
-
       const blockIndex = comment.block_index;
-      const colorClass = getColorClassForIndex(blockIndex);  // Get color class
+      const colorClass = getColorClassForIndex(blockIndex);
       let blockCommentsContainer = commentDisplayArea.querySelector(
           `.comment-group[data-block-index="${blockIndex}"]`);
-
-      // Ensure scenario block is highlighted with the correct color
       const blockElement = scenarioDisplay.querySelector(
           `.commentable-block[data-block-index="${blockIndex}"]`);
       if (blockElement) {
-        removeHighlightClasses(blockElement);  // Remove old colors if any
-        if (colorClass)
-          blockElement.classList.add(colorClass);  // Add correct color
+        removeHighlightClasses(blockElement);
+        if (colorClass) blockElement.classList.add(colorClass);
       }
-
       if (!blockCommentsContainer) {
         blockCommentsContainer = document.createElement('div');
-        // Add highlight class when creating the group
         blockCommentsContainer.classList.add(
             'comment-group', 'mb-3', 'border-r-4', 'pr-3', 'text-right');
-        if (colorClass)
-          blockCommentsContainer.classList.add(
-              colorClass);  // Add correct color
+        if (colorClass) blockCommentsContainer.classList.add(colorClass);
         blockCommentsContainer.dataset.blockIndex = blockIndex;
-
         const blockHeader = document.createElement('h4');
         blockHeader.classList.add(
             'text-sm', 'font-semibold', 'text-gray-600', 'mb-1');
         blockHeader.textContent = `تعليقات للفقرة رقم ${blockIndex + 1}`;
         blockCommentsContainer.appendChild(blockHeader);
-
-        // Insert sorted
         const existingGroups =
             commentDisplayArea.querySelectorAll('.comment-group');
         let inserted = false;
@@ -501,18 +498,14 @@ document.addEventListener('DOMContentLoaded', () => {
           commentDisplayArea.appendChild(blockCommentsContainer);
         }
       } else {
-        // Ensure existing group also has the correct highlight
         removeHighlightClasses(blockCommentsContainer);
         if (colorClass) blockCommentsContainer.classList.add(colorClass);
       }
-
       const commentElement = createCommentElement(comment);
       commentElement.classList.add('comment-item');
       blockCommentsContainer.appendChild(commentElement);
     }
-
-    function createCommentElement(comment) {
-      // ... (createCommentElement logic remains the same) ...
+    function createCommentElement(comment) { /* ... unchanged ... */
       const div = document.createElement('div');
       div.classList.add(
           'comment-item', 'bg-gray-50', 'p-2', 'rounded', 'text-sm', 'mb-1',
@@ -531,9 +524,7 @@ document.addEventListener('DOMContentLoaded', () => {
           comment.author}</span> - ${comment.timestamp} </p> `;
       return div;
     }
-
-    function clearCommentsDisplay() {
-      // ... (clearCommentsDisplay remains the same) ...
+    function clearCommentsDisplay() { /* ... unchanged ... */
       if (commentDisplayArea) {
         const groups = commentDisplayArea.querySelectorAll('.comment-group');
         groups.forEach(group => group.remove());
@@ -548,9 +539,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     }
-
-    function openCommentForm(blockIndex) {
-      // ... (openCommentForm remains the same) ...
+    function openCommentForm(blockIndex) { /* ... unchanged ... */
       currentEditingBlock = blockIndex;
       if (commentBlockIndexSpan)
         commentBlockIndexSpan.textContent = blockIndex + 1;
@@ -560,9 +549,7 @@ document.addEventListener('DOMContentLoaded', () => {
       commentText.focus();
       console.log(`Opened comment form for block index ${blockIndex}`);
     }
-
-    function closeCommentForm() {
-      // ... (closeCommentForm remains the same) ...
+    function closeCommentForm() { /* ... unchanged ... */
       commentFormContainer.classList.add('hidden');
       currentEditingBlock = null;
       commentText.value = '';
@@ -571,6 +558,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
   } else {
-    console.log('Not on episode page, or required JS variables not defined.');
+    console.log(
+        'Not on episode page, or required JS variables not defined OR not on dashboard page.');
   }
 });  // End DOMContentLoaded

@@ -26,19 +26,17 @@
                 <ul id="episode-list" class="space-y-4">
                     {% for episode in all_episodes %}
                         {% set current_user_assigned = current_user in episode.assignees %}
-                        {# --- Calculate Maslak Color Class --- #}
-                        {% set color_class = 'maslak-color-default' %} {# Default background #}
-                        {% if episode.maslak %}
-                            {% set color_index = (episode.maslak.id % 6) %} {# Cycle through 6 colors #}
-                            {% set color_class = 'maslak-color-' + color_index|string %}
-                        {% endif %}
+                        {# --- REMOVED Maslak Color Logic --- #}
+                        {# {% set color_class = 'maslak-color-default' %} #}
+                        {# {% if episode.maslak %} ... {% endif %} #}
 
                         <li data-episode-id="{{ episode.id }}"
                             class="episode-item border border-gray-200 rounded-lg shadow-md hover:shadow-xl hover:scale-[1.01] transition-all duration-200 ease-in-out cursor-default
-                                   {{ color_class }} {# Apply calculated Maslak color class #}
-                                   {# --- Conditional Border Styling for assigned --- #}
+                                   {# --- Simplified Conditional Background/Border Styling --- #}
                                    {% if current_user_assigned %}
-                                       border-r-4 border-r-blue-600 {# Keep blue border for assigned #}
+                                       border-r-4 border-r-blue-600 bg-blue-100 {# Assigned style #}
+                                   {% else %}
+                                       bg-white {# Default style #}
                                    {% endif %}">
                             {# --- Use items-center for better vertical alignment --- #}
                             <div class="p-4 text-right flex items-center justify-between">

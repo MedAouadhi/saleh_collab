@@ -40,20 +40,23 @@ DEFAULT_PLAN_MARKDOWN = """## ✅ مؤشرات نجاح الحلقة
 ---"""
 # --- End Default Template ---
 
+# --- NEW: Maslak (Chapter/Category) Model ---
+class Maslak(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+
+    def __repr__(self):
+        return f'<Maslak {self.name}>'
+# --- End Maslak Model ---
+
 
 # User model: Represents users who can log in and contribute.
-# Inherits from UserMixin for Flask-Login compatibility.
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(120), nullable=False) # Stores the hashed password
-    is_admin = db.Column(db.Boolean, nullable=False, default=False) # Admin flag
-
-    # Relationship to episodes assigned to this user
-    # REMOVED lazy='dynamic'
+    password = db.Column(db.String(120), nullable=False)
+    is_admin = db.Column(db.Boolean, nullable=False, default=False)
     assigned_episodes = db.relationship('Episode', secondary='assignment', back_populates='assignees')
-    # Relationship defining comments made by the user (backref defined in Comment)
-    # Cascade delete for comments is now handled by the backref below
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -67,11 +70,13 @@ class Episode(db.Model):
     last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     display_order = db.Column(db.Integer, nullable=False, default=0, index=True)
 
-    # Relationship to users assigned to this episode
-    # REMOVED lazy='dynamic'
+    # --- NEW: Foreign Key and Relationship to Maslak ---
+    maslak_id = db.Column(db.Integer, db.ForeignKey('maslak.id'), nullable=False)
+    maslak = db.relationship('Maslak', backref=db.backref('episodes', lazy='dynamic', order_by='Episode.display_order'))
+    # --- End Maslak Relationship ---
+
     assignees = db.relationship('User', secondary='assignment', back_populates='assigned_episodes')
-    # Relationship to comments made on this episode
-    comments = db.relationship('Comment', backref='episode', lazy='dynamic', cascade="all, delete-orphan") # Keep dynamic for comments
+    comments = db.relationship('Comment', backref='episode', lazy='dynamic', cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'<Episode {self.title}>'
@@ -92,8 +97,6 @@ class Comment(db.Model):
     block_index = db.Column(db.Integer, nullable=False)
     text = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    # Relationship to the user who made the comment
-    # Keep lazy='dynamic' on comments backref if needed for filtering user's comments later
     author = db.relationship('User', backref=db.backref('comments', lazy='dynamic'))
 
     def __repr__(self):

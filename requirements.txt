@@ -9,3 +9,4 @@ WTForms>=3.0
 WeasyPrint>=55.0 # Or latest version
 Markdown>=3.3.0
 Flask-Migrate>=4.0.0 # Added Flask-Migrate
+requests>=2.32.3

@@ -41,3 +41,5 @@ test_*
 coverage.xml
 coverage_html_report/
 .coverage.*
+
+migrations

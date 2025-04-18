@@ -1,0 +1,16 @@
+{% extends 'admin/model/list.html' %}
+
+{# Add a button bar above the list table for custom actions #}
+{% block list_header %}
+  <div class="text-right mb-4 border-b pb-2">
+      <form method="POST" action="{{ url_for('clear_audit_log') }}" onsubmit="return confirm('هل أنت متأكد أنك تريد حذف جميع سجلات النشاط؟ لا يمكن التراجع عن هذا الإجراء.');" style="display: inline-block;">
+          {# Add CSRF token if using Flask-WTF CSRF protection #}
+          {# <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/> #}
+          <button type="submit" class="btn btn-danger">
+              <i class="fa fa-trash"></i> حذف جميع السجلات
+          </button>
+      </form>
+  </div>
+  {{ super() }} {# Include the default list header content (search, filters etc) #}
+{% endblock %}
+

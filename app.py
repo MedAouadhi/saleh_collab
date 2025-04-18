@@ -3,15 +3,16 @@
 
 import os
 import io
+import json
 from datetime import datetime
 from flask import (Flask, render_template, request, redirect, url_for, flash,
                    jsonify, session, abort, current_app, send_file)
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 # Import models including Maslak and Status Constants
-from models import (db, User, Episode, Assignment, Comment, Maslak,
+from models import (db, User, Episode, Assignment, Comment, Maslak, AuditLog, # <<< Added AuditLog
                     EPISODE_STATUS_DRAFT, EPISODE_STATUS_REVIEW, EPISODE_STATUS_COMPLETE,
-                    EPISODE_STATUS_CHOICES) # Import Choices
+                    EPISODE_STATUS_CHOICES)
 from dotenv import load_dotenv
 from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -91,6 +92,25 @@ def _create_db_and_seed():
         else: print("Database already contains data.")
 
 
+# --- Helper Function for Logging Activity ---
+def log_activity(action, user=None, target=None, details=None):
+    """Logs an action to the AuditLog table."""
+    try:
+        log_user = user or (current_user if current_user.is_authenticated else None)
+        user_id = log_user.id if log_user else None
+        target_type = target.__class__.__name__ if target else None
+        target_id = target.id if target and hasattr(target, 'id') else None
+        details_str = json.dumps(details, ensure_ascii=False, default=str) if isinstance(details, dict) else details # Use default=str for complex objects
+
+        log_entry = AuditLog( user_id=user_id, action=action, target_type=target_type, target_id=target_id, details=details_str )
+        db.session.add(log_entry)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"Error logging activity '{action}': {e}", exc_info=True)
+# --- End Helper Function ---
+
+
 # --- Custom Admin Forms ---
 class UserForm(FlaskForm):
     username = StringField('اسم المستخدم', validators=[DataRequired(), Length(min=3, max=80)])
@@ -112,25 +132,32 @@ class SecureModelView(ModelView):
 
 class UserAdminView(SecureModelView):
     form = UserForm
-    column_list = ('id', 'username', 'is_admin', 'assigned_episodes')
-    column_exclude_list = ('password',)
-    form_excluded_columns = ('comments', 'assigned_episodes', 'password')
+    column_list = ('id', 'username', 'is_admin', 'last_login', 'assigned_episodes')
+    column_exclude_list = ('password', 'audit_logs')
+    form_excluded_columns = ('comments', 'assigned_episodes', 'password', 'last_login', 'audit_logs')
     column_searchable_list = ('username',)
     column_display_pk = True
+    column_sortable_list = ('id', 'username', 'is_admin', 'last_login')
     def on_model_change(self, form, model, is_created):
         if form.password.data: model.password = generate_password_hash(form.password.data, method='pbkdf2:sha256')
         elif is_created and not model.password: flash('كلمة المرور مطلوبة للمستخدمين الجدد.', 'error'); raise ValueError("Password required")
+    def after_model_change(self, form, model, is_created):
+        action = 'create_user' if is_created else 'edit_user'; log_activity(action, target=model, details=f"Admin action by {current_user.username}")
+    def on_model_delete(self, model): log_activity('delete_user', target=model, details=f"Admin action by {current_user.username}")
 
 class EpisodeAdminView(SecureModelView):
     column_list = ('id', 'title', 'maslak', 'status', 'display_order', 'last_updated', 'assignees')
     column_searchable_list = ('title', 'plan', 'scenario', 'maslak.name', 'status')
     column_filters = ('maslak', 'status')
     form_columns = ('title', 'maslak', 'status', 'plan', 'scenario', 'display_order')
-    form_excluded_columns = ('comments', 'assignees')
+    form_excluded_columns = ('comments', 'assignees', 'audit_logs')
     column_display_pk = True
     column_sortable_list = ('id', 'title', 'maslak.name', 'status', 'last_updated', 'display_order')
     form_overrides = { 'status': SelectField }
     form_args = { 'status': { 'label': 'الحالة', 'choices': EPISODE_STATUS_CHOICES } }
+    def after_model_change(self, form, model, is_created):
+        action = 'create_episode_admin' if is_created else 'edit_episode_admin'; log_activity(action, target=model, details=f"Admin action by {current_user.username}")
+    def on_model_delete(self, model): log_activity('delete_episode_admin', target=model, details=f"Admin action by {current_user.username}")
 
 class MaslakAdminView(SecureModelView):
     form = MaslakForm
@@ -138,115 +165,104 @@ class MaslakAdminView(SecureModelView):
     column_searchable_list = ('name',)
     column_display_pk = True
     form_excluded_columns = ('episodes',)
+    def after_model_change(self, form, model, is_created):
+        action = 'create_maslak' if is_created else 'edit_maslak'; log_activity(action, target=model, details=f"Admin action by {current_user.username}")
+    def on_model_delete(self, model): log_activity('delete_maslak', target=model, details=f"Admin action by {current_user.username}")
+
+class AuditLogAdminView(SecureModelView):
+    # Use custom template to add Clear button
+    list_template = 'admin/auditlog_list.html'
+
+    can_create = False; can_edit = False; can_delete = False # Read-only view
+    column_list = ('timestamp', 'user', 'action', 'target_type', 'target_id', 'details')
+    column_searchable_list = ('action', 'target_type', 'details', 'user.username')
+    column_filters = ('action', 'user', 'target_type', 'timestamp')
+    column_default_sort = ('timestamp', True)
+    column_labels = { 'user': 'المستخدم', 'timestamp': 'الوقت', 'action': 'الإجراء', 'target_type': 'نوع الهدف', 'target_id': 'معرف الهدف', 'details': 'تفاصيل' }
 
 admin = Admin(app, name='صالح - الكراسة الحمراء 📕', template_mode='bootstrap4', url='/admin', index_view=MyAdminIndexView())
 admin.add_view(UserAdminView(User, db.session, name='المستخدمون'))
 admin.add_view(EpisodeAdminView(Episode, db.session, name='الحلقات'))
 admin.add_view(MaslakAdminView(Maslak, db.session, name='المسالك'))
+admin.add_view(AuditLogAdminView(AuditLog, db.session, name='سجل النشاط')) # Added Audit Log view
 # --- End Flask-Admin Setup ---
 
 # --- Routes ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    # ... (login logic remains the same) ...
     if current_user.is_authenticated: return redirect(url_for('dashboard'))
     if request.method == 'POST':
         username = request.form.get('username'); password = request.form.get('password')
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
-            login_user(user, remember=request.form.get('remember'))
+            remember_me = bool(request.form.get('remember'))
+            login_user(user, remember=remember_me)
+            try:
+                user.last_login = datetime.utcnow()
+                # Log activity *after* potential commit for last_login
+                # db.session.add(user) # No need to re-add
+                db.session.commit() # Commit last_login first
+                log_activity('login', user=user) # Now log
+            except Exception as e:
+                 db.session.rollback()
+                 app.logger.error(f"Error updating last_login/logging for user {user.id}: {e}", exc_info=True)
             flash('تم تسجيل الدخول بنجاح.', 'success')
             next_page = request.args.get('next')
             if next_page and next_page.startswith(url_for('admin.index')):
                  if hasattr(user, 'is_admin') and user.is_admin: return redirect(next_page)
                  else: flash('ليس لديك صلاحية الوصول للوحة التحكم.', 'warning'); return redirect(url_for('dashboard'))
             return redirect(next_page or url_for('dashboard'))
-        else: flash('اسم المستخدم أو كلمة المرور غير صالحة.', 'danger')
+        else:
+            flash('اسم المستخدم أو كلمة المرور غير صالحة.', 'danger')
+            log_activity('login_failed', details=f"Username: {username}")
     return render_template('login.html')
+
+# ... (Other routes remain largely the same, but with log_activity calls added) ...
 
 @app.route('/logout')
 @login_required
-def logout(): logout_user(); flash('تم تسجيل خروجك.', 'success'); return redirect(url_for('login'))
+def logout():
+    log_activity('logout')
+    logout_user()
+    flash('تم تسجيل خروجك.', 'success')
+    return redirect(url_for('login'))
 
-# --- UPDATED: Dashboard Route with Combined Filtering ---
 @app.route('/')
 @login_required
 def dashboard():
-    """Displays the dashboard with episodes (filterable by Maslak/Status) and collaborators."""
+    # ... (dashboard logic remains the same) ...
     app.logger.info(f"Accessing dashboard route for user: {current_user.username}")
     try:
-        # Get filters from query args - use empty string as default for 'All'
         selected_maslak_id_str = request.args.get('maslak', default='', type=str)
-        selected_status = request.args.get('status', default='') # Get status as string
-
-        # Convert maslak_id to int if not empty
+        selected_status = request.args.get('status', default='')
         selected_maslak_id = None
         if selected_maslak_id_str:
             try:
                 selected_maslak_id = int(selected_maslak_id_str)
-                # Verify Maslak exists (optional but good practice)
-                if not Maslak.query.get(selected_maslak_id):
-                    app.logger.warning(f"Maslak ID {selected_maslak_id} not found, showing all.")
-                    selected_maslak_id = None
-            except ValueError:
-                app.logger.warning(f"Invalid Maslak ID received: {selected_maslak_id_str}. Showing all.")
-                selected_maslak_id = None # Reset if invalid format
-
-        # Validate selected status
+                if not Maslak.query.get(selected_maslak_id): selected_maslak_id = None
+            except ValueError: selected_maslak_id = None
         valid_statuses = [choice[0] for choice in EPISODE_STATUS_CHOICES]
-        if selected_status and selected_status not in valid_statuses:
-            app.logger.warning(f"Invalid status filter received: {selected_status}. Ignoring.")
-            selected_status = '' # Treat invalid status as 'All'
-
-        # Base query for episodes
+        if selected_status and selected_status not in valid_statuses: selected_status = ''
         episode_query = Episode.query.options(joinedload(Episode.assignees))
-
-        # Apply Maslak filter
-        if selected_maslak_id:
-            episode_query = episode_query.filter(Episode.maslak_id == selected_maslak_id)
-            app.logger.info(f"Filtering episodes by Maslak ID: {selected_maslak_id}")
-
-        # Apply Status filter
-        if selected_status: # Filter if not empty string
-            episode_query = episode_query.filter(Episode.status == selected_status)
-            app.logger.info(f"Filtering episodes by Status: {selected_status}")
-
-        # Execute the query for the list, ordered
+        if selected_maslak_id: episode_query = episode_query.filter(Episode.maslak_id == selected_maslak_id)
+        if selected_status: episode_query = episode_query.filter(Episode.status == selected_status)
         filtered_episodes = episode_query.order_by(Episode.display_order, Episode.id).all()
-
-        # Calculate Metrics based on the *filtered* view
         total_episodes_in_view = len(filtered_episodes)
         draft_episodes = sum(1 for ep in filtered_episodes if ep.status == EPISODE_STATUS_DRAFT)
         review_episodes = sum(1 for ep in filtered_episodes if ep.status == EPISODE_STATUS_REVIEW)
         complete_episodes = sum(1 for ep in filtered_episodes if ep.status == EPISODE_STATUS_COMPLETE)
-
-        metrics = {
-            'total_episodes': total_episodes_in_view,
-            'draft_episodes': draft_episodes,
-            'review_episodes': review_episodes,
-            'complete_episodes': complete_episodes,
-        }
-
+        metrics = { 'total_episodes': total_episodes_in_view, 'draft_episodes': draft_episodes, 'review_episodes': review_episodes, 'complete_episodes': complete_episodes, }
         all_maslaks = Maslak.query.order_by(Maslak.name).all()
         collaborators = User.query.filter(User.id != current_user.id).order_by(User.username).all()
-        # Use the constant directly for choices in the template
         status_filter_options = EPISODE_STATUS_CHOICES
+        return render_template('dashboard.html', all_episodes=filtered_episodes, all_maslaks=all_maslaks, selected_maslak_id=selected_maslak_id, selected_status=selected_status, status_filter_options=status_filter_options, collaborators=collaborators, metrics=metrics)
+    except Exception as e: app.logger.error(f"Error in dashboard route: {e}", exc_info=True); abort(500)
 
-        return render_template('dashboard.html',
-                               all_episodes=filtered_episodes,
-                               all_maslaks=all_maslaks,
-                               selected_maslak_id=selected_maslak_id, # Pass integer or None
-                               selected_status=selected_status, # Pass string or empty string
-                               status_filter_options=status_filter_options, # Pass status choices
-                               collaborators=collaborators,
-                               metrics=metrics)
-    except Exception as e:
-        app.logger.error(f"Error in dashboard route: {e}", exc_info=True); abort(500)
 
-# ... (rest of routes remain the same) ...
 @app.route('/test')
 @login_required
 def test_route(): return "Test route is working!"
+
 
 @app.route('/create_episode', methods=['POST'])
 @login_required
@@ -261,12 +277,14 @@ def create_episode():
     try:
         last_episode_in_maslak = Episode.query.filter_by(maslak_id=maslak_id).order_by(Episode.display_order.desc()).first()
         initial_order = (last_episode_in_maslak.display_order + 1) if last_episode_in_maslak else 0
-        new_episode = Episode(title=title, maslak_id=maslak_id, display_order=initial_order) # Status defaults in model
+        new_episode = Episode(title=title, maslak_id=maslak_id, display_order=initial_order)
         db.session.add(new_episode); db.session.flush()
         assignment = Assignment(user_id=current_user.id, episode_id=new_episode.id); db.session.add(assignment)
+        log_activity('create_episode', target=new_episode)
         db.session.commit(); flash(f'تم إنشاء الحلقة "{title}" بنجاح في مسلك "{maslak.name}" وتم تعيينك لها.', 'success')
     except Exception as e: db.session.rollback(); flash(f'خطأ في إنشاء الحلقة: {e}', 'danger'); print(f"Error: {e}")
     return redirect(url_for('dashboard', maslak=maslak_id))
+
 
 @app.route('/delete_episode/<int:episode_id>', methods=['POST'])
 @login_required
@@ -277,6 +295,7 @@ def delete_episode(episode_id):
          flash('يمكن فقط للمستخدمين المعينين أو المسؤولين حذف الحلقات.', 'warning')
          return redirect(url_for('dashboard'))
     try:
+        log_activity('delete_episode', target=episode)
         Assignment.query.filter_by(episode_id=episode.id).delete(); db.session.delete(episode); db.session.commit()
         flash(f'تم حذف الحلقة "{episode.title}" بنجاح.', 'success')
     except Exception as e: db.session.rollback(); flash(f'خطأ في حذف الحلقة: {e}', 'danger'); print(f"Error: {e}")
@@ -297,7 +316,9 @@ def change_episode_maslak(episode_id):
     try:
         old_maslak_name = episode.maslak.name if episode.maslak else 'غير محدد'
         episode.maslak_id = new_maslak_id
-        db.session.add(episode); db.session.commit()
+        db.session.add(episode)
+        log_activity('change_maslak', target=episode, details=f"New Maslak ID: {new_maslak_id}")
+        db.session.commit()
         flash(f'تم نقل الحلقة "{episode.title}" من مسلك "{old_maslak_name}" إلى مسلك "{new_maslak.name}" بنجاح.', 'success')
     except Exception as e: db.session.rollback(); flash(f'حدث خطأ أثناء تغيير المسلك: {e}', 'danger'); app.logger.error(f"Error changing maslak for episode {episode_id}: {e}", exc_info=True)
     return redirect(url_for('view_episode', episode_id=episode_id))
@@ -314,14 +335,43 @@ def change_episode_status(episode_id):
     if not new_status or new_status not in valid_statuses: flash('الحالة المحددة غير صالحة.', 'warning'); return redirect(url_for('view_episode', episode_id=episode_id))
     if episode.status == new_status: flash('الحلقة لديها هذه الحالة بالفعل.', 'info'); return redirect(url_for('view_episode', episode_id=episode_id))
     try:
-        episode.status = new_status; db.session.add(episode); db.session.commit()
+        episode.status = new_status
+        db.session.add(episode)
+        log_activity('change_status', target=episode, details=f"New Status: {new_status}")
+        db.session.commit()
         flash(f'تم تغيير حالة الحلقة "{episode.title}" إلى "{new_status}" بنجاح.', 'success')
     except Exception as e: db.session.rollback(); flash(f'حدث خطأ أثناء تغيير الحالة: {e}', 'danger'); app.logger.error(f"Error changing status for episode {episode_id}: {e}", exc_info=True)
     return redirect(url_for('view_episode', episode_id=episode_id))
 
+
+# --- NEW: Route to Clear Audit Log ---
+@app.route('/admin/clear_audit_log', methods=['POST'])
+@login_required
+def clear_audit_log():
+    """Clears all entries from the AuditLog table. Admin only."""
+    if not (hasattr(current_user, 'is_admin') and current_user.is_admin):
+        flash('غير مصرح لك بهذا الإجراء.', 'danger')
+        return redirect(url_for('admin.index')) # Redirect back to admin index
+
+    try:
+        num_rows_deleted = db.session.query(AuditLog).delete()
+        log_activity('clear_audit_log', details=f"{num_rows_deleted} rows deleted.") # Log the clear action itself
+        db.session.commit()
+        flash(f'تم حذف جميع سجلات النشاط ({num_rows_deleted} سجل).', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'حدث خطأ أثناء حذف السجلات: {e}', 'danger')
+        app.logger.error(f"Error clearing audit log: {e}", exc_info=True)
+
+    # Redirect back to the audit log view
+    return redirect(url_for('auditlog.index_view'))
+# --- End Clear Audit Log Route ---
+
+
 @app.route('/api/update_episode_order', methods=['POST'])
 @login_required
 def update_episode_order():
+    # ... (update_episode_order logic remains the same, but now logs) ...
     data = request.get_json();
     if not data or 'ordered_ids' not in data: return jsonify({'success': False, 'message': 'بيانات غير صالحة'}), 400
     ordered_ids = data['ordered_ids']; app.logger.info(f"Received new episode order: {ordered_ids}")
@@ -332,13 +382,16 @@ def update_episode_order():
                 if episode: episode.display_order = index; db.session.add(episode)
                 else: app.logger.warning(f"Episode ID {episode_id} not found during reorder.")
             except ValueError: app.logger.warning(f"Invalid episode ID received: {episode_id_str}"); continue
+        log_activity('reorder_episodes', details=f"New order: {ordered_ids}")
         db.session.commit(); app.logger.info("Episode order updated successfully.")
         return jsonify({'success': True, 'message': 'تم تحديث ترتيب الحلقات.'})
     except Exception as e: db.session.rollback(); app.logger.error(f"Error updating episode order: {e}", exc_info=True); return jsonify({'success': False, 'message': 'حدث خطأ أثناء تحديث الترتيب.'}), 500
 
+
 @app.route('/assign_user', methods=['POST'])
 @login_required
 def assign_user_to_episode():
+    # ... (validation) ...
     episode_id = request.form.get('episode_id'); user_to_assign_id = request.form.get('user_to_assign_id')
     if not episode_id or not user_to_assign_id: flash('معرّف الحلقة أو المستخدم مفقود.', 'danger'); return redirect(request.referrer or url_for('dashboard'))
     try: episode_id = int(episode_id); user_to_assign_id = int(user_to_assign_id)
@@ -348,7 +401,9 @@ def assign_user_to_episode():
     existing_assignment = Assignment.query.filter_by(user_id=user_to_assign.id, episode_id=episode.id).first()
     if existing_assignment: flash(f'المستخدم "{user_to_assign.username}" معين بالفعل للحلقة "{episode.title}".', 'info'); return redirect(url_for('view_episode', episode_id=episode_id))
     try:
-        new_assignment = Assignment(user_id=user_to_assign.id, episode_id=episode.id); db.session.add(new_assignment); db.session.commit()
+        new_assignment = Assignment(user_id=user_to_assign.id, episode_id=episode.id); db.session.add(new_assignment)
+        log_activity('assign_user', target=episode, details=f"Assigned User ID: {user_to_assign_id}")
+        db.session.commit()
         flash(f'تم تعيين المستخدم "{user_to_assign.username}" بنجاح للحلقة "{episode.title}".', 'success')
     except Exception as e: db.session.rollback(); flash(f'خطأ في تعيين المستخدم: {e}', 'danger'); print(f"Error: {e}")
     return redirect(url_for('view_episode', episode_id=episode_id))
@@ -356,10 +411,14 @@ def assign_user_to_episode():
 @app.route('/unassign_self/<int:episode_id>', methods=['POST'])
 @login_required
 def unassign_self_from_episode(episode_id):
+    # ... (validation) ...
     episode = Episode.query.get_or_404(episode_id)
     assignment = Assignment.query.filter_by(user_id=current_user.id, episode_id=episode.id).first()
     if assignment:
-        try: db.session.delete(assignment); db.session.commit(); flash(f'لقد قمت بإلغاء تعيين نفسك بنجاح من الحلقة "{episode.title}".', 'success')
+        try:
+            log_activity('unassign_self', target=episode)
+            db.session.delete(assignment); db.session.commit();
+            flash(f'لقد قمت بإلغاء تعيين نفسك بنجاح من الحلقة "{episode.title}".', 'success')
         except Exception as e: db.session.rollback(); flash(f'خطأ في إلغاء تعيين نفسك: {e}', 'danger'); print(f"Error: {e}"); return redirect(url_for('view_episode', episode_id=episode_id))
     else: flash('لم تكن معينًا لهذه الحلقة.', 'info'); return redirect(url_for('view_episode', episode_id=episode_id))
     return redirect(url_for('dashboard'))
@@ -368,16 +427,21 @@ def unassign_self_from_episode(episode_id):
 @login_required
 def delete_comment(comment_id):
     comment = Comment.query.get_or_404(comment_id)
+    # ... (permission check) ...
     if comment.user_id != current_user.id and not (hasattr(current_user, 'is_admin') and current_user.is_admin):
         return jsonify({'success': False, 'message': 'غير مصرح لك بحذف هذا التعليق.'}), 403
     try:
-        deleted_block_index = comment.block_index; db.session.delete(comment); db.session.commit()
+        episode_id = comment.episode_id
+        deleted_block_index = comment.block_index
+        log_activity('delete_comment', target_id=episode_id, target_type='Episode', details=f"Comment ID: {comment_id}")
+        db.session.delete(comment); db.session.commit()
         return jsonify({'success': True, 'message': 'تم حذف التعليق بنجاح.', 'deleted_comment_id': comment_id, 'deleted_block_index': deleted_block_index})
     except Exception as e: db.session.rollback(); print(f"Error: {e}"); return jsonify({'success': False, 'message': 'حدث خطأ أثناء حذف التعليق.'}), 500
 
 @app.route('/episode/<int:episode_id>', methods=['GET'])
 @login_required
 def view_episode(episode_id):
+    # ... (view_episode logic remains the same) ...
     episode = Episode.query.options(joinedload(Episode.assignees), joinedload(Episode.maslak)).get_or_404(episode_id)
     current_user_is_assigned = any(assignee.id == current_user.id for assignee in episode.assignees)
     all_users = User.query.order_by(User.username).all()
@@ -392,15 +456,7 @@ def view_episode(episode_id):
         author_id = comment.author.id if comment.author else None
         comments_by_block[block_idx].append({'id': comment.id, 'text': comment.text, 'author': author_username, 'author_id': author_id, 'timestamp': comment.timestamp.strftime('%Y-%m-%d %H:%M')})
     user_is_admin = hasattr(current_user, 'is_admin') and current_user.is_admin
-
-    return render_template('episode.html',
-                           episode=episode,
-                           comments_by_block=comments_by_block,
-                           is_assigned=current_user_is_assigned,
-                           all_users=all_users,
-                           all_maslaks=all_maslaks,
-                           user_is_admin=user_is_admin,
-                           status_choices=EPISODE_STATUS_CHOICES) # Pass status choices
+    return render_template('episode.html', episode=episode, comments_by_block=comments_by_block, is_assigned=current_user_is_assigned, all_users=all_users, all_maslaks=all_maslaks, user_is_admin=user_is_admin, status_choices=EPISODE_STATUS_CHOICES)
 
 
 @app.route('/episode/<int:episode_id>/update', methods=['POST'])
@@ -408,11 +464,17 @@ def view_episode(episode_id):
 def update_episode(episode_id):
      episode = Episode.query.get_or_404(episode_id); is_assigned = Assignment.query.filter_by(user_id=current_user.id, episode_id=episode.id).count() > 0
      if not is_assigned: return jsonify({'success': False, 'message': 'غير مصرح لك. يجب أن تكون معينًا للتعديل.'}), 403
-     data = request.json; updated = False
-     if 'plan' in data and data['plan'] != episode.plan: episode.plan = data['plan']; updated = True
-     if 'scenario' in data and data['scenario'] != episode.scenario: episode.scenario = data['scenario']; updated = True
+     data = request.json; updated = False; details_log = []
+     if 'plan' in data and data['plan'] != episode.plan:
+         episode.plan = data['plan']; updated = True; details_log.append('plan')
+     if 'scenario' in data and data['scenario'] != episode.scenario:
+         episode.scenario = data['scenario']; updated = True; details_log.append('scenario')
      if updated:
-         try: db.session.add(episode); db.session.commit(); return jsonify({'success': True, 'message': 'تم تحديث الحلقة بنجاح'})
+         try:
+             db.session.add(episode)
+             log_activity('update_content', target=episode, details=f"Updated: {', '.join(details_log)}")
+             db.session.commit();
+             return jsonify({'success': True, 'message': 'تم تحديث الحلقة بنجاح'})
          except Exception as e: db.session.rollback(); print(f"Error: {e}"); return jsonify({'success': False, 'message': 'خطأ في تحديث الحلقة'}), 500
      else: return jsonify({'success': True, 'message': 'لم يتم اكتشاف أي تغييرات'})
 
@@ -420,7 +482,7 @@ def update_episode(episode_id):
 @app.route('/api/episode/<int:episode_id>/update_title', methods=['POST'])
 @login_required
 def update_episode_title(episode_id):
-    # ... (update_episode_title logic remains the same) ...
+    # ... (validation, permission check) ...
     episode = Episode.query.get_or_404(episode_id)
     data = request.get_json()
     if not data or 'new_title' not in data: return jsonify({'success': False, 'message': 'بيانات غير صالحة'}), 400
@@ -432,7 +494,10 @@ def update_episode_title(episode_id):
     existing = Episode.query.filter(Episode.maslak_id == episode.maslak_id, Episode.title == new_title, Episode.id != episode_id).first()
     if existing: return jsonify({'success': False, 'message': f'عنوان الحلقة "{new_title}" مستخدم بالفعل في هذا المسلك.'}), 400
     try:
-        episode.title = new_title; db.session.commit()
+        old_title = episode.title
+        episode.title = new_title
+        log_activity('update_title', target=episode, details=f"Old: '{old_title}', New: '{new_title}'")
+        db.session.commit()
         app.logger.info(f"Updated title for episode {episode_id} to '{new_title}' by user {current_user.username}")
         return jsonify({'success': True, 'message': 'تم تحديث العنوان بنجاح', 'new_title': new_title})
     except Exception as e: db.session.rollback(); app.logger.error(f"Error updating title for episode {episode_id}: {e}", exc_info=True); return jsonify({'success': False, 'message': 'حدث خطأ أثناء تحديث العنوان'}), 500
@@ -440,7 +505,7 @@ def update_episode_title(episode_id):
 @app.route('/episode/<int:episode_id>/comments', methods=['POST'])
 @login_required
 def add_comment(episode_id):
-    # ... (add_comment logic remains the same) ...
+    # ... (validation, permission check) ...
     episode = Episode.query.get_or_404(episode_id); is_assigned = Assignment.query.filter_by(user_id=current_user.id, episode_id=episode.id).count() > 0
     if not is_assigned: return jsonify({'success': False, 'message': 'غير مصرح لك. يجب أن تكون معينًا للتعليق.'}), 403
     data = request.json; block_index = data.get('block_index'); text = data.get('text')
@@ -449,11 +514,14 @@ def add_comment(episode_id):
         block_index = int(block_index);
         if block_index < 0: return jsonify({'success': False, 'message': 'معرّف الفقرة غير صالح'}), 400
         comment = Comment(episode_id=episode.id, user_id=current_user.id, block_index=block_index, text=text.strip())
-        db.session.add(comment); db.session.commit()
+        db.session.add(comment)
+        log_activity('add_comment', target=episode, details=f"Block: {block_index}")
+        db.session.commit()
         return jsonify({'success': True, 'message': 'تمت إضافة التعليق', 'comment': {'id': comment.id, 'block_index': comment.block_index, 'text': comment.text, 'author': current_user.username, 'author_id': current_user.id, 'timestamp': comment.timestamp.strftime('%Y-%m-%d %H:%M')}}), 201
     except ValueError: return jsonify({'success': False, 'message': 'صيغة معرّف الفقرة غير صالحة'}), 400
     except Exception as e: db.session.rollback(); print(f"Error: {e}"); return jsonify({'success': False, 'message': 'خطأ في إضافة التعليق'}), 500
 
+# --- PDF Export Route ---
 @app.route('/episode/<int:episode_id>/export/pdf')
 @login_required
 def export_episode_pdf(episode_id):

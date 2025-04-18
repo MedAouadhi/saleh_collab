@@ -1,4 +1,4 @@
-// static/js/script.js (Arabic Version - Auto-Submit Filters)
+// static/js/script.js (Arabic Version - Register Service Worker)
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log('DOM fully loaded and parsed - Main script.js running.');
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // --- Elements ---
-  // Plan Elements
+  // ... (all existing element references remain the same) ...
   const planArea = document.getElementById('plan-area');
   const savePlanBtn = document.getElementById('save-plan-btn');
   const planStatus = document.getElementById('plan-status');
@@ -28,8 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const viewPlanBtn = document.getElementById('view-plan-btn');
   const editPlanBtn = document.getElementById('edit-plan-btn');
   const planEditorWrapper = document.getElementById('plan-editor-wrapper');
-
-  // Scenario Elements
   const scenarioArea = document.getElementById('scenario-area');
   const saveScenarioBtn = document.getElementById('save-scenario-btn');
   const scenarioStatus = document.getElementById('scenario-status');
@@ -39,8 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const scenarioEditorWrapper =
       document.getElementById('scenario-editor-wrapper');
   const commentInstruction = document.getElementById('comment-instruction');
-
-  // Comment Elements
   const commentDisplayArea = document.getElementById('comment-display-area');
   const commentFormContainer =
       document.getElementById('comment-form-container');
@@ -50,8 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const cancelCommentBtn = document.getElementById('cancel-comment-btn');
   const commentStatus = document.getElementById('comment-status');
   const noCommentsMsg = document.getElementById('no-comments-msg');
-
-  // Title Edit Elements
   const episodeTitleDisplay = document.getElementById('episode-title-display');
   const editTitleBtn = document.getElementById('edit-title-btn');
   const titleEditArea = document.getElementById('title-edit-area');
@@ -61,10 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const titleStatus = document.getElementById('title-status');
   let originalTitle =
       episodeTitleDisplay ? episodeTitleDisplay.textContent : '';
-
-  // Dashboard Elements
   const episodeList = document.getElementById('episode-list');
-  // --- NEW: Filter Form Elements ---
   const filterForm = document.getElementById('filter-form');
   const filterMaslakSelect = document.getElementById('filter_maslak_id');
   const filterStatusSelect = document.getElementById('filter_status');
@@ -74,6 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Initialize SortableJS on Dashboard ---
   if (episodeList && typeof Sortable !== 'undefined') {
+    // ... (SortableJS init remains the same) ...
     console.log('Initializing SortableJS for episode list.');
     new Sortable(episodeList, {
       animation: 150,
@@ -93,8 +85,9 @@ document.addEventListener('DOMContentLoaded', () => {
     console.warn('SortableJS library not found, drag-and-drop disabled.');
   }
 
-  // --- NEW: Initialize Auto-Submit Filters on Dashboard ---
+  // --- Initialize Auto-Submit Filters on Dashboard ---
   if (filterForm && filterMaslakSelect && filterStatusSelect) {
+    // ... (Auto-submit filter logic remains the same) ...
     console.log('Initializing auto-submit for filters.');
     filterMaslakSelect.addEventListener('change', () => {
       console.log('Maslak filter changed, submitting form.');
@@ -133,10 +126,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof EPISODE_ID !== 'undefined' && EPISODE_ID !== null &&
       typeof CURRENT_USER_ID !== 'undefined' &&
       typeof IS_ADMIN !== 'undefined') {
+    // ... (All episode page logic remains the same) ...
     console.log('Episode page detected. Initializing episode features.');
     console.log(`User ID: ${CURRENT_USER_ID}, Is Admin: ${IS_ADMIN}`);
-
-    // --- Initial Setup ---
     if (planDisplay && typeof INITIAL_PLAN !== 'undefined')
       renderPlanMarkdown(INITIAL_PLAN);
     if (scenarioDisplay && typeof INITIAL_SCENARIO !== 'undefined')
@@ -148,9 +140,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (scenarioEditorWrapper) scenarioEditorWrapper.classList.add('hidden');
     if (scenarioDisplay) scenarioDisplay.classList.remove('hidden');
     if (commentInstruction) commentInstruction.style.display = 'block';
-
-    // --- Event Listeners ---
-    // ... (Save Plan/Scenario, Plan/Scenario Toggles remain the same) ...
     if (savePlanBtn && IS_ASSIGNED) {
       savePlanBtn.addEventListener('click', () => {
         saveContent('plan', planArea.value, planStatus).then(success => {
@@ -221,8 +210,6 @@ document.addEventListener('DOMContentLoaded', () => {
         scenarioArea.focus();
       });
     }
-
-    // --- Title Edit Listeners ---
     if (editTitleBtn && titleEditArea && episodeTitleDisplay && titleInput &&
         saveTitleBtn && cancelTitleBtn) {
       editTitleBtn.addEventListener('click', () => {
@@ -288,9 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }
-
-    // --- Commenting Logic ---
-    // ... (Existing commenting logic remains here, unchanged) ...
     if (IS_ASSIGNED && scenarioDisplay) {
       scenarioDisplay.addEventListener('click', (event) => {
         if (scenarioDisplay.classList.contains('hidden')) return;
@@ -399,11 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }
-
-
-    // --- Helper Functions ---
-    async function saveContent(
-        type, content, statusElement) { /* ... unchanged ... */
+    async function saveContent(type, content, statusElement) { /* ... */
       statusElement.textContent = 'جارٍ الحفظ...';
       statusElement.classList.remove('text-green-600', 'text-red-600');
       statusElement.classList.add('text-gray-500');
@@ -438,7 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return false;
       }
     }
-    function renderPlanMarkdown(planText) { /* ... unchanged ... */
+    function renderPlanMarkdown(planText) { /* ... */
       if (!planDisplay || typeof marked === 'undefined') {
         console.error('Plan display area not found or Marked.js not loaded.');
         return;
@@ -452,7 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
         planDisplay.textContent = planText;
       }
     }
-    function renderScenario(scenarioText) { /* ... unchanged ... */
+    function renderScenario(scenarioText) { /* ... */
       if (!scenarioDisplay || typeof marked === 'undefined') {
         console.error(
             'Scenario display area not found or Marked.js not loaded.');
@@ -494,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
         scenarioDisplay.textContent = scenarioText;
       }
     }
-    function renderComments(commentsByBlock) { /* ... unchanged ... */
+    function renderComments(commentsByBlock) { /* ... */
       if (!commentDisplayArea) return;
       clearCommentsDisplay();
       let hasAnyComments = false;
@@ -534,7 +514,7 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log(
           `Rendered comments by block. Has comments: ${hasAnyComments}`);
     }
-    function addCommentToDisplay(comment) { /* ... unchanged ... */
+    function addCommentToDisplay(comment) { /* ... */
       if (!commentDisplayArea || comment.block_index === undefined) return;
       if (noCommentsMsg && noCommentsMsg.style.display !== 'none') {
         noCommentsMsg.style.display = 'none';
@@ -581,7 +561,7 @@ document.addEventListener('DOMContentLoaded', () => {
       commentElement.classList.add('comment-item');
       blockCommentsContainer.appendChild(commentElement);
     }
-    function createCommentElement(comment) { /* ... unchanged ... */
+    function createCommentElement(comment) { /* ... */
       const div = document.createElement('div');
       div.classList.add(
           'comment-item', 'bg-gray-50', 'p-2', 'rounded', 'text-sm', 'mb-1',
@@ -600,7 +580,7 @@ document.addEventListener('DOMContentLoaded', () => {
           comment.author}</span> - ${comment.timestamp} </p> `;
       return div;
     }
-    function clearCommentsDisplay() { /* ... unchanged ... */
+    function clearCommentsDisplay() { /* ... */
       if (commentDisplayArea) {
         const groups = commentDisplayArea.querySelectorAll('.comment-group');
         groups.forEach(group => group.remove());
@@ -615,7 +595,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     }
-    function openCommentForm(blockIndex) { /* ... unchanged ... */
+    function openCommentForm(blockIndex) { /* ... */
       currentEditingBlock = blockIndex;
       if (commentBlockIndexSpan)
         commentBlockIndexSpan.textContent = blockIndex + 1;
@@ -625,7 +605,7 @@ document.addEventListener('DOMContentLoaded', () => {
       commentText.focus();
       console.log(`Opened comment form for block index ${blockIndex}`);
     }
-    function closeCommentForm() { /* ... unchanged ... */
+    function closeCommentForm() { /* ... */
       commentFormContainer.classList.add('hidden');
       currentEditingBlock = null;
       commentText.value = '';
@@ -638,3 +618,23 @@ document.addEventListener('DOMContentLoaded', () => {
         'Not on episode page, or required JS variables not defined OR not on dashboard page.');
   }
 });  // End DOMContentLoaded
+
+
+// --- NEW: Service Worker Registration ---
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    // Use /static/sw.js as the path since sw.js is in the static folder
+    navigator.serviceWorker.register('/static/sw.js')
+        .then(registration => {
+          console.log(
+              'ServiceWorker registration successful with scope: ',
+              registration.scope);
+        })
+        .catch(error => {
+          console.log('ServiceWorker registration failed: ', error);
+        });
+  });
+} else {
+  console.log('Service workers are not supported by this browser.');
+}
+// --- End Service Worker Registration ---

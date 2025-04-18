@@ -54,23 +54,67 @@
     </style>
 </head>
 <body class="bg-gray-100 font-sans antialiased">
-    <nav class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-4 shadow-md">
+    {# --- Wrap Nav content in Alpine.js component --- #}
+    <nav class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-4 shadow-md relative" x-data="{ mobileMenuOpen: false }">
         <div class="container mx-auto flex justify-between items-center">
             <a href="{{ url_for('dashboard') }}" class="text-xl sm:text-2xl font-bold hover:text-blue-200 transition duration-200 flex-shrink-0">📕 صالح - الكراسة الحمراء</a>
-            <div class="flex items-center space-x-reverse space-x-2 sm:space-x-3">
+
+            {# --- Desktop Links (Hidden on small screens) --- #}
+            <div class="hidden sm:flex items-center space-x-reverse space-x-3">
                 {% if current_user.is_authenticated %}
-                    <span class="text-sm sm:text-base whitespace-nowrap hidden sm:inline">مرحباً، {{ current_user.username }}!</span>
-                    {# --- NEW: Admin Panel Link --- #}
+                    <span class="text-sm sm:text-base whitespace-nowrap">مرحباً، {{ current_user.username }}!</span>
                     {% if current_user.is_admin %}
-                    <a href="{{ url_for('admin.index') }}" class="bg-yellow-500 hover:bg-yellow-600 text-yellow-900 py-1 px-3 sm:py-2 sm:px-4 rounded btn-hover-effect text-sm sm:text-base flex-shrink-0">لوحة التحكم</a>
+                    <a href="{{ url_for('admin.index') }}" class="inline-flex items-center bg-yellow-500 hover:bg-yellow-600 text-yellow-900 py-1 px-3 sm:py-2 sm:px-4 rounded btn-hover-effect text-sm sm:text-base flex-shrink-0">لوحة التحكم</a>
                     {% endif %}
-                    {# --- End Admin Panel Link --- #}
                     <a href="{{ url_for('logout') }}" class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 sm:py-2 sm:px-4 rounded btn-hover-effect text-sm sm:text-base flex-shrink-0">تسجيل الخروج</a>
                 {% else %}
                     <a href="{{ url_for('login') }}" class="bg-green-500 hover:bg-green-600 text-white py-1 px-3 sm:py-2 sm:px-4 rounded btn-hover-effect text-sm sm:text-base flex-shrink-0">تسجيل الدخول</a>
                 {% endif %}
             </div>
+            {# --- End Desktop Links --- #}
+
+            {# --- Hamburger Button (Visible on small screens) --- #}
+            <div class="sm:hidden">
+                <button @click="mobileMenuOpen = !mobileMenuOpen" type="button" class="p-2 rounded-md text-gray-300 hover:text-white hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
+                    <span class="sr-only">Open main menu</span>
+                    {# Hamburger Icon (hidden when menu is open) #}
+                    <svg x-show="!mobileMenuOpen" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    {# Close Icon (X) (shown when menu is open) #}
+                    <svg x-show="mobileMenuOpen" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            {# --- End Hamburger Button --- #}
         </div>
+
+        {# --- Mobile Menu Dropdown (Hidden on larger screens) --- #}
+        <div x-show="mobileMenuOpen"
+             x-transition:enter="transition ease-out duration-100"
+             x-transition:enter-start="transform opacity-0 scale-95"
+             x-transition:enter-end="transform opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-75"
+             x-transition:leave-start="transform opacity-100 scale-100"
+             x-transition:leave-end="transform opacity-0 scale-95"
+             class="sm:hidden absolute top-full right-0 left-0 bg-indigo-700 shadow-lg z-20" id="mobile-menu"
+             @click.away="mobileMenuOpen = false" {# Close when clicking outside #}
+             >
+            <div class="px-2 pt-2 pb-3 space-y-1 text-right">
+                 {% if current_user.is_authenticated %}
+                    {# Show welcome on mobile too #}
+                    <span class="block px-3 py-2 text-base font-medium text-indigo-200">مرحباً، {{ current_user.username }}!</span>
+                    {% if current_user.is_admin %}
+                    <a href="{{ url_for('admin.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-indigo-800 hover:text-white">لوحة التحكم</a>
+                    {% endif %}
+                    <a href="{{ url_for('logout') }}" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-indigo-800 hover:text-white">تسجيل الخروج</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-indigo-800 hover:text-white">تسجيل الدخول</a>
+                {% endif %}
+            </div>
+        </div>
+        {# --- End Mobile Menu Dropdown --- #}
     </nav>
 
     <main class="container mx-auto mt-8 p-4">

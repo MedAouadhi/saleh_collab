@@ -38,11 +38,14 @@ from models import (
     Comment,
     Maslak,
     AuditLog,  # <<< Added AuditLog
+    Scene,              # <<< Added
+    VideoGeneration,    # <<< Added
     EPISODE_STATUS_DRAFT,
     EPISODE_STATUS_REVIEW,
     EPISODE_STATUS_COMPLETE,
     EPISODE_STATUS_CHOICES,
 )
+from routes_video import video_bp
 from dotenv import load_dotenv
 from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -392,6 +395,40 @@ admin.add_view(MaslakAdminView(Maslak, db.session, name="المسالك"))
 admin.add_view(
     AuditLogAdminView(AuditLog, db.session, name="سجل النشاط")
 )  # Added Audit Log view
+
+class SceneAdminView(SecureModelView):
+    column_list = ("id", "episode", "number", "created_at")
+    column_filters = ("episode",)
+    form_columns = ("episode", "number")
+    column_display_pk = True
+
+
+class VideoGenerationAdminView(SecureModelView):
+    column_list = (
+        "id", "scene", "model", "status", "resolution",
+        "aspect_ratio", "generate_audio", "cost", "created_at"
+    )
+    column_filters = ("status", "model", "scene")
+    form_columns = (
+        "scene", "prompt", "model", "resolution",
+        "aspect_ratio", "generate_audio", "duration",
+        "job_id", "polling_url", "status",
+        "unsigned_url", "drive_file_id", "drive_view_url",
+        "local_path", "cost", "error_message",
+        "created_by", "completed_at",
+    )
+    column_display_pk = True
+    can_create = True
+    can_edit = True
+    can_delete = True
+
+
+admin.add_view(SceneAdminView(Scene, db.session, name="المشاهد"))
+admin.add_view(
+    VideoGenerationAdminView(VideoGeneration, db.session, name="عمليات التوليد")
+)
+
+app.register_blueprint(video_bp)
 # --- End Flask-Admin Setup ---
 
 
@@ -892,6 +929,33 @@ def view_episode(episode_id):
                 "timestamp": comment.timestamp.strftime("%Y-%m-%d %H:%M"),
             }
         )
+    # Build scenes with generations
+    scenes_data = []
+    for scene in episode.scenes.order_by(Scene.number).all():
+        gens = []
+        for gen in scene.generations.order_by(VideoGeneration.created_at.desc()).all():
+            gens.append({
+                "id": gen.id,
+                "prompt": gen.prompt,
+                "model": gen.model,
+                "resolution": gen.resolution,
+                "aspect_ratio": gen.aspect_ratio,
+                "generate_audio": gen.generate_audio,
+                "status": gen.status,
+                "drive_file_id": gen.drive_file_id,
+                "drive_view_url": gen.drive_view_url,
+                "local_path": gen.local_path,
+                "error_message": gen.error_message,
+                "cost": gen.cost,
+                "created_at": gen.created_at.isoformat() if gen.created_at else None,
+                "completed_at": gen.completed_at.isoformat() if gen.completed_at else None,
+            })
+        scenes_data.append({
+            "id": scene.id,
+            "number": scene.number,
+            "generations": gens,
+        })
+
     user_is_admin = hasattr(current_user, "is_admin") and current_user.is_admin
     return render_template(
         "episode.html",
@@ -902,6 +966,7 @@ def view_episode(episode_id):
         all_maslaks=all_maslaks,
         user_is_admin=user_is_admin,
         status_choices=EPISODE_STATUS_CHOICES,
+        scenes=scenes_data,
     )
 
 

@@ -176,7 +176,7 @@ class AuditLog(db.Model):
 # Scene model (مشهد)
 class Scene(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    episode_id = db.Column(db.Integer, db.ForeignKey("episode.id", ondelete="CASCADE"), nullable=False)
+    episode_id = db.Column(db.Integer, db.ForeignKey("episode.id", ondelete="CASCADE"), nullable=False, index=True)
     number = db.Column(db.Integer, nullable=False, default=1)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 

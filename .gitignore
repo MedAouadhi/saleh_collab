@@ -42,7 +42,8 @@ coverage.xml
 coverage_html_report/
 .coverage.*
 
-migrations/*
+migrations/__pycache__/
+migrations/versions/__pycache__/
 
 # graphifpy
 graphify-out/manifest.json    # mtime-based, breaks after git clone

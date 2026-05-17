@@ -171,3 +171,59 @@ class AuditLog(db.Model):
 
 
 # --- End Audit Log Model ---
+
+
+# Scene model (مشهد)
+class Scene(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    episode_id = db.Column(db.Integer, db.ForeignKey("episode.id", ondelete="CASCADE"), nullable=False)
+    number = db.Column(db.Integer, nullable=False, default=1)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    episode = db.relationship("Episode", backref=db.backref("scenes", lazy="dynamic", cascade="all, delete-orphan"))
+    generations = db.relationship("VideoGeneration", backref="scene", lazy="dynamic", cascade="all, delete-orphan")
+
+    __table_args__ = (
+        db.UniqueConstraint("episode_id", "number", name="_episode_scene_number_uc"),
+    )
+
+    def __repr__(self):
+        return f"<Scene {self.number} of Episode {self.episode_id}>"
+
+
+# VideoGeneration model (عملية توليد)
+class VideoGeneration(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    scene_id = db.Column(db.Integer, db.ForeignKey("scene.id", ondelete="CASCADE"), nullable=False)
+    prompt = db.Column(db.Text, nullable=False)
+    model = db.Column(db.String(100), nullable=False)
+    resolution = db.Column(db.String(20), nullable=True)
+    aspect_ratio = db.Column(db.String(10), nullable=True)
+    generate_audio = db.Column(db.Boolean, nullable=False, default=True)
+    duration = db.Column(db.Integer, nullable=True)
+
+    # OpenRouter job tracking
+    job_id = db.Column(db.String(100), nullable=True, index=True)
+    polling_url = db.Column(db.String(500), nullable=True)
+    status = db.Column(
+        db.String(20),
+        nullable=False,
+        default="pending",
+        index=True,
+    )  # pending, in_progress, completed, failed, cancelled, expired
+
+    unsigned_url = db.Column(db.Text, nullable=True)
+    drive_file_id = db.Column(db.String(100), nullable=True)
+    drive_view_url = db.Column(db.Text, nullable=True)
+    local_path = db.Column(db.Text, nullable=True)
+    cost = db.Column(db.Float, nullable=True)
+    error_message = db.Column(db.Text, nullable=True)
+
+    created_by = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="SET NULL"), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    completed_at = db.Column(db.DateTime, nullable=True)
+
+    creator = db.relationship("User", backref=db.backref("video_generations", lazy="dynamic"))
+
+    def __repr__(self):
+        return f"<VideoGeneration {self.id} status={self.status}>"

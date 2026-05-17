@@ -1,0 +1,5688 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {
+    "hyperedges": [
+      {
+        "id": "audit_logging_flow",
+        "label": "Audit Logging Flow",
+        "nodes": [
+          "app_log_activity",
+          "models_auditlog",
+          "app_auditlog_admin_view",
+          "templates_admin_auditlog_list",
+          "app_clear_audit_log"
+        ],
+        "relation": "participate_in",
+        "confidence": "INFERRED",
+        "confidence_score": 0.85,
+        "source_file": "app.py"
+      },
+      {
+        "id": "admin_authorization_pattern",
+        "label": "Admin Authorization Pattern",
+        "nodes": [
+          "app_secure_model_view",
+          "app_my_admin_index_view",
+          "app_user_admin_view",
+          "app_episode_admin_view",
+          "app_maslak_admin_view",
+          "app_auditlog_admin_view"
+        ],
+        "relation": "implement",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "app.py"
+      },
+      {
+        "id": "block_based_commenting_system",
+        "label": "Block-Based Commenting System",
+        "nodes": [
+          "models_comment",
+          "app_add_comment",
+          "app_delete_comment",
+          "app_view_episode",
+          "static_script"
+        ],
+        "relation": "form",
+        "confidence": "INFERRED",
+        "confidence_score": 0.8,
+        "source_file": "app.py"
+      },
+      {
+        "id": "saleh_logo_composition",
+        "label": "Saleh Logo Visual Composition",
+        "nodes": [
+          "saleh_logo_image",
+          "smartphone_graphic",
+          "red_card_graphic",
+          "saleh_modern_text",
+          "saleh_calligraphy_text"
+        ],
+        "relation": "participate_in",
+        "confidence": "INFERRED",
+        "confidence_score": 0.85,
+        "source_file": "static/images/saleh.png"
+      },
+      {
+        "id": "logo_composition",
+        "label": "Logo Composition Elements",
+        "nodes": [
+          "smartphone_graphic",
+          "red_book_graphic",
+          "saleh_brand_name",
+          "arabic_calligraphy_text"
+        ],
+        "relation": "form",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "static/images/saleh-512.png"
+      },
+      {
+        "id": "logo_composition",
+        "label": "Logo Composition",
+        "nodes": [
+          "mtab3_logo",
+          "smartphone_icon",
+          "arabic_text_mtab3",
+          "red_background_element"
+        ],
+        "relation": "form",
+        "confidence": "INFERRED",
+        "confidence_score": 0.85,
+        "source_file": "static/images/saleh-192.png"
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "label": "models.py",
+      "file_type": "code",
+      "source_file": "models.py",
+      "source_location": "L1",
+      "id": "models_py",
+      "community": 3,
+      "norm_label": "models.py"
+    },
+    {
+      "label": "Maslak",
+      "file_type": "code",
+      "source_file": "models.py",
+      "source_location": "L57",
+      "id": "saleh_collab_models_maslak",
+      "community": 3,
+      "norm_label": "maslak"
+    },
+    {
+      "label": ".__repr__()",
+      "file_type": "code",
+      "source_file": "models.py",
+      "source_location": "L61",
+      "id": "saleh_collab_models_maslak_repr",
+      "community": 3,
+      "norm_label": ".__repr__()"
+    },
+    {
+      "label": "User",
+      "file_type": "code",
+      "source_file": "models.py",
+      "source_location": "L66",
+      "id": "saleh_collab_models_user",
+      "community": 3,
+      "norm_label": "user"
+    },
+    {
+      "label": "UserMixin",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "id": "usermixin",
+      "community": 3,
+      "norm_label": "usermixin"
+    },
+    {
+      "label": ".__repr__()",
+      "file_type": "code",
+      "source_file": "models.py",
+      "source_location": "L81",
+      "id": "saleh_collab_models_user_repr",
+      "community": 3,
+      "norm_label": ".__repr__()"
+    },
+    {
+      "label": "Episode",
+      "file_type": "code",
+      "source_file": "models.py",
+      "source_location": "L86",
+      "id": "saleh_collab_models_episode",
+      "community": 3,
+      "norm_label": "episode"
+    },
+    {
+      "label": ".__repr__()",
+      "file_type": "code",
+      "source_file": "models.py",
+      "source_location": "L112",
+      "id": "saleh_collab_models_episode_repr",
+      "community": 3,
+      "norm_label": ".__repr__()"
+    },
+    {
+      "label": "Assignment",
+      "file_type": "code",
+      "source_file": "models.py",
+      "source_location": "L117",
+      "id": "saleh_collab_models_assignment",
+      "community": 3,
+      "norm_label": "assignment"
+    },
+    {
+      "label": "Comment",
+      "file_type": "code",
+      "source_file": "models.py",
+      "source_location": "L131",
+      "id": "saleh_collab_models_comment",
+      "community": 3,
+      "norm_label": "comment"
+    },
+    {
+      "label": ".__repr__()",
+      "file_type": "code",
+      "source_file": "models.py",
+      "source_location": "L144",
+      "id": "saleh_collab_models_comment_repr",
+      "community": 3,
+      "norm_label": ".__repr__()"
+    },
+    {
+      "label": "AuditLog",
+      "file_type": "code",
+      "source_file": "models.py",
+      "source_location": "L149",
+      "id": "saleh_collab_models_auditlog",
+      "community": 3,
+      "norm_label": "auditlog"
+    },
+    {
+      "label": ".__repr__()",
+      "file_type": "code",
+      "source_file": "models.py",
+      "source_location": "L169",
+      "id": "saleh_collab_models_auditlog_repr",
+      "community": 3,
+      "norm_label": ".__repr__()"
+    },
+    {
+      "label": "backup.py",
+      "file_type": "code",
+      "source_file": "backup.py",
+      "source_location": "L1",
+      "id": "backup_py",
+      "community": 6,
+      "norm_label": "backup.py"
+    },
+    {
+      "label": "get_upload_details()",
+      "file_type": "code",
+      "source_file": "backup.py",
+      "source_location": "L34",
+      "id": "saleh_collab_backup_get_upload_details",
+      "community": 6,
+      "norm_label": "get_upload_details()"
+    },
+    {
+      "label": "upload_file()",
+      "file_type": "code",
+      "source_file": "backup.py",
+      "source_location": "L74",
+      "id": "saleh_collab_backup_upload_file",
+      "community": 6,
+      "norm_label": "upload_file()"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "backup.py",
+      "source_location": "L164",
+      "id": "saleh_collab_backup_main",
+      "community": 6,
+      "norm_label": "main()"
+    },
+    {
+      "label": "Gets an upload server URL and session ID from the DDownload API v2.      Args:",
+      "file_type": "rationale",
+      "source_file": "backup.py",
+      "source_location": "L35",
+      "id": "saleh_collab_backup_rationale_35",
+      "community": 6,
+      "norm_label": "gets an upload server url and session id from the ddownload api v2.      args:"
+    },
+    {
+      "label": "Uploads a file to the specified DDownload upload URL using API v2 parameters.",
+      "file_type": "rationale",
+      "source_file": "backup.py",
+      "source_location": "L75",
+      "id": "saleh_collab_backup_rationale_75",
+      "community": 6,
+      "norm_label": "uploads a file to the specified ddownload upload url using api v2 parameters."
+    },
+    {
+      "label": "Main function to perform the database backup and upload using API v2.",
+      "file_type": "rationale",
+      "source_file": "backup.py",
+      "source_location": "L165",
+      "id": "saleh_collab_backup_rationale_165",
+      "community": 6,
+      "norm_label": "main function to perform the database backup and upload using api v2."
+    },
+    {
+      "label": "# TODO: Implement cleanup logic here if/when the delete file API endpoint is kno",
+      "file_type": "rationale",
+      "source_file": "backup.py",
+      "source_location": "L254",
+      "id": "saleh_collab_backup_rationale_254",
+      "community": 6,
+      "norm_label": "# todo: implement cleanup logic here if/when the delete file api endpoint is kno"
+    },
+    {
+      "label": "app.py",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L1",
+      "id": "app_py",
+      "community": 1,
+      "norm_label": "app.py"
+    },
+    {
+      "label": "utility_processor()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L89",
+      "id": "saleh_collab_app_utility_processor",
+      "community": 1,
+      "norm_label": "utility_processor()"
+    },
+    {
+      "label": "load_user()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L98",
+      "id": "saleh_collab_app_load_user",
+      "community": 1,
+      "norm_label": "load_user()"
+    },
+    {
+      "label": "create_db_command()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L107",
+      "id": "saleh_collab_app_create_db_command",
+      "community": 1,
+      "norm_label": "create_db_command()"
+    },
+    {
+      "label": "_create_db_and_seed()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L111",
+      "id": "saleh_collab_app_create_db_and_seed",
+      "community": 1,
+      "norm_label": "_create_db_and_seed()"
+    },
+    {
+      "label": "update_plans()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L152",
+      "id": "saleh_collab_app_update_plans",
+      "community": 1,
+      "norm_label": "update_plans()"
+    },
+    {
+      "label": "log_activity()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L185",
+      "id": "saleh_collab_app_log_activity",
+      "community": 1,
+      "norm_label": "log_activity()"
+    },
+    {
+      "label": "UserForm",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L216",
+      "id": "saleh_collab_app_userform",
+      "community": 3,
+      "norm_label": "userform"
+    },
+    {
+      "label": "FlaskForm",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "id": "flaskform",
+      "community": 3,
+      "norm_label": "flaskform"
+    },
+    {
+      "label": "MaslakForm",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L231",
+      "id": "saleh_collab_app_maslakform",
+      "community": 3,
+      "norm_label": "maslakform"
+    },
+    {
+      "label": "MyAdminIndexView",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L236",
+      "id": "saleh_collab_app_myadminindexview",
+      "community": 3,
+      "norm_label": "myadminindexview"
+    },
+    {
+      "label": "AdminIndexView",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "id": "adminindexview",
+      "community": 3,
+      "norm_label": "adminindexview"
+    },
+    {
+      "label": ".is_accessible()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L237",
+      "id": "saleh_collab_app_myadminindexview_is_accessible",
+      "community": 3,
+      "norm_label": ".is_accessible()"
+    },
+    {
+      "label": ".inaccessible_callback()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L244",
+      "id": "saleh_collab_app_myadminindexview_inaccessible_callback",
+      "community": 3,
+      "norm_label": ".inaccessible_callback()"
+    },
+    {
+      "label": "SecureModelView",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L249",
+      "id": "saleh_collab_app_securemodelview",
+      "community": 3,
+      "norm_label": "securemodelview"
+    },
+    {
+      "label": "ModelView",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "id": "modelview",
+      "community": 3,
+      "norm_label": "modelview"
+    },
+    {
+      "label": ".is_accessible()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L250",
+      "id": "saleh_collab_app_securemodelview_is_accessible",
+      "community": 3,
+      "norm_label": ".is_accessible()"
+    },
+    {
+      "label": ".inaccessible_callback()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L257",
+      "id": "saleh_collab_app_securemodelview_inaccessible_callback",
+      "community": 3,
+      "norm_label": ".inaccessible_callback()"
+    },
+    {
+      "label": "UserAdminView",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L262",
+      "id": "saleh_collab_app_useradminview",
+      "community": 3,
+      "norm_label": "useradminview"
+    },
+    {
+      "label": ".on_model_change()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L277",
+      "id": "saleh_collab_app_useradminview_on_model_change",
+      "community": 3,
+      "norm_label": ".on_model_change()"
+    },
+    {
+      "label": ".after_model_change()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L286",
+      "id": "saleh_collab_app_useradminview_after_model_change",
+      "community": 1,
+      "norm_label": ".after_model_change()"
+    },
+    {
+      "label": ".on_model_delete()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L292",
+      "id": "saleh_collab_app_useradminview_on_model_delete",
+      "community": 1,
+      "norm_label": ".on_model_delete()"
+    },
+    {
+      "label": "EpisodeAdminView",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L300",
+      "id": "saleh_collab_app_episodeadminview",
+      "community": 3,
+      "norm_label": "episodeadminview"
+    },
+    {
+      "label": ".after_model_change()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L326",
+      "id": "saleh_collab_app_episodeadminview_after_model_change",
+      "community": 1,
+      "norm_label": ".after_model_change()"
+    },
+    {
+      "label": ".on_model_delete()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L332",
+      "id": "saleh_collab_app_episodeadminview_on_model_delete",
+      "community": 1,
+      "norm_label": ".on_model_delete()"
+    },
+    {
+      "label": "MaslakAdminView",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L340",
+      "id": "saleh_collab_app_maslakadminview",
+      "community": 3,
+      "norm_label": "maslakadminview"
+    },
+    {
+      "label": ".after_model_change()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L347",
+      "id": "saleh_collab_app_maslakadminview_after_model_change",
+      "community": 1,
+      "norm_label": ".after_model_change()"
+    },
+    {
+      "label": ".on_model_delete()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L353",
+      "id": "saleh_collab_app_maslakadminview_on_model_delete",
+      "community": 1,
+      "norm_label": ".on_model_delete()"
+    },
+    {
+      "label": "AuditLogAdminView",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L361",
+      "id": "saleh_collab_app_auditlogadminview",
+      "community": 3,
+      "norm_label": "auditlogadminview"
+    },
+    {
+      "label": "login()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L400",
+      "id": "saleh_collab_app_login",
+      "community": 1,
+      "norm_label": "login()"
+    },
+    {
+      "label": "logout()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L442",
+      "id": "saleh_collab_app_logout",
+      "community": 1,
+      "norm_label": "logout()"
+    },
+    {
+      "label": "dashboard()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L451",
+      "id": "saleh_collab_app_dashboard",
+      "community": 1,
+      "norm_label": "dashboard()"
+    },
+    {
+      "label": "test_route()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L516",
+      "id": "saleh_collab_app_test_route",
+      "community": 1,
+      "norm_label": "test_route()"
+    },
+    {
+      "label": "create_episode()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L522",
+      "id": "saleh_collab_app_create_episode",
+      "community": 3,
+      "norm_label": "create_episode()"
+    },
+    {
+      "label": "delete_episode()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L570",
+      "id": "saleh_collab_app_delete_episode",
+      "community": 1,
+      "norm_label": "delete_episode()"
+    },
+    {
+      "label": "change_episode_maslak()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L598",
+      "id": "saleh_collab_app_change_episode_maslak",
+      "community": 1,
+      "norm_label": "change_episode_maslak()"
+    },
+    {
+      "label": "change_episode_status()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L644",
+      "id": "saleh_collab_app_change_episode_status",
+      "community": 1,
+      "norm_label": "change_episode_status()"
+    },
+    {
+      "label": "clear_audit_log()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L687",
+      "id": "saleh_collab_app_clear_audit_log",
+      "community": 1,
+      "norm_label": "clear_audit_log()"
+    },
+    {
+      "label": "update_episode_order()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L714",
+      "id": "saleh_collab_app_update_episode_order",
+      "community": 1,
+      "norm_label": "update_episode_order()"
+    },
+    {
+      "label": "assign_user_to_episode()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L751",
+      "id": "saleh_collab_app_assign_user_to_episode",
+      "community": 1,
+      "norm_label": "assign_user_to_episode()"
+    },
+    {
+      "label": "unassign_self_from_episode()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L800",
+      "id": "saleh_collab_app_unassign_self_from_episode",
+      "community": 1,
+      "norm_label": "unassign_self_from_episode()"
+    },
+    {
+      "label": "delete_comment()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L828",
+      "id": "saleh_collab_app_delete_comment",
+      "community": 1,
+      "norm_label": "delete_comment()"
+    },
+    {
+      "label": "view_episode()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L865",
+      "id": "saleh_collab_app_view_episode",
+      "community": 1,
+      "norm_label": "view_episode()"
+    },
+    {
+      "label": "update_episode()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L910",
+      "id": "saleh_collab_app_update_episode",
+      "community": 1,
+      "norm_label": "update_episode()"
+    },
+    {
+      "label": "update_episode_title()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L956",
+      "id": "saleh_collab_app_update_episode_title",
+      "community": 1,
+      "norm_label": "update_episode_title()"
+    },
+    {
+      "label": "add_comment()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L1027",
+      "id": "saleh_collab_app_add_comment",
+      "community": 1,
+      "norm_label": "add_comment()"
+    },
+    {
+      "label": "export_episode_pdf()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L1097",
+      "id": "saleh_collab_app_export_episode_pdf",
+      "community": 1,
+      "norm_label": "export_episode_pdf()"
+    },
+    {
+      "label": "Updates the 'plan' field for episodes where it is currently empty or NULL.",
+      "file_type": "rationale",
+      "source_file": "app.py",
+      "source_location": "L153",
+      "id": "saleh_collab_app_rationale_153",
+      "community": 1,
+      "norm_label": "updates the 'plan' field for episodes where it is currently empty or null."
+    },
+    {
+      "label": "Logs an action to the AuditLog table.",
+      "file_type": "rationale",
+      "source_file": "app.py",
+      "source_location": "L186",
+      "id": "saleh_collab_app_rationale_186",
+      "community": 1,
+      "norm_label": "logs an action to the auditlog table."
+    },
+    {
+      "label": "Clears all entries from the AuditLog table. Admin only.",
+      "file_type": "rationale",
+      "source_file": "app.py",
+      "source_location": "L688",
+      "id": "saleh_collab_app_rationale_688",
+      "community": 1,
+      "norm_label": "clears all entries from the auditlog table. admin only."
+    },
+    {
+      "label": "env.py",
+      "file_type": "code",
+      "source_file": "migrations/env.py",
+      "source_location": "L1",
+      "id": "migrations_env_py",
+      "community": 7,
+      "norm_label": "env.py"
+    },
+    {
+      "label": "get_engine()",
+      "file_type": "code",
+      "source_file": "migrations/env.py",
+      "source_location": "L18",
+      "id": "migrations_env_get_engine",
+      "community": 7,
+      "norm_label": "get_engine()"
+    },
+    {
+      "label": "get_engine_url()",
+      "file_type": "code",
+      "source_file": "migrations/env.py",
+      "source_location": "L27",
+      "id": "migrations_env_get_engine_url",
+      "community": 7,
+      "norm_label": "get_engine_url()"
+    },
+    {
+      "label": "get_metadata()",
+      "file_type": "code",
+      "source_file": "migrations/env.py",
+      "source_location": "L48",
+      "id": "migrations_env_get_metadata",
+      "community": 7,
+      "norm_label": "get_metadata()"
+    },
+    {
+      "label": "run_migrations_offline()",
+      "file_type": "code",
+      "source_file": "migrations/env.py",
+      "source_location": "L54",
+      "id": "migrations_env_run_migrations_offline",
+      "community": 7,
+      "norm_label": "run_migrations_offline()"
+    },
+    {
+      "label": "run_migrations_online()",
+      "file_type": "code",
+      "source_file": "migrations/env.py",
+      "source_location": "L75",
+      "id": "migrations_env_run_migrations_online",
+      "community": 7,
+      "norm_label": "run_migrations_online()"
+    },
+    {
+      "label": "Run migrations in 'offline' mode.      This configures the context with just a U",
+      "file_type": "rationale",
+      "source_file": "migrations/env.py",
+      "source_location": "L55",
+      "id": "migrations_env_rationale_55",
+      "community": 7,
+      "norm_label": "run migrations in 'offline' mode.      this configures the context with just a u"
+    },
+    {
+      "label": "Run migrations in 'online' mode.      In this scenario we need to create an Engi",
+      "file_type": "rationale",
+      "source_file": "migrations/env.py",
+      "source_location": "L76",
+      "id": "migrations_env_rationale_76",
+      "community": 7,
+      "norm_label": "run migrations in 'online' mode.      in this scenario we need to create an engi"
+    },
+    {
+      "label": "7afddda2e580_add_status_column_to_episode.py",
+      "file_type": "code",
+      "source_file": "migrations/versions/7afddda2e580_add_status_column_to_episode.py",
+      "source_location": "L1",
+      "id": "migrations_versions_7afddda2e580_add_status_column_to_episode_py",
+      "community": 10,
+      "norm_label": "7afddda2e580_add_status_column_to_episode.py"
+    },
+    {
+      "label": "upgrade()",
+      "file_type": "code",
+      "source_file": "migrations/versions/7afddda2e580_add_status_column_to_episode.py",
+      "source_location": "L19",
+      "id": "versions_7afddda2e580_add_status_column_to_episode_upgrade",
+      "community": 10,
+      "norm_label": "upgrade()"
+    },
+    {
+      "label": "downgrade()",
+      "file_type": "code",
+      "source_file": "migrations/versions/7afddda2e580_add_status_column_to_episode.py",
+      "source_location": "L29",
+      "id": "versions_7afddda2e580_add_status_column_to_episode_downgrade",
+      "community": 10,
+      "norm_label": "downgrade()"
+    },
+    {
+      "label": "Add status column to Episode  Revision ID: 7afddda2e580 Revises:  Create Date: 2",
+      "file_type": "rationale",
+      "source_file": "migrations/versions/7afddda2e580_add_status_column_to_episode.py",
+      "source_location": "L1",
+      "id": "versions_7afddda2e580_add_status_column_to_episode_rationale_1",
+      "community": 10,
+      "norm_label": "add status column to episode  revision id: 7afddda2e580 revises:  create date: 2"
+    },
+    {
+      "label": "a91101fbc394_add_audit_log.py",
+      "file_type": "code",
+      "source_file": "migrations/versions/a91101fbc394_add_audit_log.py",
+      "source_location": "L1",
+      "id": "migrations_versions_a91101fbc394_add_audit_log_py",
+      "community": 11,
+      "norm_label": "a91101fbc394_add_audit_log.py"
+    },
+    {
+      "label": "upgrade()",
+      "file_type": "code",
+      "source_file": "migrations/versions/a91101fbc394_add_audit_log.py",
+      "source_location": "L19",
+      "id": "versions_a91101fbc394_add_audit_log_upgrade",
+      "community": 11,
+      "norm_label": "upgrade()"
+    },
+    {
+      "label": "downgrade()",
+      "file_type": "code",
+      "source_file": "migrations/versions/a91101fbc394_add_audit_log.py",
+      "source_location": "L43",
+      "id": "versions_a91101fbc394_add_audit_log_downgrade",
+      "community": 11,
+      "norm_label": "downgrade()"
+    },
+    {
+      "label": "Add audit log  Revision ID: a91101fbc394 Revises: 7afddda2e580 Create Date: 2025",
+      "file_type": "rationale",
+      "source_file": "migrations/versions/a91101fbc394_add_audit_log.py",
+      "source_location": "L1",
+      "id": "versions_a91101fbc394_add_audit_log_rationale_1",
+      "community": 11,
+      "norm_label": "add audit log  revision id: a91101fbc394 revises: 7afddda2e580 create date: 2025"
+    },
+    {
+      "label": "sw.js",
+      "file_type": "code",
+      "source_file": "static/sw.js",
+      "source_location": "L1",
+      "id": "static_sw_js",
+      "community": 12,
+      "norm_label": "sw.js"
+    },
+    {
+      "label": "urlsToCache",
+      "file_type": "code",
+      "source_file": "static/sw.js",
+      "source_location": "L5",
+      "id": "static_sw_urlstocache",
+      "community": 12,
+      "norm_label": "urlstocache"
+    },
+    {
+      "label": "cacheWhitelist",
+      "file_type": "code",
+      "source_file": "static/sw.js",
+      "source_location": "L42",
+      "id": "static_sw_cachewhitelist",
+      "community": 12,
+      "norm_label": "cachewhitelist"
+    },
+    {
+      "label": "requestUrl",
+      "file_type": "code",
+      "source_file": "static/sw.js",
+      "source_location": "L62",
+      "id": "static_sw_requesturl",
+      "community": 12,
+      "norm_label": "requesturl"
+    },
+    {
+      "label": "script.js",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L1",
+      "id": "static_js_script_js",
+      "community": 0,
+      "norm_label": "script.js"
+    },
+    {
+      "label": "highlightColors",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L7",
+      "id": "js_script_highlightcolors",
+      "community": 0,
+      "norm_label": "highlightcolors"
+    },
+    {
+      "label": "getColorClassForIndex()",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L12",
+      "id": "js_script_getcolorclassforindex",
+      "community": 8,
+      "norm_label": "getcolorclassforindex()"
+    },
+    {
+      "label": "removeHighlightClasses()",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L16",
+      "id": "js_script_removehighlightclasses",
+      "community": 8,
+      "norm_label": "removehighlightclasses()"
+    },
+    {
+      "label": "planArea",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L24",
+      "id": "js_script_planarea",
+      "community": 0,
+      "norm_label": "planarea"
+    },
+    {
+      "label": "savePlanBtn",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L25",
+      "id": "js_script_saveplanbtn",
+      "community": 0,
+      "norm_label": "saveplanbtn"
+    },
+    {
+      "label": "planStatus",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L26",
+      "id": "js_script_planstatus",
+      "community": 0,
+      "norm_label": "planstatus"
+    },
+    {
+      "label": "planDisplay",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L27",
+      "id": "js_script_plandisplay",
+      "community": 0,
+      "norm_label": "plandisplay"
+    },
+    {
+      "label": "viewPlanBtn",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L28",
+      "id": "js_script_viewplanbtn",
+      "community": 0,
+      "norm_label": "viewplanbtn"
+    },
+    {
+      "label": "editPlanBtn",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L29",
+      "id": "js_script_editplanbtn",
+      "community": 0,
+      "norm_label": "editplanbtn"
+    },
+    {
+      "label": "planEditorWrapper",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L30",
+      "id": "js_script_planeditorwrapper",
+      "community": 0,
+      "norm_label": "planeditorwrapper"
+    },
+    {
+      "label": "scenarioArea",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L31",
+      "id": "js_script_scenarioarea",
+      "community": 0,
+      "norm_label": "scenarioarea"
+    },
+    {
+      "label": "saveScenarioBtn",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L32",
+      "id": "js_script_savescenariobtn",
+      "community": 0,
+      "norm_label": "savescenariobtn"
+    },
+    {
+      "label": "scenarioStatus",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L33",
+      "id": "js_script_scenariostatus",
+      "community": 0,
+      "norm_label": "scenariostatus"
+    },
+    {
+      "label": "scenarioDisplay",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L34",
+      "id": "js_script_scenariodisplay",
+      "community": 0,
+      "norm_label": "scenariodisplay"
+    },
+    {
+      "label": "viewScenarioBtnActual",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L35",
+      "id": "js_script_viewscenariobtnactual",
+      "community": 0,
+      "norm_label": "viewscenariobtnactual"
+    },
+    {
+      "label": "editScenarioBtnActual",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L36",
+      "id": "js_script_editscenariobtnactual",
+      "community": 0,
+      "norm_label": "editscenariobtnactual"
+    },
+    {
+      "label": "scenarioEditorWrapper",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L37",
+      "id": "js_script_scenarioeditorwrapper",
+      "community": 0,
+      "norm_label": "scenarioeditorwrapper"
+    },
+    {
+      "label": "commentInstruction",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L39",
+      "id": "js_script_commentinstruction",
+      "community": 0,
+      "norm_label": "commentinstruction"
+    },
+    {
+      "label": "commentDisplayArea",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L40",
+      "id": "js_script_commentdisplayarea",
+      "community": 0,
+      "norm_label": "commentdisplayarea"
+    },
+    {
+      "label": "commentFormContainer",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L41",
+      "id": "js_script_commentformcontainer",
+      "community": 0,
+      "norm_label": "commentformcontainer"
+    },
+    {
+      "label": "commentBlockIndexSpan",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L43",
+      "id": "js_script_commentblockindexspan",
+      "community": 0,
+      "norm_label": "commentblockindexspan"
+    },
+    {
+      "label": "commentText",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L44",
+      "id": "js_script_commenttext",
+      "community": 0,
+      "norm_label": "commenttext"
+    },
+    {
+      "label": "submitCommentBtn",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L45",
+      "id": "js_script_submitcommentbtn",
+      "community": 0,
+      "norm_label": "submitcommentbtn"
+    },
+    {
+      "label": "cancelCommentBtn",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L46",
+      "id": "js_script_cancelcommentbtn",
+      "community": 0,
+      "norm_label": "cancelcommentbtn"
+    },
+    {
+      "label": "commentStatus",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L47",
+      "id": "js_script_commentstatus",
+      "community": 0,
+      "norm_label": "commentstatus"
+    },
+    {
+      "label": "noCommentsMsg",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L48",
+      "id": "js_script_nocommentsmsg",
+      "community": 0,
+      "norm_label": "nocommentsmsg"
+    },
+    {
+      "label": "episodeTitleDisplay",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L49",
+      "id": "js_script_episodetitledisplay",
+      "community": 0,
+      "norm_label": "episodetitledisplay"
+    },
+    {
+      "label": "editTitleBtn",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L50",
+      "id": "js_script_edittitlebtn",
+      "community": 0,
+      "norm_label": "edittitlebtn"
+    },
+    {
+      "label": "titleEditArea",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L51",
+      "id": "js_script_titleeditarea",
+      "community": 0,
+      "norm_label": "titleeditarea"
+    },
+    {
+      "label": "titleInput",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L52",
+      "id": "js_script_titleinput",
+      "community": 0,
+      "norm_label": "titleinput"
+    },
+    {
+      "label": "saveTitleBtn",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L53",
+      "id": "js_script_savetitlebtn",
+      "community": 0,
+      "norm_label": "savetitlebtn"
+    },
+    {
+      "label": "cancelTitleBtn",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L54",
+      "id": "js_script_canceltitlebtn",
+      "community": 0,
+      "norm_label": "canceltitlebtn"
+    },
+    {
+      "label": "titleStatus",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L55",
+      "id": "js_script_titlestatus",
+      "community": 0,
+      "norm_label": "titlestatus"
+    },
+    {
+      "label": "episodeList",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L58",
+      "id": "js_script_episodelist",
+      "community": 0,
+      "norm_label": "episodelist"
+    },
+    {
+      "label": "filterForm",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L59",
+      "id": "js_script_filterform",
+      "community": 0,
+      "norm_label": "filterform"
+    },
+    {
+      "label": "filterMaslakSelect",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L60",
+      "id": "js_script_filtermaslakselect",
+      "community": 0,
+      "norm_label": "filtermaslakselect"
+    },
+    {
+      "label": "filterStatusSelect",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L61",
+      "id": "js_script_filterstatusselect",
+      "community": 0,
+      "norm_label": "filterstatusselect"
+    },
+    {
+      "label": "items",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L76",
+      "id": "js_script_items",
+      "community": 0,
+      "norm_label": "items"
+    },
+    {
+      "label": "orderedIds",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L77",
+      "id": "js_script_orderedids",
+      "community": 0,
+      "norm_label": "orderedids"
+    },
+    {
+      "label": "saveEpisodeOrder()",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L103",
+      "id": "js_script_saveepisodeorder",
+      "community": 0,
+      "norm_label": "saveepisodeorder()"
+    },
+    {
+      "label": "newTitle",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L232",
+      "id": "js_script_newtitle",
+      "community": 0,
+      "norm_label": "newtitle"
+    },
+    {
+      "label": "targetBlock",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L281",
+      "id": "js_script_targetblock",
+      "community": 0,
+      "norm_label": "targetblock"
+    },
+    {
+      "label": "blockIndex",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L283",
+      "id": "js_script_blockindex",
+      "community": 0,
+      "norm_label": "blockindex"
+    },
+    {
+      "label": "text",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L293",
+      "id": "js_script_text",
+      "community": 0,
+      "norm_label": "text"
+    },
+    {
+      "label": "deleteButton",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L336",
+      "id": "js_script_deletebutton",
+      "community": 0,
+      "norm_label": "deletebutton"
+    },
+    {
+      "label": "commentElement",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L338",
+      "id": "js_script_commentelement",
+      "community": 0,
+      "norm_label": "commentelement"
+    },
+    {
+      "label": "confirmed",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L346",
+      "id": "js_script_confirmed",
+      "community": 0,
+      "norm_label": "confirmed"
+    },
+    {
+      "label": "blockElement",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L361",
+      "id": "js_script_blockelement",
+      "community": 0,
+      "norm_label": "blockelement"
+    },
+    {
+      "label": "saveContent()",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L386",
+      "id": "js_script_savecontent",
+      "community": 8,
+      "norm_label": "savecontent()"
+    },
+    {
+      "label": "renderPlanMarkdown()",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L421",
+      "id": "js_script_renderplanmarkdown",
+      "community": 8,
+      "norm_label": "renderplanmarkdown()"
+    },
+    {
+      "label": "renderScenario()",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L435",
+      "id": "js_script_renderscenario",
+      "community": 8,
+      "norm_label": "renderscenario()"
+    },
+    {
+      "label": "renderComments()",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L477",
+      "id": "js_script_rendercomments",
+      "community": 14,
+      "norm_label": "rendercomments()"
+    },
+    {
+      "label": "addCommentToDisplay()",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L517",
+      "id": "js_script_addcommenttodisplay",
+      "community": 8,
+      "norm_label": "addcommenttodisplay()"
+    },
+    {
+      "label": "createCommentElement()",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L564",
+      "id": "js_script_createcommentelement",
+      "community": 8,
+      "norm_label": "createcommentelement()"
+    },
+    {
+      "label": "clearCommentsDisplay()",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L583",
+      "id": "js_script_clearcommentsdisplay",
+      "community": 14,
+      "norm_label": "clearcommentsdisplay()"
+    },
+    {
+      "label": "openCommentForm()",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L598",
+      "id": "js_script_opencommentform",
+      "community": 0,
+      "norm_label": "opencommentform()"
+    },
+    {
+      "label": "closeCommentForm()",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L608",
+      "id": "js_script_closecommentform",
+      "community": 0,
+      "norm_label": "closecommentform()"
+    },
+    {
+      "label": "SQLAlchemy db instance",
+      "file_type": "code",
+      "source_file": "models.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Initialized once and bound to Flask app in app.py. Shared across all models.",
+      "id": "models_db",
+      "community": 15,
+      "norm_label": "sqlalchemy db instance"
+    },
+    {
+      "label": "Maslak Model",
+      "file_type": "code",
+      "source_file": "models.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Represents a chapter/category (muslak) that groups episodes. Ordered episodes are back-referenced via dynamic relationship.",
+      "id": "models_maslak",
+      "community": 5,
+      "norm_label": "maslak model"
+    },
+    {
+      "label": "User Model",
+      "file_type": "code",
+      "source_file": "models.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Includes last_login timestamp and is_admin flag. Many-to-many with Episode via Assignment table.",
+      "id": "models_user",
+      "community": 5,
+      "norm_label": "user model"
+    },
+    {
+      "label": "Episode Model",
+      "file_type": "code",
+      "source_file": "models.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Episode status workflow (draft/review/complete) tracks production state. display_order enables manual drag-and-drop sorting within a maslak. Plan field defaults to a structured markdown template.",
+      "id": "models_episode",
+      "community": 5,
+      "norm_label": "episode model"
+    },
+    {
+      "label": "Assignment Model",
+      "file_type": "code",
+      "source_file": "models.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "models_assignment",
+      "community": 5,
+      "norm_label": "assignment model"
+    },
+    {
+      "label": "Comment Model",
+      "file_type": "code",
+      "source_file": "models.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Block-based commenting associates comments with paragraph indices (block_index) in the scenario, enabling contextual feedback rather than free-floating comments.",
+      "id": "models_comment",
+      "community": 5,
+      "norm_label": "comment model"
+    },
+    {
+      "label": "AuditLog Model",
+      "file_type": "code",
+      "source_file": "models.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Centralized action logging for accountability. Designed with nullable user_id to handle system actions or deleted users. Uses JSON for flexible detail storage.",
+      "id": "models_auditlog",
+      "community": 5,
+      "norm_label": "auditlog model"
+    },
+    {
+      "label": "DEFAULT_PLAN_MARKDOWN",
+      "file_type": "code",
+      "source_file": "models.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Arabic-language default template providing structured sections for episode planning (goals, topics, Quran/Sunnah references, UX vision, assignment, success indicators).",
+      "id": "models_default_plan_markdown",
+      "community": 5,
+      "norm_label": "default_plan_markdown"
+    },
+    {
+      "label": "EPISODE_STATUS_CHOICES",
+      "file_type": "code",
+      "source_file": "models.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "models_episode_status_choices",
+      "community": 2,
+      "norm_label": "episode_status_choices"
+    },
+    {
+      "label": "log_activity helper",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Centralized helper ensures consistent audit logging across all routes. Handles current_user fallback and JSON serialization of details with graceful rollback on error.",
+      "id": "app_log_activity",
+      "community": 2,
+      "norm_label": "log_activity helper"
+    },
+    {
+      "label": "create_db_and_seed",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "app_create_db_and_seed",
+      "community": 5,
+      "norm_label": "create_db_and_seed"
+    },
+    {
+      "label": "update-plans CLI command",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Backfill utility that sets all episodes to the default plan template. Useful after introducing the template.",
+      "id": "app_update_plans",
+      "community": 5,
+      "norm_label": "update-plans cli command"
+    },
+    {
+      "label": "login route",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "app_login",
+      "community": 2,
+      "norm_label": "login route"
+    },
+    {
+      "label": "logout route",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "app_logout",
+      "community": 2,
+      "norm_label": "logout route"
+    },
+    {
+      "label": "dashboard route",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "app_dashboard",
+      "community": 2,
+      "norm_label": "dashboard route"
+    },
+    {
+      "label": "create_episode route",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "app_create_episode",
+      "community": 2,
+      "norm_label": "create_episode route"
+    },
+    {
+      "label": "delete_episode route",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "app_delete_episode",
+      "community": 2,
+      "norm_label": "delete_episode route"
+    },
+    {
+      "label": "change_episode_maslak route",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "app_change_episode_maslak",
+      "community": 2,
+      "norm_label": "change_episode_maslak route"
+    },
+    {
+      "label": "change_episode_status route",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "app_change_episode_status",
+      "community": 2,
+      "norm_label": "change_episode_status route"
+    },
+    {
+      "label": "clear_audit_log route",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Admin-only destructive operation. Logs the clear action itself before deletion for meta-auditing.",
+      "id": "app_clear_audit_log",
+      "community": 2,
+      "norm_label": "clear_audit_log route"
+    },
+    {
+      "label": "update_episode_order API",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "app_update_episode_order",
+      "community": 2,
+      "norm_label": "update_episode_order api"
+    },
+    {
+      "label": "assign_user_to_episode route",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "app_assign_user",
+      "community": 2,
+      "norm_label": "assign_user_to_episode route"
+    },
+    {
+      "label": "unassign_self_from_episode route",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "app_unassign_self",
+      "community": 2,
+      "norm_label": "unassign_self_from_episode route"
+    },
+    {
+      "label": "delete_comment route",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "app_delete_comment",
+      "community": 2,
+      "norm_label": "delete_comment route"
+    },
+    {
+      "label": "view_episode route",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Loads comments and groups them by block_index to support the block-based commenting UI. Uses joinedload to avoid N+1 queries.",
+      "id": "app_view_episode",
+      "community": 16,
+      "norm_label": "view_episode route"
+    },
+    {
+      "label": "update_episode route",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "app_update_episode",
+      "community": 2,
+      "norm_label": "update_episode route"
+    },
+    {
+      "label": "update_episode_title API",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "app_update_episode_title",
+      "community": 2,
+      "norm_label": "update_episode_title api"
+    },
+    {
+      "label": "add_comment route",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "app_add_comment",
+      "community": 2,
+      "norm_label": "add_comment route"
+    },
+    {
+      "label": "export_episode_pdf route",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Server-side PDF generation using WeasyPrint with inline Arabic CSS (Tajawal/IBM Plex Sans Arabic fonts) and Markdown-to-HTML conversion.",
+      "id": "app_export_pdf",
+      "community": 2,
+      "norm_label": "export_episode_pdf route"
+    },
+    {
+      "label": "UserAdminView",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "app_user_admin_view",
+      "community": 2,
+      "norm_label": "useradminview"
+    },
+    {
+      "label": "EpisodeAdminView",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "app_episode_admin_view",
+      "community": 2,
+      "norm_label": "episodeadminview"
+    },
+    {
+      "label": "MaslakAdminView",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "app_maslak_admin_view",
+      "community": 2,
+      "norm_label": "maslakadminview"
+    },
+    {
+      "label": "AuditLogAdminView",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Read-only admin view with custom template to expose a clear-all button. Explicitly disables create/edit/delete.",
+      "id": "app_auditlog_admin_view",
+      "community": 2,
+      "norm_label": "auditlogadminview"
+    },
+    {
+      "label": "SecureModelView",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Base Flask-Admin model view enforcing is_admin check and redirecting unauthorized users to login.",
+      "id": "app_secure_model_view",
+      "community": 2,
+      "norm_label": "securemodelview"
+    },
+    {
+      "label": "MyAdminIndexView",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "app_my_admin_index_view",
+      "community": 2,
+      "norm_label": "myadminindexview"
+    },
+    {
+      "label": "main backup function",
+      "file_type": "code",
+      "source_file": "backup.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Standalone script for scheduled database backups. Copies SQLite DB to timestamped file and uploads to DDownload cloud storage via API v2. Designed for PythonAnywhere cron jobs.",
+      "id": "backup_main",
+      "community": 13,
+      "norm_label": "main backup function"
+    },
+    {
+      "label": "get_upload_details",
+      "file_type": "code",
+      "source_file": "backup.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "backup_get_upload_details",
+      "community": 13,
+      "norm_label": "get_upload_details"
+    },
+    {
+      "label": "upload_file",
+      "file_type": "code",
+      "source_file": "backup.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "backup_upload_file",
+      "community": 13,
+      "norm_label": "upload_file"
+    },
+    {
+      "label": "Service Worker",
+      "file_type": "code",
+      "source_file": "static/sw.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Implements cache-first strategy for static assets (CSS/JS) to improve load times and offline availability, while leaving dynamic routes to the network. Uses versioned cache for cache-busting.",
+      "id": "static_sw",
+      "community": 2,
+      "norm_label": "service worker"
+    },
+    {
+      "label": "Frontend script.js",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Handles drag-and-drop episode reordering, markdown rendering with marked.js, block-based comment UI, inline title editing, and service worker registration.",
+      "id": "static_script",
+      "community": 2,
+      "norm_label": "frontend script.js"
+    },
+    {
+      "label": "base.html template",
+      "file_type": "code",
+      "source_file": "templates/base.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Base layout with Arabic RTL direction, Tailwind CSS, Alpine.js mobile nav, flash message auto-dismiss, and PWA manifest/link tags.",
+      "id": "templates_base",
+      "community": 2,
+      "norm_label": "base.html template"
+    },
+    {
+      "label": "dashboard.html template",
+      "file_type": "code",
+      "source_file": "templates/dashboard.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "templates_dashboard",
+      "community": 2,
+      "norm_label": "dashboard.html template"
+    },
+    {
+      "label": "login.html template",
+      "file_type": "code",
+      "source_file": "templates/login.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "templates_login",
+      "community": 2,
+      "norm_label": "login.html template"
+    },
+    {
+      "label": "episode.html template",
+      "file_type": "code",
+      "source_file": "templates/episode.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "templates_episode",
+      "community": 2,
+      "norm_label": "episode.html template"
+    },
+    {
+      "label": "auditlog_list.html template",
+      "file_type": "code",
+      "source_file": "templates/admin/auditlog_list.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "templates_admin_auditlog_list",
+      "community": 2,
+      "norm_label": "auditlog_list.html template"
+    },
+    {
+      "label": "Alembic env.py",
+      "file_type": "code",
+      "source_file": "migrations/env.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "migrations_env",
+      "community": 17,
+      "norm_label": "alembic env.py"
+    },
+    {
+      "label": "Add status column migration",
+      "file_type": "code",
+      "source_file": "migrations/versions/7afddda2e580_add_status_column_to_episode.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "migration_add_status",
+      "community": 5,
+      "norm_label": "add status column migration"
+    },
+    {
+      "label": "Add audit log migration",
+      "file_type": "code",
+      "source_file": "migrations/versions/a91101fbc394_add_audit_log.py",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "migration_add_audit_log",
+      "community": 5,
+      "norm_label": "add audit log migration"
+    },
+    {
+      "label": "requirements.txt",
+      "file_type": "document",
+      "source_file": "requirements.txt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "requirements",
+      "community": 18,
+      "norm_label": "requirements.txt"
+    },
+    {
+      "label": "README.md",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "readme",
+      "community": 19,
+      "norm_label": "readme.md"
+    },
+    {
+      "label": "Saleh Logo Image",
+      "file_type": "image",
+      "source_file": "static/images/saleh.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "saleh_logo_image",
+      "community": 4,
+      "norm_label": "saleh logo image"
+    },
+    {
+      "label": "Saleh Mobile Application Brand",
+      "file_type": "rationale",
+      "source_file": "static/images/saleh.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "saleh_app_brand",
+      "community": 4,
+      "norm_label": "saleh mobile application brand"
+    },
+    {
+      "label": "Smartphone Graphic Element",
+      "file_type": "image",
+      "source_file": "static/images/saleh.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "smartphone_graphic",
+      "community": 4,
+      "norm_label": "smartphone graphic element"
+    },
+    {
+      "label": "Red Card Graphic Element",
+      "file_type": "image",
+      "source_file": "static/images/saleh.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "red_card_graphic",
+      "community": 4,
+      "norm_label": "red card graphic element"
+    },
+    {
+      "label": "Arabic Text 'Saleh' (Modern Font)",
+      "file_type": "image",
+      "source_file": "static/images/saleh.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "saleh_modern_text",
+      "community": 4,
+      "norm_label": "arabic text 'saleh' (modern font)"
+    },
+    {
+      "label": "Arabic Text 'Saleh' (Calligraphic Style)",
+      "file_type": "image",
+      "source_file": "static/images/saleh.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "saleh_calligraphy_text",
+      "community": 4,
+      "norm_label": "arabic text 'saleh' (calligraphic style)"
+    },
+    {
+      "label": "Saleh App Logo (512x512 PNG)",
+      "file_type": "image",
+      "source_file": "static/images/saleh-512.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "saleh_512_logo_image",
+      "community": 4,
+      "norm_label": "saleh app logo (512x512 png)"
+    },
+    {
+      "label": "Brand Name: \u0635\u0627\u0644\u062d (Saleh)",
+      "file_type": "image",
+      "source_file": "static/images/saleh-512.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "saleh_brand_name",
+      "community": 4,
+      "norm_label": "brand name: \u0635\u0627\u0644\u062d (saleh)"
+    },
+    {
+      "label": "Red Book/Document Graphic Element",
+      "file_type": "image",
+      "source_file": "static/images/saleh-512.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "red_book_graphic",
+      "community": 4,
+      "norm_label": "red book/document graphic element"
+    },
+    {
+      "label": "Arabic Calligraphy Text (specific wording stylized and uncertain)",
+      "file_type": "image",
+      "source_file": "static/images/saleh-512.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "arabic_calligraphy_text",
+      "community": 4,
+      "norm_label": "arabic calligraphy text (specific wording stylized and uncertain)"
+    },
+    {
+      "label": "Horizontal Text Lines Graphic Element",
+      "file_type": "image",
+      "source_file": "static/images/saleh-512.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "text_lines_graphic",
+      "community": 4,
+      "norm_label": "horizontal text lines graphic element"
+    },
+    {
+      "label": "Saleh Mobile Application (inferred concept)",
+      "file_type": "rationale",
+      "source_file": "static/images/saleh-512.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "saleh_mobile_app",
+      "community": 4,
+      "norm_label": "saleh mobile application (inferred concept)"
+    },
+    {
+      "label": "saleh-192.png",
+      "file_type": "image",
+      "source_file": "static/images/saleh-192.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "saleh_192_png",
+      "community": 9,
+      "norm_label": "saleh-192.png"
+    },
+    {
+      "label": "Mtab3 Logo / Favicon",
+      "file_type": "image",
+      "source_file": "static/images/saleh-192.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "mtab3_logo",
+      "community": 9,
+      "norm_label": "mtab3 logo / favicon"
+    },
+    {
+      "label": "Smartphone Icon",
+      "file_type": "image",
+      "source_file": "static/images/saleh-192.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "smartphone_icon",
+      "community": 9,
+      "norm_label": "smartphone icon"
+    },
+    {
+      "label": "Arabic Text '\u0645\u062a\u0627\u0628\u0639' (Mtab3)",
+      "file_type": "image",
+      "source_file": "static/images/saleh-192.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "arabic_text_mtab3",
+      "community": 9,
+      "norm_label": "arabic text '\u0645\u062a\u0627\u0628\u0639' (mtab3)"
+    },
+    {
+      "label": "Red Background Element",
+      "file_type": "image",
+      "source_file": "static/images/saleh-192.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "red_background_element",
+      "community": 9,
+      "norm_label": "red background element"
+    },
+    {
+      "label": "Mtab3 Brand Identity",
+      "file_type": "image",
+      "source_file": "static/images/saleh-192.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "brand_identity",
+      "community": 9,
+      "norm_label": "mtab3 brand identity"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "models.py",
+      "source_location": "L57",
+      "weight": 1.0,
+      "source": "models_py",
+      "target": "saleh_collab_models_maslak",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "models.py",
+      "source_location": "L66",
+      "weight": 1.0,
+      "source": "models_py",
+      "target": "saleh_collab_models_user",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "models.py",
+      "source_location": "L86",
+      "weight": 1.0,
+      "source": "models_py",
+      "target": "saleh_collab_models_episode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "models.py",
+      "source_location": "L117",
+      "weight": 1.0,
+      "source": "models_py",
+      "target": "saleh_collab_models_assignment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "models.py",
+      "source_location": "L131",
+      "weight": 1.0,
+      "source": "models_py",
+      "target": "saleh_collab_models_comment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "models.py",
+      "source_location": "L149",
+      "weight": 1.0,
+      "source": "models_py",
+      "target": "saleh_collab_models_auditlog",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "models.py",
+      "source_location": "L61",
+      "weight": 1.0,
+      "source": "saleh_collab_models_maslak",
+      "target": "saleh_collab_models_maslak_repr",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_userform",
+      "target": "saleh_collab_models_maslak",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_maslakform",
+      "target": "saleh_collab_models_maslak",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_myadminindexview",
+      "target": "saleh_collab_models_maslak",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_securemodelview",
+      "target": "saleh_collab_models_maslak",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_useradminview",
+      "target": "saleh_collab_models_maslak",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_episodeadminview",
+      "target": "saleh_collab_models_maslak",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_maslakadminview",
+      "target": "saleh_collab_models_maslak",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_auditlogadminview",
+      "target": "saleh_collab_models_maslak",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "app.py",
+      "source_location": "L140",
+      "weight": 1.0,
+      "source": "saleh_collab_app_create_db_and_seed",
+      "target": "saleh_collab_models_maslak"
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "models.py",
+      "source_location": "L66",
+      "weight": 1.0,
+      "source": "saleh_collab_models_user",
+      "target": "usermixin",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "models.py",
+      "source_location": "L81",
+      "weight": 1.0,
+      "source": "saleh_collab_models_user",
+      "target": "saleh_collab_models_user_repr",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_userform",
+      "target": "saleh_collab_models_user",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_maslakform",
+      "target": "saleh_collab_models_user",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_myadminindexview",
+      "target": "saleh_collab_models_user",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_securemodelview",
+      "target": "saleh_collab_models_user",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_useradminview",
+      "target": "saleh_collab_models_user",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_episodeadminview",
+      "target": "saleh_collab_models_user",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_maslakadminview",
+      "target": "saleh_collab_models_user",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_auditlogadminview",
+      "target": "saleh_collab_models_user",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "app.py",
+      "source_location": "L119",
+      "weight": 1.0,
+      "source": "saleh_collab_app_create_db_and_seed",
+      "target": "saleh_collab_models_user"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "models.py",
+      "source_location": "L112",
+      "weight": 1.0,
+      "source": "saleh_collab_models_episode",
+      "target": "saleh_collab_models_episode_repr",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_userform",
+      "target": "saleh_collab_models_episode",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_maslakform",
+      "target": "saleh_collab_models_episode",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_myadminindexview",
+      "target": "saleh_collab_models_episode",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_securemodelview",
+      "target": "saleh_collab_models_episode",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_useradminview",
+      "target": "saleh_collab_models_episode",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_episodeadminview",
+      "target": "saleh_collab_models_episode",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_maslakadminview",
+      "target": "saleh_collab_models_episode",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_auditlogadminview",
+      "target": "saleh_collab_models_episode",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "app.py",
+      "source_location": "L548",
+      "weight": 1.0,
+      "source": "saleh_collab_app_create_episode",
+      "target": "saleh_collab_models_episode"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_userform",
+      "target": "saleh_collab_models_assignment",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_maslakform",
+      "target": "saleh_collab_models_assignment",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_myadminindexview",
+      "target": "saleh_collab_models_assignment",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_securemodelview",
+      "target": "saleh_collab_models_assignment",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_useradminview",
+      "target": "saleh_collab_models_assignment",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_episodeadminview",
+      "target": "saleh_collab_models_assignment",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_maslakadminview",
+      "target": "saleh_collab_models_assignment",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_auditlogadminview",
+      "target": "saleh_collab_models_assignment",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "app.py",
+      "source_location": "L553",
+      "weight": 1.0,
+      "source": "saleh_collab_app_create_episode",
+      "target": "saleh_collab_models_assignment"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "app.py",
+      "source_location": "L779",
+      "weight": 1.0,
+      "source": "saleh_collab_app_assign_user_to_episode",
+      "target": "saleh_collab_models_assignment"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "models.py",
+      "source_location": "L144",
+      "weight": 1.0,
+      "source": "saleh_collab_models_comment",
+      "target": "saleh_collab_models_comment_repr",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_userform",
+      "target": "saleh_collab_models_comment",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_maslakform",
+      "target": "saleh_collab_models_comment",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_myadminindexview",
+      "target": "saleh_collab_models_comment",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_securemodelview",
+      "target": "saleh_collab_models_comment",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_useradminview",
+      "target": "saleh_collab_models_comment",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_episodeadminview",
+      "target": "saleh_collab_models_comment",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_maslakadminview",
+      "target": "saleh_collab_models_comment",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_auditlogadminview",
+      "target": "saleh_collab_models_comment",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "app.py",
+      "source_location": "L1060",
+      "weight": 1.0,
+      "source": "saleh_collab_app_add_comment",
+      "target": "saleh_collab_models_comment"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "models.py",
+      "source_location": "L169",
+      "weight": 1.0,
+      "source": "saleh_collab_models_auditlog",
+      "target": "saleh_collab_models_auditlog_repr",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_userform",
+      "target": "saleh_collab_models_auditlog",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_maslakform",
+      "target": "saleh_collab_models_auditlog",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_myadminindexview",
+      "target": "saleh_collab_models_auditlog",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_securemodelview",
+      "target": "saleh_collab_models_auditlog",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_useradminview",
+      "target": "saleh_collab_models_auditlog",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_episodeadminview",
+      "target": "saleh_collab_models_auditlog",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_maslakadminview",
+      "target": "saleh_collab_models_auditlog",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "app.py",
+      "source_location": "L32",
+      "weight": 0.8,
+      "source": "saleh_collab_app_auditlogadminview",
+      "target": "saleh_collab_models_auditlog",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "app.py",
+      "source_location": "L198",
+      "weight": 1.0,
+      "source": "saleh_collab_app_log_activity",
+      "target": "saleh_collab_models_auditlog"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backup.py",
+      "source_location": "L34",
+      "weight": 1.0,
+      "source": "backup_py",
+      "target": "saleh_collab_backup_get_upload_details",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backup.py",
+      "source_location": "L74",
+      "weight": 1.0,
+      "source": "backup_py",
+      "target": "saleh_collab_backup_upload_file",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backup.py",
+      "source_location": "L164",
+      "weight": 1.0,
+      "source": "backup_py",
+      "target": "saleh_collab_backup_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "backup.py",
+      "source_location": "L254",
+      "weight": 1.0,
+      "source": "saleh_collab_backup_rationale_254",
+      "target": "backup_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "backup.py",
+      "source_location": "L223",
+      "weight": 1.0,
+      "source": "saleh_collab_backup_main",
+      "target": "saleh_collab_backup_get_upload_details",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "backup.py",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "saleh_collab_backup_rationale_35",
+      "target": "saleh_collab_backup_get_upload_details",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "backup.py",
+      "source_location": "L236",
+      "weight": 1.0,
+      "source": "saleh_collab_backup_main",
+      "target": "saleh_collab_backup_upload_file",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "backup.py",
+      "source_location": "L75",
+      "weight": 1.0,
+      "source": "saleh_collab_backup_rationale_75",
+      "target": "saleh_collab_backup_upload_file",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "backup.py",
+      "source_location": "L165",
+      "weight": 1.0,
+      "source": "saleh_collab_backup_rationale_165",
+      "target": "saleh_collab_backup_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L89",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_utility_processor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L98",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_load_user",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L107",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_create_db_command",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L111",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_create_db_and_seed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L152",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_update_plans",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L185",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_log_activity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L216",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_userform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L231",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_maslakform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L236",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_myadminindexview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L249",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_securemodelview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L262",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_useradminview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L300",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_episodeadminview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L340",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_maslakadminview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L361",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_auditlogadminview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L400",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_login",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L442",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_logout",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L451",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_dashboard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L516",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_test_route",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L522",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_create_episode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L570",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_delete_episode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L598",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_change_episode_maslak",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L644",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_change_episode_status",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L687",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_clear_audit_log",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L714",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_update_episode_order",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L751",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_assign_user_to_episode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L800",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_unassign_self_from_episode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L828",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_delete_comment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L865",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_view_episode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L910",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_update_episode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L956",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_update_episode_title",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L1027",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_add_comment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L1097",
+      "weight": 1.0,
+      "source": "app_py",
+      "target": "saleh_collab_app_export_episode_pdf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L108",
+      "weight": 1.0,
+      "source": "saleh_collab_app_create_db_command",
+      "target": "saleh_collab_app_create_db_and_seed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L153",
+      "weight": 1.0,
+      "source": "saleh_collab_app_rationale_153",
+      "target": "saleh_collab_app_update_plans",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L288",
+      "weight": 1.0,
+      "source": "saleh_collab_app_useradminview_after_model_change",
+      "target": "saleh_collab_app_log_activity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L293",
+      "weight": 1.0,
+      "source": "saleh_collab_app_useradminview_on_model_delete",
+      "target": "saleh_collab_app_log_activity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L328",
+      "weight": 1.0,
+      "source": "saleh_collab_app_episodeadminview_after_model_change",
+      "target": "saleh_collab_app_log_activity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L333",
+      "weight": 1.0,
+      "source": "saleh_collab_app_episodeadminview_on_model_delete",
+      "target": "saleh_collab_app_log_activity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L349",
+      "weight": 1.0,
+      "source": "saleh_collab_app_maslakadminview_after_model_change",
+      "target": "saleh_collab_app_log_activity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L354",
+      "weight": 1.0,
+      "source": "saleh_collab_app_maslakadminview_on_model_delete",
+      "target": "saleh_collab_app_log_activity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L415",
+      "weight": 1.0,
+      "source": "saleh_collab_app_login",
+      "target": "saleh_collab_app_log_activity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L443",
+      "weight": 1.0,
+      "source": "saleh_collab_app_logout",
+      "target": "saleh_collab_app_log_activity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L555",
+      "weight": 1.0,
+      "source": "saleh_collab_app_create_episode",
+      "target": "saleh_collab_app_log_activity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L584",
+      "weight": 1.0,
+      "source": "saleh_collab_app_delete_episode",
+      "target": "saleh_collab_app_log_activity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L625",
+      "weight": 1.0,
+      "source": "saleh_collab_app_change_episode_maslak",
+      "target": "saleh_collab_app_log_activity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L667",
+      "weight": 1.0,
+      "source": "saleh_collab_app_change_episode_status",
+      "target": "saleh_collab_app_log_activity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L695",
+      "weight": 1.0,
+      "source": "saleh_collab_app_clear_audit_log",
+      "target": "saleh_collab_app_log_activity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L736",
+      "weight": 1.0,
+      "source": "saleh_collab_app_update_episode_order",
+      "target": "saleh_collab_app_log_activity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L781",
+      "weight": 1.0,
+      "source": "saleh_collab_app_assign_user_to_episode",
+      "target": "saleh_collab_app_log_activity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L808",
+      "weight": 1.0,
+      "source": "saleh_collab_app_unassign_self_from_episode",
+      "target": "saleh_collab_app_log_activity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L841",
+      "weight": 1.0,
+      "source": "saleh_collab_app_delete_comment",
+      "target": "saleh_collab_app_log_activity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L939",
+      "weight": 1.0,
+      "source": "saleh_collab_app_update_episode",
+      "target": "saleh_collab_app_log_activity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L998",
+      "weight": 1.0,
+      "source": "saleh_collab_app_update_episode_title",
+      "target": "saleh_collab_app_log_activity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L1067",
+      "weight": 1.0,
+      "source": "saleh_collab_app_add_comment",
+      "target": "saleh_collab_app_log_activity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L186",
+      "weight": 1.0,
+      "source": "saleh_collab_app_rationale_186",
+      "target": "saleh_collab_app_log_activity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L216",
+      "weight": 1.0,
+      "source": "saleh_collab_app_userform",
+      "target": "flaskform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L231",
+      "weight": 1.0,
+      "source": "saleh_collab_app_maslakform",
+      "target": "flaskform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L236",
+      "weight": 1.0,
+      "source": "saleh_collab_app_myadminindexview",
+      "target": "adminindexview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L237",
+      "weight": 1.0,
+      "source": "saleh_collab_app_myadminindexview",
+      "target": "saleh_collab_app_myadminindexview_is_accessible",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L244",
+      "weight": 1.0,
+      "source": "saleh_collab_app_myadminindexview",
+      "target": "saleh_collab_app_myadminindexview_inaccessible_callback",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L249",
+      "weight": 1.0,
+      "source": "saleh_collab_app_securemodelview",
+      "target": "modelview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L250",
+      "weight": 1.0,
+      "source": "saleh_collab_app_securemodelview",
+      "target": "saleh_collab_app_securemodelview_is_accessible",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L257",
+      "weight": 1.0,
+      "source": "saleh_collab_app_securemodelview",
+      "target": "saleh_collab_app_securemodelview_inaccessible_callback",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L262",
+      "weight": 1.0,
+      "source": "saleh_collab_app_useradminview",
+      "target": "saleh_collab_app_securemodelview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L300",
+      "weight": 1.0,
+      "source": "saleh_collab_app_episodeadminview",
+      "target": "saleh_collab_app_securemodelview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L340",
+      "weight": 1.0,
+      "source": "saleh_collab_app_maslakadminview",
+      "target": "saleh_collab_app_securemodelview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L361",
+      "weight": 1.0,
+      "source": "saleh_collab_app_auditlogadminview",
+      "target": "saleh_collab_app_securemodelview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L277",
+      "weight": 1.0,
+      "source": "saleh_collab_app_useradminview",
+      "target": "saleh_collab_app_useradminview_on_model_change",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L286",
+      "weight": 1.0,
+      "source": "saleh_collab_app_useradminview",
+      "target": "saleh_collab_app_useradminview_after_model_change",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L292",
+      "weight": 1.0,
+      "source": "saleh_collab_app_useradminview",
+      "target": "saleh_collab_app_useradminview_on_model_delete",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L326",
+      "weight": 1.0,
+      "source": "saleh_collab_app_episodeadminview",
+      "target": "saleh_collab_app_episodeadminview_after_model_change",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L332",
+      "weight": 1.0,
+      "source": "saleh_collab_app_episodeadminview",
+      "target": "saleh_collab_app_episodeadminview_on_model_delete",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L347",
+      "weight": 1.0,
+      "source": "saleh_collab_app_maslakadminview",
+      "target": "saleh_collab_app_maslakadminview_after_model_change",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L353",
+      "weight": 1.0,
+      "source": "saleh_collab_app_maslakadminview",
+      "target": "saleh_collab_app_maslakadminview_on_model_delete",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L688",
+      "weight": 1.0,
+      "source": "saleh_collab_app_rationale_688",
+      "target": "saleh_collab_app_clear_audit_log",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "migrations/env.py",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "migrations_env_py",
+      "target": "migrations_env_get_engine",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "migrations/env.py",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "migrations_env_py",
+      "target": "migrations_env_get_engine_url",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "migrations/env.py",
+      "source_location": "L48",
+      "weight": 1.0,
+      "source": "migrations_env_py",
+      "target": "migrations_env_get_metadata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "migrations/env.py",
+      "source_location": "L54",
+      "weight": 1.0,
+      "source": "migrations_env_py",
+      "target": "migrations_env_run_migrations_offline",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "migrations/env.py",
+      "source_location": "L75",
+      "weight": 1.0,
+      "source": "migrations_env_py",
+      "target": "migrations_env_run_migrations_online",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "migrations/env.py",
+      "source_location": "L29",
+      "weight": 1.0,
+      "source": "migrations_env_get_engine_url",
+      "target": "migrations_env_get_engine",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "migrations/env.py",
+      "source_location": "L97",
+      "weight": 1.0,
+      "source": "migrations_env_run_migrations_online",
+      "target": "migrations_env_get_engine",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "migrations/env.py",
+      "source_location": "L68",
+      "weight": 1.0,
+      "source": "migrations_env_run_migrations_offline",
+      "target": "migrations_env_get_metadata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "migrations/env.py",
+      "source_location": "L102",
+      "weight": 1.0,
+      "source": "migrations_env_run_migrations_online",
+      "target": "migrations_env_get_metadata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "migrations/env.py",
+      "source_location": "L55",
+      "weight": 1.0,
+      "source": "migrations_env_rationale_55",
+      "target": "migrations_env_run_migrations_offline",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "migrations/env.py",
+      "source_location": "L76",
+      "weight": 1.0,
+      "source": "migrations_env_rationale_76",
+      "target": "migrations_env_run_migrations_online",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "migrations/versions/7afddda2e580_add_status_column_to_episode.py",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "migrations_versions_7afddda2e580_add_status_column_to_episode_py",
+      "target": "versions_7afddda2e580_add_status_column_to_episode_upgrade",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "migrations/versions/7afddda2e580_add_status_column_to_episode.py",
+      "source_location": "L29",
+      "weight": 1.0,
+      "source": "migrations_versions_7afddda2e580_add_status_column_to_episode_py",
+      "target": "versions_7afddda2e580_add_status_column_to_episode_downgrade",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "migrations/versions/7afddda2e580_add_status_column_to_episode.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "versions_7afddda2e580_add_status_column_to_episode_rationale_1",
+      "target": "migrations_versions_7afddda2e580_add_status_column_to_episode_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "migrations/versions/a91101fbc394_add_audit_log.py",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "migrations_versions_a91101fbc394_add_audit_log_py",
+      "target": "versions_a91101fbc394_add_audit_log_upgrade",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "migrations/versions/a91101fbc394_add_audit_log.py",
+      "source_location": "L43",
+      "weight": 1.0,
+      "source": "migrations_versions_a91101fbc394_add_audit_log_py",
+      "target": "versions_a91101fbc394_add_audit_log_downgrade",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "migrations/versions/a91101fbc394_add_audit_log.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "versions_a91101fbc394_add_audit_log_rationale_1",
+      "target": "migrations_versions_a91101fbc394_add_audit_log_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/sw.js",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "static_sw_js",
+      "target": "static_sw_urlstocache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/sw.js",
+      "source_location": "L42",
+      "weight": 1.0,
+      "source": "static_sw_js",
+      "target": "static_sw_cachewhitelist",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/sw.js",
+      "source_location": "L62",
+      "weight": 1.0,
+      "source": "static_sw_js",
+      "target": "static_sw_requesturl",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_highlightcolors",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_getcolorclassforindex",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_removehighlightclasses",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_planarea",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L25",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_saveplanbtn",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_planstatus",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_plandisplay",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_viewplanbtn",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L29",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_editplanbtn",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L30",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_planeditorwrapper",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_scenarioarea",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_savescenariobtn",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_scenariostatus",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L34",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_scenariodisplay",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_viewscenariobtnactual",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L36",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_editscenariobtnactual",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L37",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_scenarioeditorwrapper",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L39",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_commentinstruction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L40",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_commentdisplayarea",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L41",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_commentformcontainer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L43",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_commentblockindexspan",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_commenttext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L45",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_submitcommentbtn",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L46",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_cancelcommentbtn",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L47",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_commentstatus",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L48",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_nocommentsmsg",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L49",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_episodetitledisplay",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L50",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_edittitlebtn",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L51",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_titleeditarea",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L52",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_titleinput",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L53",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_savetitlebtn",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L54",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_canceltitlebtn",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L55",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_titlestatus",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L58",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_episodelist",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L59",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_filterform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L60",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_filtermaslakselect",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L61",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_filterstatusselect",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L76",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_items",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L77",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_orderedids",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L103",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_saveepisodeorder",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L232",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_newtitle",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L281",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_targetblock",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L283",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_blockindex",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L293",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_text",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L336",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_deletebutton",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L338",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_commentelement",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L346",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_confirmed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L361",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_blockelement",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L386",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_savecontent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L421",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_renderplanmarkdown",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L435",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_renderscenario",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L477",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_rendercomments",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L517",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_addcommenttodisplay",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L564",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_createcommentelement",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L583",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_clearcommentsdisplay",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L598",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_opencommentform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L608",
+      "weight": 1.0,
+      "source": "static_js_script_js",
+      "target": "js_script_closecommentform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L454",
+      "weight": 1.0,
+      "source": "js_script_renderscenario",
+      "target": "js_script_getcolorclassforindex",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L523",
+      "weight": 1.0,
+      "source": "js_script_addcommenttodisplay",
+      "target": "js_script_getcolorclassforindex",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L451",
+      "weight": 1.0,
+      "source": "js_script_renderscenario",
+      "target": "js_script_removehighlightclasses",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L529",
+      "weight": 1.0,
+      "source": "js_script_addcommenttodisplay",
+      "target": "js_script_removehighlightclasses",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L405",
+      "weight": 1.0,
+      "source": "js_script_savecontent",
+      "target": "js_script_renderplanmarkdown",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L407",
+      "weight": 1.0,
+      "source": "js_script_savecontent",
+      "target": "js_script_renderscenario",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L479",
+      "weight": 1.0,
+      "source": "js_script_rendercomments",
+      "target": "js_script_clearcommentsdisplay",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L560",
+      "weight": 1.0,
+      "source": "js_script_addcommenttodisplay",
+      "target": "js_script_createcommentelement",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "models.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "models_episode",
+      "target": "models_maslak"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "models.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "models_episode",
+      "target": "models_user"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "models.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "models_comment",
+      "target": "models_user"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "models.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "models_assignment",
+      "target": "models_user"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "models.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "models_auditlog",
+      "target": "models_user"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "migrations/versions/a91101fbc394_add_audit_log.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "migration_add_audit_log",
+      "target": "models_user"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "models.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "models_episode",
+      "target": "models_default_plan_markdown"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "models.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "models_episode",
+      "target": "models_episode_status_choices"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "models.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "models_comment",
+      "target": "models_episode"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "models.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "models_assignment",
+      "target": "models_episode"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "migrations/versions/7afddda2e580_add_status_column_to_episode.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "migration_add_status",
+      "target": "models_episode"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "migrations/versions/a91101fbc394_add_audit_log.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "migration_add_audit_log",
+      "target": "models_auditlog"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_update_plans",
+      "target": "models_default_plan_markdown"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_dashboard",
+      "target": "models_episode_status_choices"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_episode_admin_view",
+      "target": "models_episode_status_choices"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_change_episode_status",
+      "target": "models_episode_status_choices"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_login",
+      "target": "app_log_activity"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_logout",
+      "target": "app_log_activity"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_create_episode",
+      "target": "app_log_activity"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_delete_episode",
+      "target": "app_log_activity"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_change_episode_maslak",
+      "target": "app_log_activity"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_change_episode_status",
+      "target": "app_log_activity"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_clear_audit_log",
+      "target": "app_log_activity"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_update_episode_order",
+      "target": "app_log_activity"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_assign_user",
+      "target": "app_log_activity"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_unassign_self",
+      "target": "app_log_activity"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_delete_comment",
+      "target": "app_log_activity"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_update_episode",
+      "target": "app_log_activity"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_update_episode_title",
+      "target": "app_log_activity"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_add_comment",
+      "target": "app_log_activity"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_user_admin_view",
+      "target": "app_log_activity"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_episode_admin_view",
+      "target": "app_log_activity"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_maslak_admin_view",
+      "target": "app_log_activity"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.65,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_update_plans",
+      "target": "app_create_db_and_seed"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "templates/admin/auditlog_list.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "templates_admin_auditlog_list",
+      "target": "app_clear_audit_log"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "static/js/script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "static_script",
+      "target": "app_update_episode_order"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "static/js/script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "static_script",
+      "target": "app_delete_comment"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "static/js/script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "static_script",
+      "target": "app_update_episode"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "static/js/script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "static_script",
+      "target": "app_update_episode_title"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "static/js/script.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "static_script",
+      "target": "app_add_comment"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_export_pdf",
+      "target": "static_script"
+    },
+    {
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_user_admin_view",
+      "target": "app_secure_model_view"
+    },
+    {
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_episode_admin_view",
+      "target": "app_secure_model_view"
+    },
+    {
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_maslak_admin_view",
+      "target": "app_secure_model_view"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "templates/admin/auditlog_list.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "templates_admin_auditlog_list",
+      "target": "app_auditlog_admin_view"
+    },
+    {
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_auditlog_admin_view",
+      "target": "app_secure_model_view"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "app.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "app_my_admin_index_view",
+      "target": "app_secure_model_view"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "backup.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "backup_main",
+      "target": "backup_get_upload_details"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "backup.py",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "backup_main",
+      "target": "backup_upload_file"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "static/sw.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "static_sw",
+      "target": "static_script"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "templates/episode.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "templates_episode",
+      "target": "static_script"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "templates/dashboard.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "templates_dashboard",
+      "target": "static_script"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "templates/base.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "templates_base",
+      "target": "static_script"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "templates/login.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "templates_login",
+      "target": "templates_base"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "templates/dashboard.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "templates_dashboard",
+      "target": "templates_base"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "templates/episode.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "templates_episode",
+      "target": "templates_base"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "static/images/saleh.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "saleh_logo_image",
+      "target": "saleh_app_brand"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "static/images/saleh.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "saleh_logo_image",
+      "target": "smartphone_graphic"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "static/images/saleh.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "saleh_logo_image",
+      "target": "red_card_graphic"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "static/images/saleh.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "saleh_logo_image",
+      "target": "saleh_modern_text"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "static/images/saleh.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "saleh_logo_image",
+      "target": "saleh_calligraphy_text"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "static/images/saleh.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "saleh_app_brand",
+      "target": "saleh_modern_text"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "static/images/saleh.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "saleh_app_brand",
+      "target": "saleh_calligraphy_text"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "static/images/saleh.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "smartphone_graphic",
+      "target": "saleh_modern_text"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "static/images/saleh.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "smartphone_graphic",
+      "target": "red_card_graphic"
+    },
+    {
+      "relation": "depicts",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "static/images/saleh-512.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "saleh_512_logo_image",
+      "target": "smartphone_graphic"
+    },
+    {
+      "relation": "displays",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "static/images/saleh-512.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "smartphone_graphic",
+      "target": "saleh_brand_name"
+    },
+    {
+      "relation": "visually_composed_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "static/images/saleh-512.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "smartphone_graphic",
+      "target": "red_book_graphic"
+    },
+    {
+      "relation": "suggests",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "static/images/saleh-512.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "smartphone_graphic",
+      "target": "saleh_mobile_app"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "static/images/saleh.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "red_card_graphic",
+      "target": "saleh_calligraphy_text"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "static/images/saleh.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "saleh_modern_text",
+      "target": "saleh_calligraphy_text"
+    },
+    {
+      "relation": "depicts",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "static/images/saleh-512.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "saleh_512_logo_image",
+      "target": "red_book_graphic"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "static/images/saleh-512.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "saleh_512_logo_image",
+      "target": "saleh_brand_name"
+    },
+    {
+      "relation": "represents",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "static/images/saleh-512.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "saleh_512_logo_image",
+      "target": "saleh_mobile_app"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "static/images/saleh-512.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "saleh_brand_name",
+      "target": "saleh_mobile_app"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "static/images/saleh-512.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "red_book_graphic",
+      "target": "arabic_calligraphy_text"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "static/images/saleh-512.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "red_book_graphic",
+      "target": "text_lines_graphic"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "static/images/saleh-512.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "red_book_graphic",
+      "target": "saleh_mobile_app"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "static/images/saleh-192.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "saleh_192_png",
+      "target": "mtab3_logo"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "static/images/saleh-192.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "mtab3_logo",
+      "target": "smartphone_icon"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "static/images/saleh-192.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "mtab3_logo",
+      "target": "arabic_text_mtab3"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "static/images/saleh-192.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "mtab3_logo",
+      "target": "red_background_element"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "static/images/saleh-192.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "smartphone_icon",
+      "target": "arabic_text_mtab3"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "static/images/saleh-192.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "smartphone_icon",
+      "target": "brand_identity"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "static/images/saleh-192.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "arabic_text_mtab3",
+      "target": "brand_identity"
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "audit_logging_flow",
+      "label": "Audit Logging Flow",
+      "nodes": [
+        "app_log_activity",
+        "models_auditlog",
+        "app_auditlog_admin_view",
+        "templates_admin_auditlog_list",
+        "app_clear_audit_log"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "app.py"
+    },
+    {
+      "id": "admin_authorization_pattern",
+      "label": "Admin Authorization Pattern",
+      "nodes": [
+        "app_secure_model_view",
+        "app_my_admin_index_view",
+        "app_user_admin_view",
+        "app_episode_admin_view",
+        "app_maslak_admin_view",
+        "app_auditlog_admin_view"
+      ],
+      "relation": "implement",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app.py"
+    },
+    {
+      "id": "block_based_commenting_system",
+      "label": "Block-Based Commenting System",
+      "nodes": [
+        "models_comment",
+        "app_add_comment",
+        "app_delete_comment",
+        "app_view_episode",
+        "static_script"
+      ],
+      "relation": "form",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "app.py"
+    },
+    {
+      "id": "saleh_logo_composition",
+      "label": "Saleh Logo Visual Composition",
+      "nodes": [
+        "saleh_logo_image",
+        "smartphone_graphic",
+        "red_card_graphic",
+        "saleh_modern_text",
+        "saleh_calligraphy_text"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "static/images/saleh.png"
+    },
+    {
+      "id": "logo_composition",
+      "label": "Logo Composition Elements",
+      "nodes": [
+        "smartphone_graphic",
+        "red_book_graphic",
+        "saleh_brand_name",
+        "arabic_calligraphy_text"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "static/images/saleh-512.png"
+    },
+    {
+      "id": "logo_composition",
+      "label": "Logo Composition",
+      "nodes": [
+        "mtab3_logo",
+        "smartphone_icon",
+        "arabic_text_mtab3",
+        "red_background_element"
+      ],
+      "relation": "form",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "static/images/saleh-192.png"
+    }
+  ],
+  "built_at_commit": "5371dfb3d337efe198c57ea4ad32e2ed353a141c"
+}

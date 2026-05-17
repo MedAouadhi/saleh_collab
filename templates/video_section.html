@@ -1,0 +1,164 @@
+<!-- templates/video_section.html -->
+<div x-data="videoSection()" x-init="initVideoSection()" class="bg-white p-6 rounded-lg shadow-md mt-6">
+    <div class="flex justify-between items-center mb-4 border-b pb-2 cursor-pointer" @click="open = !open">
+        <h2 class="text-xl font-semibold text-gray-700">🎬 فيديوهات الحلقة</h2>
+        <span x-text="open ? '▲' : '▼'" class="text-gray-500"></span>
+    </div>
+
+    <div x-show="open" x-transition>
+        <!-- Loading state for models -->
+        <div x-show="modelsLoading" class="text-center py-4 text-gray-500">
+            جاري تحميل الموديلات...
+        </div>
+        <div x-show="modelsError" class="text-center py-4 text-red-500">
+            <span x-text="modelsError"></span>
+        </div>
+
+        <!-- Scene list -->
+        <template x-for="scene in scenes" :key="scene.id">
+            <div class="mb-4 border rounded-lg overflow-hidden">
+                <div class="bg-gray-50 px-4 py-2 flex justify-between items-center cursor-pointer" @click="scene.open = !scene.open">
+                    <h3 class="font-semibold text-gray-700" x-text="'مشهد ' + scene.number"></h3>
+                    <div class="flex items-center gap-2">
+                        <button
+                            x-show="isAssigned || isAdmin"
+                            @click.stop="deleteScene(scene.id)"
+                            class="text-red-500 hover:text-red-700 text-sm"
+                            title="حذف المشهد"
+                        >🗑️</button>
+                        <span x-text="scene.open ? '▲' : '▼'" class="text-gray-500"></span>
+                    </div>
+                </div>
+
+                <div x-show="scene.open" x-transition class="p-4 space-y-4">
+                    <!-- Generation Form -->
+                    <div x-show="isAssigned || isAdmin" class="bg-gray-50 p-4 rounded">
+                        <h4 class="text-sm font-semibold text-gray-600 mb-2">توليد فيديو جديد</h4>
+                        <div class="space-y-2">
+                            <textarea
+                                x-model="scene.newPrompt"
+                                rows="3"
+                                class="w-full p-2 border rounded text-right"
+                                placeholder="أدخل وصف الفيديو..."
+                            ></textarea>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                <select x-model="scene.newModel" @change="updateModelOptions(scene)" class="border rounded p-2">
+                                    <option value="">-- اختر الموديل --</option>
+                                    <template x-for="model in availableModels" :key="model.id">
+                                        <option :value="model.id" x-text="model.name || model.id"></option>
+                                    </template>
+                                </select>
+                                <select x-model="scene.newResolution" class="border rounded p-2">
+                                    <option value="">-- الدقة --</option>
+                                    <template x-for="res in scene.availableResolutions" :key="res">
+                                        <option :value="res" x-text="res"></option>
+                                    </template>
+                                </select>
+                                <select x-model="scene.newAspectRatio" class="border rounded p-2">
+                                    <option value="">-- الأبعاد --</option>
+                                    <template x-for="ar in scene.availableAspectRatios" :key="ar">
+                                        <option :value="ar" x-text="ar"></option>
+                                    </template>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" x-model="scene.newAudio" id="audio-toggle" class="rounded">
+                                <label for="audio-toggle" class="text-sm text-gray-600">مع صوت</label>
+                            </div>
+                            <button
+                                @click="submitGeneration(scene)"
+                                :disabled="!scene.newPrompt || !scene.newModel || scene.submitting"
+                                class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded disabled:opacity-50"
+                            >
+                                <span x-show="!scene.submitting">توليد</span>
+                                <span x-show="scene.submitting">جاري الإرسال...</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Generations list -->
+                    <div class="space-y-2">
+                        <template x-for="gen in scene.generations" :key="gen.id">
+                            <div class="border rounded p-3 bg-gray-50">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <span class="text-xs font-mono bg-gray-200 px-2 py-0.5 rounded" x-text="gen.model"></span>
+                                        <span class="text-xs text-gray-500 mr-2" x-text="gen.status"></span>
+                                    </div>
+                                    <button
+                                        x-show="(isAssigned || isAdmin) && gen.status !== 'pending' && gen.status !== 'in_progress'"
+                                        @click="deleteGeneration(gen.id)"
+                                        class="text-red-400 hover:text-red-600 text-sm"
+                                    >🗑️</button>
+                                </div>
+                                <p class="text-sm text-gray-700 mb-2 line-clamp-2" x-text="gen.prompt"></p>
+
+                                <!-- Status messages -->
+                                <div x-show="gen.status === 'pending' || gen.status === 'in_progress'" class="text-sm text-blue-600">
+                                    <span x-text="gen.status === 'pending' ? 'في الانتظار...' : 'جاري التوليد...'"></span>
+                                </div>
+                                <div x-show="gen.status === 'failed'" class="text-sm text-red-600" x-text="gen.error_message || 'فشل التوليد'"></div>
+
+                                <!-- Actions for completed -->
+                                <div x-show="gen.status === 'completed'" class="flex gap-2 mt-2 flex-wrap">
+                                    <button
+                                        x-show="!gen.drive_file_id && !gen.local_path"
+                                        @click="downloadVideo(gen.id)"
+                                        :disabled="gen.downloading"
+                                        class="bg-green-500 hover:bg-green-600 text-white text-xs py-1 px-3 rounded"
+                                    >
+                                        <span x-show="!gen.downloading">تحميل</span>
+                                        <span x-show="gen.downloading">جاري التحميل...</span>
+                                    </button>
+                                    <button
+                                        x-show="gen.local_path && !gen.drive_file_id"
+                                        @click="saveToDrive(gen.id)"
+                                        :disabled="gen.saving"
+                                        class="bg-indigo-500 hover:bg-indigo-600 text-white text-xs py-1 px-3 rounded"
+                                    >
+                                        <span x-show="!gen.saving">حفظ في Drive</span>
+                                        <span x-show="gen.saving">جاري الرفع...</span>
+                                    </button>
+                                    <button
+                                        x-show="gen.drive_file_id"
+                                        @click="playVideo(gen)"
+                                        class="bg-purple-500 hover:bg-purple-600 text-white text-xs py-1 px-3 rounded"
+                                    >
+                                        ▶️ تشغيل
+                                    </button>
+                                </div>
+
+                                <!-- Video Player -->
+                                <div x-show="gen.showPlayer && gen.drive_file_id" class="mt-2">
+                                    <iframe
+                                        :src="'https://drive.google.com/file/d/' + gen.drive_file_id + '/preview'"
+                                        class="w-full aspect-video rounded"
+                                        allow="autoplay"
+                                    ></iframe>
+                                </div>
+                            </div>
+                        </template>
+                        <div x-show="scene.generations.length === 0" class="text-center text-gray-400 text-sm py-4">
+                            لا توجد عمليات توليد بعد.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- Add Scene Button -->
+        <button
+            x-show="isAssigned || isAdmin"
+            @click="addScene()"
+            :disabled="addingScene"
+            class="w-full border-2 border-dashed border-gray-300 hover:border-blue-400 text-gray-500 hover:text-blue-500 py-3 rounded-lg transition"
+        >
+            <span x-show="!addingScene">+ إضافة مشهد جديد</span>
+            <span x-show="addingScene">جاري الإضافة...</span>
+        </button>
+
+        <div x-show="scenes.length === 0 && !(isAssigned || isAdmin)" class="text-center text-gray-400 py-4">
+            لا توجد مشاهد بعد.
+        </div>
+    </div>
+</div>

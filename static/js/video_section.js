@@ -21,7 +21,7 @@ function videoSection() {
             // Resume polling for any in-progress generations
             this.scenes.forEach(scene => {
                 scene.generations.forEach(gen => {
-                    if (gen.status === 'pending' || gen.status === 'in_progress') {
+                    if (gen.status === 'pending' || gen.status === 'in_progress' || gen.status === 'processing' || gen.status === 'queued') {
                         this.startPolling(gen);
                     }
                 });
@@ -122,6 +122,7 @@ function videoSection() {
                     }),
                 });
                 const data = await resp.json();
+                console.log('[submitGeneration] response:', data);
                 if (data.success && data.generation) {
                     const gen = {
                         ...data.generation,
@@ -145,6 +146,7 @@ function videoSection() {
                     alert(data.message || 'فشل إنشاء عملية التوليد');
                 }
             } catch (e) {
+                console.error('[submitGeneration] error:', e);
                 alert('خطأ في الشبكة');
             } finally {
                 scene.submitting = false;
@@ -153,13 +155,27 @@ function videoSection() {
 
         startPolling(gen) {
             if (this.pollIntervals[gen.id]) return;
+            console.log('[startPolling] starting polling for gen', gen.id, 'current status:', gen.status);
             this.pollIntervals[gen.id] = setInterval(async () => {
                 try {
                     const resp = await fetch(`/api/generations/${gen.id}/status`);
                     const data = await resp.json();
+                    console.log('[poll] gen', gen.id, 'response:', data);
                     if (data.success && data.generation) {
-                        Object.assign(gen, data.generation);
+                        const g = data.generation;
+                        // Explicitly update each property to ensure Alpine reactivity
+                        if (g.status !== undefined) gen.status = g.status;
+                        if (g.unsigned_url !== undefined) gen.unsigned_url = g.unsigned_url;
+                        if (g.drive_file_id !== undefined) gen.drive_file_id = g.drive_file_id;
+                        if (g.drive_view_url !== undefined) gen.drive_view_url = g.drive_view_url;
+                        if (g.local_path !== undefined) gen.local_path = g.local_path;
+                        if (g.error_message !== undefined) gen.error_message = g.error_message;
+                        if (g.cost !== undefined) gen.cost = g.cost;
+                        if (g.created_at !== undefined) gen.created_at = g.created_at;
+                        if (g.completed_at !== undefined) gen.completed_at = g.completed_at;
+
                         if (['completed', 'failed', 'cancelled', 'expired'].includes(gen.status)) {
+                            console.log('[poll] gen', gen.id, 'reached terminal status:', gen.status, 'stopping polling');
                             clearInterval(this.pollIntervals[gen.id]);
                             delete this.pollIntervals[gen.id];
                         }
@@ -171,18 +187,28 @@ function videoSection() {
         },
 
         async downloadVideo(genId) {
+            console.log('[downloadVideo] called with genId:', genId, 'type:', typeof genId);
             const gen = this.findGeneration(genId);
-            if (!gen) return;
+            console.log('[downloadVideo] found gen:', gen);
+            if (!gen) {
+                console.error('[downloadVideo] generation not found for id:', genId);
+                alert('لم يتم العثور على العملية');
+                return;
+            }
             gen.downloading = true;
             try {
+                console.log('[downloadVideo] sending POST to /api/generations/' + genId + '/download');
                 const resp = await fetch(`/api/generations/${genId}/download`, { method: 'POST' });
+                console.log('[downloadVideo] response status:', resp.status);
                 const data = await resp.json();
+                console.log('[downloadVideo] response data:', data);
                 if (data.success) {
                     gen.local_path = data.local_path;
                 } else {
                     alert(data.message || 'فشل التحميل');
                 }
             } catch (e) {
+                console.error('[downloadVideo] error:', e);
                 alert('خطأ في الشبكة');
             } finally {
                 gen.downloading = false;
@@ -190,12 +216,18 @@ function videoSection() {
         },
 
         async saveToDrive(genId) {
+            console.log('[saveToDrive] called with genId:', genId);
             const gen = this.findGeneration(genId);
-            if (!gen) return;
+            console.log('[saveToDrive] found gen:', gen);
+            if (!gen) {
+                alert('لم يتم العثور على العملية');
+                return;
+            }
             gen.saving = true;
             try {
                 const resp = await fetch(`/api/generations/${genId}/save-to-drive`, { method: 'POST' });
                 const data = await resp.json();
+                console.log('[saveToDrive] response:', data);
                 if (data.success) {
                     gen.drive_file_id = data.drive_file_id;
                     gen.drive_view_url = data.drive_view_url;
@@ -204,9 +236,35 @@ function videoSection() {
                     alert(data.message || 'فشل الرفع إلى Drive');
                 }
             } catch (e) {
+                console.error('[saveToDrive] error:', e);
                 alert('خطأ في الشبكة');
             } finally {
                 gen.saving = false;
+            }
+        },
+
+        async checkStatus(gen) {
+            // Manual status check button
+            console.log('[checkStatus] manual check for gen', gen.id);
+            try {
+                const resp = await fetch(`/api/generations/${gen.id}/status`);
+                const data = await resp.json();
+                console.log('[checkStatus] response:', data);
+                if (data.success && data.generation) {
+                    const g = data.generation;
+                    if (g.status !== undefined) gen.status = g.status;
+                    if (g.unsigned_url !== undefined) gen.unsigned_url = g.unsigned_url;
+                    if (g.drive_file_id !== undefined) gen.drive_file_id = g.drive_file_id;
+                    if (g.drive_view_url !== undefined) gen.drive_view_url = g.drive_view_url;
+                    if (g.local_path !== undefined) gen.local_path = g.local_path;
+                    if (g.error_message !== undefined) gen.error_message = g.error_message;
+                    if (g.cost !== undefined) gen.cost = g.cost;
+                    if (g.created_at !== undefined) gen.created_at = g.created_at;
+                    if (g.completed_at !== undefined) gen.completed_at = g.completed_at;
+                }
+            } catch (e) {
+                console.error('[checkStatus] error:', e);
+                alert('خطأ في الاتصال');
             }
         },
 
@@ -236,8 +294,13 @@ function videoSection() {
         },
 
         findGeneration(genId) {
+            console.log('[findGeneration] searching for genId:', genId, 'type:', typeof genId);
             for (const scene of this.scenes) {
-                const gen = scene.generations.find(g => g.id === genId);
+                const gen = scene.generations.find(g => {
+                    const match = g.id == genId;
+                    console.log('[findGeneration] comparing g.id:', g.id, 'type:', typeof g.id, 'with genId:', genId, 'type:', typeof genId, 'match:', match);
+                    return match;
+                });
                 if (gen) return gen;
             }
             return null;

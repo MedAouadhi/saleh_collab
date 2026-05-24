@@ -157,10 +157,13 @@ def get_generation_status(gen_id):
 @video_bp.route("/generations/<int:gen_id>/download", methods=["POST"])
 @login_required
 def download_generation_video(gen_id):
+    current_app.logger.info(f"[download] requested for gen_id={gen_id}")
     gen = VideoGeneration.query.get_or_404(gen_id)
     if not _is_assigned_or_admin(gen.scene.episode_id):
+        current_app.logger.warning(f"[download] unauthorized for gen_id={gen_id}")
         return jsonify({"success": False, "message": "غير مصرح لك."}), 403
     if gen.status != "completed" or not gen.unsigned_url:
+        current_app.logger.warning(f"[download] not ready gen_id={gen_id} status={gen.status} url={gen.unsigned_url}")
         return jsonify({"success": False, "message": "الفيديو غير جاهز."}), 400
 
     local_path = os.path.join(
@@ -170,9 +173,11 @@ def download_generation_video(gen_id):
         f"gen_{gen.id}.mp4"
     )
     try:
+        current_app.logger.info(f"[download] starting download for gen_id={gen_id} to {local_path}")
         VideoService.download_video(gen.unsigned_url, local_path)
         gen.local_path = local_path
         db.session.commit()
+        current_app.logger.info(f"[download] success gen_id={gen_id} path={local_path}")
         return jsonify({"success": True, "local_path": local_path})
     except Exception as e:
         current_app.logger.error(f"Download error for gen {gen_id}: {e}", exc_info=True)
@@ -182,13 +187,17 @@ def download_generation_video(gen_id):
 @video_bp.route("/generations/<int:gen_id>/save-to-drive", methods=["POST"])
 @login_required
 def save_generation_to_drive(gen_id):
+    current_app.logger.info(f"[drive] save requested for gen_id={gen_id}")
     gen = VideoGeneration.query.get_or_404(gen_id)
     if not _is_assigned_or_admin(gen.scene.episode_id):
+        current_app.logger.warning(f"[drive] unauthorized for gen_id={gen_id}")
         return jsonify({"success": False, "message": "غير مصرح لك."}), 403
     if not gen.local_path or not os.path.exists(gen.local_path):
+        current_app.logger.warning(f"[drive] local file missing gen_id={gen_id} path={gen.local_path}")
         return jsonify({"success": False, "message": "الملف المحلي غير موجود."}), 400
 
     try:
+        current_app.logger.info(f"[drive] uploading gen_id={gen_id} from {gen.local_path}")
         drive_file_id, drive_view_url = VideoService.upload_to_drive(
             gen.local_path,
             gen.scene.episode_id,
@@ -202,6 +211,7 @@ def save_generation_to_drive(gen_id):
         os.remove(gen.local_path)
         gen.local_path = None
         db.session.commit()
+        current_app.logger.info(f"[drive] upload success gen_id={gen_id} drive_file_id={drive_file_id}")
         return jsonify({"success": True, "drive_file_id": drive_file_id, "drive_view_url": drive_view_url})
     except Exception as e:
         current_app.logger.error(f"Drive upload error for gen {gen_id}: {e}", exc_info=True)

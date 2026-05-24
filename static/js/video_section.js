@@ -15,6 +15,8 @@ function videoSection() {
         pollIntervals: {},
 
         initVideoSection() {
+            // Expose this component to window for plain onclick handlers
+            window.videoSectionScope = this;
             // Open first scene by default
             this.scenes.forEach((s, i) => { s.open = i === 0; });
             this.fetchModels();

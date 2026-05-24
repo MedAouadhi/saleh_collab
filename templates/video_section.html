@@ -103,11 +103,17 @@
                                 </div>
                                 <div x-show="gen.status === 'failed'" class="text-sm text-red-600" x-text="gen.error_message || 'فشل التوليد'"></div>
 
+                                <!-- DEBUG: show raw data -->
+                                <div class="text-xs text-gray-400 mt-1">
+                                    DEBUG: id=<span x-text="gen.id"></span> type=<span x-text="typeof gen.id"></span> status=<span x-text="gen.status"></span> local=<span x-text="gen.local_path"></span> drive=<span x-text="gen.drive_file_id"></span>
+                                </div>
+
                                 <!-- Actions for completed -->
                                 <div x-show="gen.status === 'completed'" class="flex gap-2 mt-2 flex-wrap">
                                     <button
                                         x-show="!gen.drive_file_id && !gen.local_path"
-                                        @click="console.log('DOWNLOAD CLICK gen.id=', gen.id, 'type=', typeof gen.id); downloadVideo(gen.id)"
+                                        onclick="alert('Button clicked! gen.id=' + this.dataset.genid); window.videoSectionScope && window.videoSectionScope.downloadVideo(parseInt(this.dataset.genid))"
+                                        :data-genid="gen.id"
                                         :disabled="gen.downloading"
                                         class="bg-green-500 hover:bg-green-600 text-white text-xs py-1 px-3 rounded"
                                     >
@@ -168,3 +174,13 @@
         </div>
     </div>
 </div>
+
+<script>
+// Global click listener to debug button clicks
+document.addEventListener('click', function(e) {
+    const btn = e.target.closest('button');
+    if (btn) {
+        console.log('[GLOBAL CLICK] button text:', btn.textContent.trim(), 'classes:', btn.className, 'disabled:', btn.disabled, 'data-genid:', btn.dataset.genid);
+    }
+});
+</script>

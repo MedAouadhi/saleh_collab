@@ -134,7 +134,17 @@ class VideoService:
         query = f"mimeType='application/vnd.google-apps.folder' and name='{safe_name}' and trashed=false"
         if parent_id:
             query += f" and '{parent_id}' in parents"
-        results = service.files().list(q=query, spaces="drive", fields="files(id, name)").execute()
+        results = (
+            service.files()
+            .list(
+                q=query,
+                spaces="drive",
+                fields="files(id, name)",
+                supportsAllDrives=True,
+                includeItemsFromAllDrives=True,
+            )
+            .execute()
+        )
         items = results.get("files", [])
         if items:
             return items[0]["id"]
@@ -144,7 +154,11 @@ class VideoService:
             "mimeType": "application/vnd.google-apps.folder",
             "parents": [parent_id] if parent_id else [],
         }
-        folder = service.files().create(body=metadata, fields="id").execute()
+        folder = (
+            service.files()
+            .create(body=metadata, fields="id", supportsAllDrives=True)
+            .execute()
+        )
         return folder["id"]
 
     @staticmethod
@@ -167,7 +181,12 @@ class VideoService:
         media = MediaFileUpload(local_path, mimetype="video/mp4", resumable=True)
         file = (
             service.files()
-            .create(body=file_metadata, media_body=media, fields="id, webViewLink")
+            .create(
+                body=file_metadata,
+                media_body=media,
+                fields="id, webViewLink",
+                supportsAllDrives=True,
+            )
             .execute()
         )
 
@@ -176,7 +195,11 @@ class VideoService:
 
         # Make publicly viewable
         permission = {"type": "anyone", "role": "reader"}
-        service.permissions().create(fileId=drive_file_id, body=permission).execute()
+        service.permissions().create(
+            fileId=drive_file_id,
+            body=permission,
+            supportsAllDrives=True,
+        ).execute()
 
         return drive_file_id, drive_view_url
 
@@ -184,7 +207,7 @@ class VideoService:
     def delete_from_drive(file_id):
         try:
             service = VideoService._get_drive_service()
-            service.files().delete(fileId=file_id).execute()
+            service.files().delete(fileId=file_id, supportsAllDrives=True).execute()
             return True
         except Exception as e:
             print(f"[VideoService] Failed to delete drive file {file_id}: {e}")

@@ -68,6 +68,9 @@
                     <div class="flex items-center gap-3">
                         <h3 class="font-semibold text-gray-700" x-text="'مشهد ' + scene.number"></h3>
                         <span class="text-xs text-gray-500" x-text="scene.generations.length + ' محاولة'"></span>
+                        <template x-if="scene.hasDraft">
+                            <span class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded" title="هناك مسودة محفوظة">📝 مسودة</span>
+                        </template>
                     </div>
                     <div class="flex items-center gap-2">
                         <button
@@ -117,14 +120,32 @@
                                 <input type="checkbox" x-model="scene.newAudio" :id="'audio-toggle-' + scene.id" class="rounded">
                                 <label :for="'audio-toggle-' + scene.id" class="text-sm text-gray-600">مع صوت</label>
                             </div>
-                            <button
-                                @click="submitGeneration(scene)"
-                                :disabled="!scene.newPrompt || !scene.newModel || scene.submitting"
-                                class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                <span x-show="!scene.submitting" x-text="scene.generations.length > 0 ? 'توليد محاولة جديدة' : 'توليد'"></span>
-                                <span x-show="scene.submitting">جاري الإرسال...</span>
-                            </button>
+                            <div class="flex gap-2 flex-wrap">
+                                <button
+                                    @click="submitGeneration(scene)"
+                                    :disabled="!scene.newPrompt || !scene.newModel || scene.submitting"
+                                    class="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    <span x-show="!scene.submitting" x-text="scene.generations.length > 0 ? 'توليد محاولة جديدة' : 'توليد'"></span>
+                                    <span x-show="scene.submitting">جاري الإرسال...</span>
+                                </button>
+                                <button
+                                    @click="saveDraft(scene)"
+                                    :disabled="!scene.newPrompt || scene.savingDraft"
+                                    class="bg-amber-500 hover:bg-amber-600 text-white py-2 px-4 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                    title="حفظ النص والإعدادات بدون توليد"
+                                >
+                                    <span x-show="!scene.savingDraft && !scene.draftSaved">💾 حفظ كمسودة</span>
+                                    <span x-show="scene.savingDraft">جاري الحفظ...</span>
+                                    <span x-show="scene.draftSaved && !scene.savingDraft">✅ محفوظ</span>
+                                </button>
+                                <button
+                                    x-show="scene.hasDraft"
+                                    @click="clearDraft(scene)"
+                                    class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-3 rounded text-sm"
+                                    title="مسح المسودة"
+                                >🗑️</button>
+                            </div>
                         </div>
                     </div>
 
@@ -202,10 +223,20 @@
                                 </div>
                                 <div x-show="gen.status === 'failed'" class="text-sm text-red-600 mb-2" x-text="gen.error_message || 'فشل التوليد'"></div>
 
+                                <!-- Auto-pipeline progress -->
+                                <div x-show="gen.status === 'completed' && gen.autoProcessing" class="text-sm text-indigo-600 mb-2 flex items-center gap-2">
+                                    <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/>
+                                        <path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" class="opacity-75"/>
+                                    </svg>
+                                    <span x-text="gen.downloading ? 'جاري التحميل...' : (gen.saving ? 'جاري الرفع إلى Drive...' : 'جاري المعالجة...')"></span>
+                                </div>
+                                <div x-show="gen.autoError" class="text-xs text-amber-600 mb-2" x-text="gen.autoError"></div>
+
                                 <!-- Actions for completed -->
                                 <div x-show="gen.status === 'completed'" class="flex gap-2 flex-wrap mt-auto pt-2">
                                     <button
-                                        x-show="!gen.drive_file_id && !gen.local_path"
+                                        x-show="!gen.drive_file_id && !gen.local_path && !gen.autoProcessing"
                                         type="button"
                                         @click="downloadVideo(gen.id)"
                                         :disabled="gen.downloading"
@@ -215,7 +246,7 @@
                                         <span x-show="gen.downloading">جاري التحميل...</span>
                                     </button>
                                     <button
-                                        x-show="gen.local_path && !gen.drive_file_id"
+                                        x-show="gen.local_path && !gen.drive_file_id && !gen.autoProcessing"
                                         type="button"
                                         @click="saveToDrive(gen.id)"
                                         :disabled="gen.saving"

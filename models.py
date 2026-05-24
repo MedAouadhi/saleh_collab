@@ -180,6 +180,14 @@ class Scene(db.Model):
     number = db.Column(db.Integer, nullable=False, default=1)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    # Draft fields — let user save prompt + params without generating
+    draft_prompt = db.Column(db.Text, nullable=True)
+    draft_model = db.Column(db.String(100), nullable=True)
+    draft_resolution = db.Column(db.String(20), nullable=True)
+    draft_aspect_ratio = db.Column(db.String(20), nullable=True)
+    draft_generate_audio = db.Column(db.Boolean, nullable=True, default=True)
+    draft_duration = db.Column(db.Integer, nullable=True)
+
     episode = db.relationship("Episode", backref=db.backref("scenes", lazy="dynamic", cascade="all, delete-orphan"))
     generations = db.relationship("VideoGeneration", backref="scene", lazy="dynamic", cascade="all, delete-orphan")
 

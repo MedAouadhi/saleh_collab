@@ -956,6 +956,12 @@ def view_episode(episode_id):
             "id": scene.id,
             "number": scene.number,
             "generations": gens,
+            "draft_prompt": scene.draft_prompt,
+            "draft_model": scene.draft_model,
+            "draft_resolution": scene.draft_resolution,
+            "draft_aspect_ratio": scene.draft_aspect_ratio,
+            "draft_generate_audio": scene.draft_generate_audio,
+            "draft_duration": scene.draft_duration,
         })
 
     user_is_admin = hasattr(current_user, "is_admin") and current_user.is_admin

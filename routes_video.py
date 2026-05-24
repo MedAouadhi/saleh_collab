@@ -57,6 +57,37 @@ def create_scene(episode_id):
     return jsonify({"success": True, "scene": {"id": new_scene.id, "number": new_scene.number}}), 201
 
 
+@video_bp.route("/scenes/<int:scene_id>/draft", methods=["PUT"])
+@login_required
+def update_scene_draft(scene_id):
+    scene = Scene.query.get_or_404(scene_id)
+    if not _is_assigned_or_admin(scene.episode_id):
+        return jsonify({"success": False, "message": "غير مصرح لك."}), 403
+
+    data = request.get_json() or {}
+    scene.draft_prompt = (data.get("prompt") or "").strip() or None
+    scene.draft_model = (data.get("model") or "").strip() or None
+    scene.draft_resolution = (data.get("resolution") or "").strip() or None
+    scene.draft_aspect_ratio = (data.get("aspect_ratio") or "").strip() or None
+    audio = data.get("generate_audio")
+    scene.draft_generate_audio = bool(audio) if audio is not None else None
+    duration = data.get("duration")
+    scene.draft_duration = int(duration) if duration else None
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "draft": {
+            "prompt": scene.draft_prompt,
+            "model": scene.draft_model,
+            "resolution": scene.draft_resolution,
+            "aspect_ratio": scene.draft_aspect_ratio,
+            "generate_audio": scene.draft_generate_audio,
+            "duration": scene.draft_duration,
+        },
+    })
+
+
 @video_bp.route("/scenes/<int:scene_id>", methods=["DELETE"])
 @login_required
 def delete_scene(scene_id):

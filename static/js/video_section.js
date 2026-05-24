@@ -22,16 +22,65 @@ function videoSection() {
         _initScene(scene, openByDefault = false) {
             // Idempotent: only sets undefined props so we don't clobber user input.
             if (typeof scene.open === 'undefined') scene.open = openByDefault;
-            if (typeof scene.newPrompt === 'undefined') scene.newPrompt = '';
-            if (typeof scene.newModel === 'undefined') scene.newModel = '';
-            if (typeof scene.newResolution === 'undefined') scene.newResolution = '';
-            if (typeof scene.newAspectRatio === 'undefined') scene.newAspectRatio = '';
-            if (typeof scene.newAudio === 'undefined') scene.newAudio = true;
+            if (typeof scene.newPrompt === 'undefined') scene.newPrompt = scene.draft_prompt || '';
+            if (typeof scene.newModel === 'undefined') scene.newModel = scene.draft_model || '';
+            if (typeof scene.newResolution === 'undefined') scene.newResolution = scene.draft_resolution || '';
+            if (typeof scene.newAspectRatio === 'undefined') scene.newAspectRatio = scene.draft_aspect_ratio || '';
+            if (typeof scene.newAudio === 'undefined') scene.newAudio = scene.draft_generate_audio == null ? true : scene.draft_generate_audio;
             if (typeof scene.availableResolutions === 'undefined') scene.availableResolutions = [];
             if (typeof scene.availableAspectRatios === 'undefined') scene.availableAspectRatios = [];
             if (typeof scene.submitting === 'undefined') scene.submitting = false;
+            if (typeof scene.savingDraft === 'undefined') scene.savingDraft = false;
+            if (typeof scene.draftSaved === 'undefined') scene.draftSaved = false;
+            if (typeof scene.hasDraft === 'undefined') scene.hasDraft = !!(scene.draft_prompt || scene.draft_model);
             if (!Array.isArray(scene.generations)) scene.generations = [];
             scene.generations.forEach(gen => this._initGeneration(gen));
+        },
+
+        async saveDraft(scene) {
+            scene.savingDraft = true;
+            scene.draftSaved = false;
+            try {
+                const resp = await fetch(`/api/scenes/${scene.id}/draft`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: scene.newPrompt,
+                        model: scene.newModel,
+                        resolution: scene.newResolution,
+                        aspect_ratio: scene.newAspectRatio,
+                        generate_audio: scene.newAudio,
+                    }),
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    scene.draft_prompt = data.draft.prompt;
+                    scene.draft_model = data.draft.model;
+                    scene.draft_resolution = data.draft.resolution;
+                    scene.draft_aspect_ratio = data.draft.aspect_ratio;
+                    scene.draft_generate_audio = data.draft.generate_audio;
+                    scene.hasDraft = !!(data.draft.prompt || data.draft.model);
+                    scene.draftSaved = true;
+                    setTimeout(() => { scene.draftSaved = false; }, 2000);
+                } else {
+                    alert(data.message || 'فشل حفظ المسودة');
+                }
+            } catch (e) {
+                console.error('[saveDraft] error:', e);
+                alert('خطأ في الشبكة');
+            } finally {
+                scene.savingDraft = false;
+            }
+        },
+
+        async clearDraft(scene) {
+            if (!confirm('مسح المسودة المحفوظة؟')) return;
+            scene.newPrompt = '';
+            scene.newModel = '';
+            scene.newResolution = '';
+            scene.newAspectRatio = '';
+            scene.newAudio = true;
+            await this.saveDraft(scene);
         },
 
         _initGeneration(gen) {
@@ -39,10 +88,48 @@ function videoSection() {
             if (typeof gen.downloading === 'undefined') gen.downloading = false;
             if (typeof gen.showPlayer === 'undefined') gen.showPlayer = false;
             if (typeof gen.promptExpanded === 'undefined') gen.promptExpanded = false;
+            if (typeof gen.autoProcessing === 'undefined') gen.autoProcessing = false;
+            if (typeof gen.autoError === 'undefined') gen.autoError = null;
+        },
+
+        async _autoPipeline(genId) {
+            const gen = this.findGeneration(genId);
+            if (!gen) return;
+            if (gen.status !== 'completed') return;
+            if (gen.drive_file_id) return;
+            if (gen.autoProcessing) return;
+
+            gen.autoProcessing = true;
+            gen.autoError = null;
+            try {
+                // 1. download from OpenRouter if not yet local
+                let current = this.findGeneration(genId);
+                if (current && !current.local_path && !current.drive_file_id) {
+                    console.log('[autoPipeline] downloading gen', genId);
+                    await this.downloadVideo(genId);
+                }
+                // 2. upload to Drive if local + drive connected + not yet uploaded
+                current = this.findGeneration(genId);
+                if (current && current.local_path && !current.drive_file_id && this.driveConnected) {
+                    console.log('[autoPipeline] uploading gen', genId, 'to Drive');
+                    await this.saveToDrive(genId);
+                }
+                console.log('[autoPipeline] gen', genId, 'pipeline done');
+            } catch (e) {
+                console.error('[autoPipeline] gen', genId, 'failed:', e);
+                const g = this.findGeneration(genId);
+                if (g) g.autoError = 'فشل المعالجة التلقائية';
+            } finally {
+                const g = this.findGeneration(genId);
+                if (g) g.autoProcessing = false;
+            }
         },
 
         initVideoSection() {
-            this.scenes.forEach((scene, i) => this._initScene(scene, i === 0));
+            this.scenes.forEach((scene, i) => {
+                const openByDefault = i === 0 || (Array.isArray(scene.generations) && scene.generations.length > 0);
+                this._initScene(scene, openByDefault);
+            });
             this.fetchModels();
             this.checkDriveStatus();
             this.fetchCredits();
@@ -50,6 +137,9 @@ function videoSection() {
                 scene.generations.forEach(gen => {
                     if (this._shouldPoll(gen)) {
                         this.startPolling(gen);
+                    } else if (gen.status === 'completed') {
+                        // Resume pipeline for generations that completed but didn't finish auto-flow (e.g. page reload mid-flight)
+                        this._autoPipeline(gen.id);
                     }
                 });
             });
@@ -161,6 +251,10 @@ function videoSection() {
                 const data = await resp.json();
                 if (data.success) {
                     this.availableModels = data.models;
+                    // Hydrate per-scene resolution/aspect-ratio options now that models are known
+                    this.scenes.forEach(scene => {
+                        if (scene.newModel) this._hydrateSceneOptions(scene);
+                    });
                 } else {
                     this.modelsError = data.message || 'فشل تحميل الموديلات';
                 }
@@ -168,6 +262,14 @@ function videoSection() {
                 this.modelsError = 'خطأ في الاتصال بـ OpenRouter';
             } finally {
                 this.modelsLoading = false;
+            }
+        },
+
+        _hydrateSceneOptions(scene) {
+            const model = this.availableModels.find(m => m.id === scene.newModel);
+            if (model) {
+                scene.availableResolutions = model.supported_resolutions || [];
+                scene.availableAspectRatios = model.supported_aspect_ratios || [];
             }
         },
 
@@ -257,6 +359,12 @@ function videoSection() {
                     scene.generations.unshift(gen);
                     // Keep model + params for quick re-tries with tweaks; clear prompt only.
                     scene.newPrompt = '';
+                    // Clear saved draft on server too — generation supersedes it
+                    if (scene.hasDraft) {
+                        scene.draft_prompt = null;
+                        scene.hasDraft = false;
+                        this.saveDraft(scene);
+                    }
                     this.startPolling(gen);
                 } else {
                     alert(data.message || 'فشل إنشاء عملية التوليد');
@@ -286,6 +394,9 @@ function videoSection() {
                             clearInterval(this.pollIntervals[gen.id]);
                             delete this.pollIntervals[gen.id];
                             this.fetchCredits();
+                            if (freshStatus === 'completed') {
+                                this._autoPipeline(gen.id);
+                            }
                         }
                     }
                 } catch (e) {

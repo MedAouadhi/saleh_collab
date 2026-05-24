@@ -4,13 +4,13 @@
 function videoSection() {
     return {
         open: false,
-        scenes: window.INITIAL_SCENES || [],
+        scenes: INITIAL_SCENES || [],
         availableModels: [],
         modelsLoading: false,
         modelsError: null,
-        isAssigned: window.IS_ASSIGNED || false,
-        isAdmin: window.IS_ADMIN || false,
-        episodeId: window.EPISODE_ID || null,
+        isAssigned: IS_ASSIGNED || false,
+        isAdmin: IS_ADMIN || false,
+        episodeId: EPISODE_ID || null,
         addingScene: false,
         pollIntervals: {},
 

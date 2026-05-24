@@ -218,6 +218,57 @@ def save_generation_to_drive(gen_id):
         return jsonify({"success": False, "message": f"خطأ في الرفع: {e}"}), 500
 
 
+# --- Google Drive OAuth ---
+@video_bp.route("/drive/status", methods=["GET"])
+@login_required
+def drive_status():
+    """Check if Google Drive OAuth is connected."""
+    return jsonify({
+        "success": True,
+        "connected": VideoService.is_drive_connected(),
+    })
+
+
+@video_bp.route("/drive/auth", methods=["GET"])
+@login_required
+def drive_auth():
+    """Generate Google OAuth authorization URL."""
+    try:
+        redirect_uri = request.args.get(
+            "redirect_uri",
+            f"{request.scheme}://{request.host}/api/drive/callback"
+        )
+        auth_url = VideoService.get_oauth_auth_url(redirect_uri)
+        return jsonify({"success": True, "auth_url": auth_url, "redirect_uri": redirect_uri})
+    except Exception as e:
+        current_app.logger.error(f"Drive auth error: {e}", exc_info=True)
+        return jsonify({"success": False, "message": f"خطأ في إنشاء رابط المصادقة: {e}"}), 500
+
+
+@video_bp.route("/drive/callback", methods=["GET"])
+@login_required
+def drive_callback():
+    """Handle Google OAuth callback."""
+    code = request.args.get("code")
+    error = request.args.get("error")
+    redirect_uri = request.args.get("redirect_uri", f"{request.scheme}://{request.host}/api/drive/callback")
+
+    if error:
+        current_app.logger.warning(f"Drive OAuth error: {error}")
+        return jsonify({"success": False, "message": f"خطأ من Google: {error}"}), 400
+
+    if not code:
+        return jsonify({"success": False, "message": "لم يتم استلام رمز المصادقة."}), 400
+
+    try:
+        VideoService.exchange_oauth_code(code, redirect_uri)
+        current_app.logger.info("Drive OAuth connected successfully")
+        return jsonify({"success": True, "message": "تم ربط Google Drive بنجاح."})
+    except Exception as e:
+        current_app.logger.error(f"Drive callback error: {e}", exc_info=True)
+        return jsonify({"success": False, "message": f"خطأ في ربط الحساب: {e}"}), 500
+
+
 @video_bp.route("/generations/<int:gen_id>", methods=["DELETE"])
 @login_required
 def delete_generation(gen_id):

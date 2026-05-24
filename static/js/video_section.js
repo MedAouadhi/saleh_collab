@@ -13,6 +13,8 @@ function videoSection() {
         episodeId: EPISODE_ID || null,
         addingScene: false,
         pollIntervals: {},
+        driveConnected: false,
+        driveChecked: false,
 
         initVideoSection() {
             // Ensure client-only reactive properties exist on server-loaded generations
@@ -25,6 +27,7 @@ function videoSection() {
                 });
             });
             this.fetchModels();
+            this.checkDriveStatus();
             // Resume polling for non-terminal generations
             this.scenes.forEach(scene => {
                 scene.generations.forEach(gen => {
@@ -33,6 +36,50 @@ function videoSection() {
                     }
                 });
             });
+        },
+
+        async checkDriveStatus() {
+            try {
+                const resp = await fetch('/api/drive/status');
+                const data = await resp.json();
+                this.driveConnected = data.success && data.connected;
+            } catch (e) {
+                console.error('[checkDriveStatus] error:', e);
+                this.driveConnected = false;
+            } finally {
+                this.driveChecked = true;
+            }
+        },
+
+        async connectDrive() {
+            try {
+                const resp = await fetch('/api/drive/auth');
+                const data = await resp.json();
+                if (data.success && data.auth_url) {
+                    // Open auth URL in a popup
+                    const width = 500;
+                    const height = 600;
+                    const left = (window.screen.width - width) / 2;
+                    const top = (window.screen.height - height) / 2;
+                    const popup = window.open(
+                        data.auth_url,
+                        'googleOAuth',
+                        `width=${width},height=${height},top=${top},left=${left},toolbar=no,menubar=no`
+                    );
+                    // Poll to see when popup closes
+                    const timer = setInterval(() => {
+                        if (popup && popup.closed) {
+                            clearInterval(timer);
+                            this.checkDriveStatus();
+                        }
+                    }, 500);
+                } else {
+                    alert(data.message || 'فشل إنشاء رابط المصادقة');
+                }
+            } catch (e) {
+                console.error('[connectDrive] error:', e);
+                alert('خطأ في الاتصال');
+            }
         },
 
         async fetchModels() {
@@ -276,6 +323,11 @@ function videoSection() {
 
         playVideo(gen) {
             gen.showPlayer = !gen.showPlayer;
+        },
+
+        _shouldPoll(gen) {
+            const terminal = ['completed', 'failed', 'cancelled', 'expired'];
+            return !terminal.includes(gen.status);
         },
 
         async deleteGeneration(genId) {

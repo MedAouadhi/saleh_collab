@@ -1,12 +1,15 @@
 # video_service.py
 # Encapsulates OpenRouter video generation and Google Drive upload/download.
 
+import json
 import os
 import requests
 from datetime import datetime, timedelta
 
 # Google Drive imports
 from google.oauth2 import service_account
+from google.oauth2.credentials import Credentials as OAuthCredentials
+from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
@@ -28,6 +31,10 @@ def _get_drive_credentials_path():
 
 def _get_drive_root_folder_name():
     return os.environ.get("GOOGLE_DRIVE_ROOT_FOLDER_NAME", "صالح - الكراسة الحمراء 📕")
+
+
+def _get_oauth_tokens_path():
+    return os.environ.get("GOOGLE_DRIVE_OAUTH_TOKENS_PATH", "instance/oauth_tokens.json")
 
 
 class VideoService:
@@ -114,18 +121,122 @@ class VideoService:
 
     # --- Google Drive ---
     @staticmethod
+    def _load_oauth_client_config():
+        """Load OAuth client config from the credentials JSON file."""
+        creds_path = _get_drive_credentials_path()
+        if not os.path.exists(creds_path):
+            return None
+        with open(creds_path) as f:
+            data = json.load(f)
+        # Handle both "installed" (desktop) and "web" client types
+        return data.get("installed") or data.get("web")
+
+    @staticmethod
+    def _load_oauth_credentials():
+        """Load OAuth credentials from stored tokens. Returns None if not connected."""
+        tokens_path = _get_oauth_tokens_path()
+        if not os.path.exists(tokens_path):
+            return None
+        client_config = VideoService._load_oauth_client_config()
+        if not client_config:
+            return None
+        with open(tokens_path) as f:
+            tokens = json.load(f)
+        creds = OAuthCredentials(
+            None,  # access token will be refreshed
+            refresh_token=tokens.get("refresh_token"),
+            token_uri=client_config["token_uri"],
+            client_id=client_config["client_id"],
+            client_secret=client_config["client_secret"],
+            scopes=["https://www.googleapis.com/auth/drive"],
+        )
+        creds.refresh(Request())
+        return creds
+
+    @staticmethod
     def _get_drive_service():
+        # Try OAuth first
+        oauth_creds = VideoService._load_oauth_credentials()
+        if oauth_creds:
+            print("[VideoService] Using OAuth credentials for Google Drive")
+            return build("drive", "v3", credentials=oauth_creds, cache_discovery=False)
+
+        # Fallback to service account
         creds_path = _get_drive_credentials_path()
         if not os.path.exists(creds_path):
             raise FileNotFoundError(
-                f"Google Drive service account file not found: {creds_path}. "
-                f"Please set GOOGLE_DRIVE_CREDENTIALS_PATH in your .env file."
+                f"Google Drive credentials file not found: {creds_path}. "
+                f"Please connect Google Drive via OAuth or set GOOGLE_DRIVE_CREDENTIALS_PATH."
             )
-        credentials = service_account.Credentials.from_service_account_file(
-            creds_path,
-            scopes=["https://www.googleapis.com/auth/drive"],
+        # Check if it's a service account file
+        with open(creds_path) as f:
+            data = json.load(f)
+        if data.get("type") == "service_account":
+            credentials = service_account.Credentials.from_service_account_file(
+                creds_path,
+                scopes=["https://www.googleapis.com/auth/drive"],
+            )
+            print("[VideoService] Using service account credentials for Google Drive")
+            return build("drive", "v3", credentials=credentials, cache_discovery=False)
+
+        raise RuntimeError(
+            "Google Drive not connected. Please connect via /api/drive/auth first."
         )
-        return build("drive", "v3", credentials=credentials, cache_discovery=False)
+
+    @staticmethod
+    def is_drive_connected():
+        """Check if Google Drive is connected (OAuth tokens exist)."""
+        return os.path.exists(_get_oauth_tokens_path())
+
+    @staticmethod
+    def get_oauth_auth_url(redirect_uri):
+        """Generate Google OAuth authorization URL."""
+        client_config = VideoService._load_oauth_client_config()
+        if not client_config:
+            raise FileNotFoundError("OAuth client config not found")
+
+        # Build authorization URL manually
+        auth_uri = client_config["auth_uri"]
+        from urllib.parse import urlencode
+        params = {
+            "client_id": client_config["client_id"],
+            "redirect_uri": redirect_uri,
+            "scope": "https://www.googleapis.com/auth/drive",
+            "response_type": "code",
+            "access_type": "offline",
+            "prompt": "consent",
+        }
+        return f"{auth_uri}?{urlencode(params)}"
+
+    @staticmethod
+    def exchange_oauth_code(code, redirect_uri):
+        """Exchange authorization code for tokens and save refresh token."""
+        client_config = VideoService._load_oauth_client_config()
+        if not client_config:
+            raise FileNotFoundError("OAuth client config not found")
+
+        token_uri = client_config["token_uri"]
+        resp = requests.post(
+            token_uri,
+            data={
+                "grant_type": "authorization_code",
+                "code": code,
+                "redirect_uri": redirect_uri,
+                "client_id": client_config["client_id"],
+                "client_secret": client_config["client_secret"],
+            },
+            timeout=30,
+        )
+        resp.raise_for_status()
+        tokens = resp.json()
+
+        # Save refresh token
+        tokens_path = _get_oauth_tokens_path()
+        os.makedirs(os.path.dirname(tokens_path), exist_ok=True)
+        with open(tokens_path, "w") as f:
+            json.dump({"refresh_token": tokens["refresh_token"]}, f)
+
+        return tokens
 
     @staticmethod
     def _find_or_create_folder(service, folder_name, parent_id=None):
@@ -138,16 +249,29 @@ class VideoService:
             service.files()
             .list(
                 q=query,
+                corpora="allDrives",
                 spaces="drive",
-                fields="files(id, name)",
+                fields="files(id, name, owners, shared)",
+                pageSize=10,
                 supportsAllDrives=True,
                 includeItemsFromAllDrives=True,
             )
             .execute()
         )
         items = results.get("files", [])
+        print(f"[VideoService] _find_or_create_folder found {len(items)} items for '{folder_name}' parent={parent_id}")
+        for item in items:
+            print(f"  - id={item['id']} name={item['name']} shared={item.get('shared')} owners={[o.get('emailAddress') for o in item.get('owners', [])]}")
+
         if items:
-            return items[0]["id"]
+            # Prefer shared/owned-by-others folders over service account's own
+            shared_items = [i for i in items if i.get("shared") or any(
+                o.get("emailAddress", "").endswith("@gmail.com")
+                for o in i.get("owners", [])
+            )]
+            chosen = shared_items[0] if shared_items else items[0]
+            print(f"[VideoService] Chose folder id={chosen['id']} (shared={chosen.get('shared')})")
+            return chosen["id"]
 
         metadata = {
             "name": folder_name,
@@ -159,6 +283,7 @@ class VideoService:
             .create(body=metadata, fields="id", supportsAllDrives=True)
             .execute()
         )
+        print(f"[VideoService] Created new folder '{folder_name}' id={folder['id']}")
         return folder["id"]
 
     @staticmethod

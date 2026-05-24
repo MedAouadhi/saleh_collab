@@ -82,13 +82,17 @@ class VideoService:
 
         resp = requests.post(url, headers=VideoService._get_headers(), json=payload, timeout=30)
         resp.raise_for_status()
-        return resp.json()
+        data = resp.json()
+        print(f"[VideoService] submit_generation response: {data}")
+        return data
 
     @staticmethod
     def poll_status(polling_url):
         resp = requests.get(polling_url, headers=VideoService._get_headers(), timeout=15)
         resp.raise_for_status()
-        return resp.json()
+        data = resp.json()
+        print(f"[VideoService] poll_status response: {data}")
+        return data
 
     @staticmethod
     def download_video(unsigned_url, local_path):

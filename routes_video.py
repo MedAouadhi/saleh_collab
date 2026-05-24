@@ -87,6 +87,7 @@ def create_generation(scene_id):
             generate_audio=data.get("generate_audio", True),
             duration=data.get("duration"),
         )
+        current_app.logger.info(f"[OpenRouter] submit_generation response: {result}")
     except Exception as e:
         current_app.logger.error(f"OpenRouter submit error: {e}", exc_info=True)
         return jsonify({"success": False, "message": f"خطأ في إرسال الطلب: {e}"}), 500
@@ -114,10 +115,15 @@ def create_generation(scene_id):
 @login_required
 def get_generation_status(gen_id):
     gen = VideoGeneration.query.get_or_404(gen_id)
-    if gen.status in ("pending", "in_progress") and gen.polling_url:
+    # Poll if status is not terminal (completed/failed/cancelled/expired)
+    terminal_statuses = {"completed", "failed", "cancelled", "expired"}
+    if gen.status not in terminal_statuses and gen.polling_url:
         try:
             status_data = VideoService.poll_status(gen.polling_url)
-            gen.status = status_data.get("status", gen.status)
+            current_app.logger.info(f"[OpenRouter] poll_status gen={gen_id} response: {status_data}")
+            new_status = status_data.get("status", gen.status)
+            if new_status != gen.status:
+                gen.status = new_status
             if gen.status == "completed":
                 urls = status_data.get("unsigned_urls", [])
                 gen.unsigned_url = urls[0] if urls else None
@@ -126,7 +132,7 @@ def get_generation_status(gen_id):
                 gen.completed_at = datetime.utcnow()
                 db.session.commit()
             elif gen.status == "failed":
-                gen.error_message = status_data.get("error")
+                gen.error_message = status_data.get("error", status_data.get("error_message"))
                 db.session.commit()
         except Exception as e:
             current_app.logger.error(f"Polling error for gen {gen_id}: {e}", exc_info=True)

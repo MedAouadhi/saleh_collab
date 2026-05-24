@@ -936,6 +936,7 @@ def view_episode(episode_id):
         for gen in scene.generations.order_by(VideoGeneration.created_at.desc()).all():
             gens.append({
                 "id": gen.id,
+                "attempt_number": gen.attempt_number,
                 "prompt": gen.prompt,
                 "model": gen.model,
                 "resolution": gen.resolution,

@@ -3,7 +3,7 @@
 
 function videoSection() {
     return {
-        open: false,
+        open: true,
         scenes: INITIAL_SCENES || [],
         availableModels: [],
         modelsLoading: false,
@@ -15,20 +15,37 @@ function videoSection() {
         pollIntervals: {},
         driveConnected: false,
         driveChecked: false,
+        credits: null,
+        creditsLoading: false,
+        creditsError: null,
+
+        _initScene(scene, openByDefault = false) {
+            // Idempotent: only sets undefined props so we don't clobber user input.
+            if (typeof scene.open === 'undefined') scene.open = openByDefault;
+            if (typeof scene.newPrompt === 'undefined') scene.newPrompt = '';
+            if (typeof scene.newModel === 'undefined') scene.newModel = '';
+            if (typeof scene.newResolution === 'undefined') scene.newResolution = '';
+            if (typeof scene.newAspectRatio === 'undefined') scene.newAspectRatio = '';
+            if (typeof scene.newAudio === 'undefined') scene.newAudio = true;
+            if (typeof scene.availableResolutions === 'undefined') scene.availableResolutions = [];
+            if (typeof scene.availableAspectRatios === 'undefined') scene.availableAspectRatios = [];
+            if (typeof scene.submitting === 'undefined') scene.submitting = false;
+            if (!Array.isArray(scene.generations)) scene.generations = [];
+            scene.generations.forEach(gen => this._initGeneration(gen));
+        },
+
+        _initGeneration(gen) {
+            if (typeof gen.saving === 'undefined') gen.saving = false;
+            if (typeof gen.downloading === 'undefined') gen.downloading = false;
+            if (typeof gen.showPlayer === 'undefined') gen.showPlayer = false;
+            if (typeof gen.promptExpanded === 'undefined') gen.promptExpanded = false;
+        },
 
         initVideoSection() {
-            // Ensure client-only reactive properties exist on server-loaded generations
-            this.scenes.forEach((scene, i) => {
-                scene.open = i === 0;
-                scene.generations.forEach(gen => {
-                    gen.saving = gen.saving || false;
-                    gen.downloading = gen.downloading || false;
-                    gen.showPlayer = gen.showPlayer || false;
-                });
-            });
+            this.scenes.forEach((scene, i) => this._initScene(scene, i === 0));
             this.fetchModels();
             this.checkDriveStatus();
-            // Resume polling for non-terminal generations
+            this.fetchCredits();
             this.scenes.forEach(scene => {
                 scene.generations.forEach(gen => {
                     if (this._shouldPoll(gen)) {
@@ -36,6 +53,60 @@ function videoSection() {
                     }
                 });
             });
+        },
+
+        async fetchCredits() {
+            this.creditsLoading = true;
+            this.creditsError = null;
+            try {
+                const resp = await fetch('/api/credits');
+                const data = await resp.json();
+                if (data.success) {
+                    this.credits = {
+                        total_credits_usd: data.total_credits_usd,
+                        total_usage_usd: data.total_usage_usd,
+                        remaining_usd: data.remaining_usd,
+                        remaining_eur: data.remaining_eur,
+                        usd_to_eur_rate: data.usd_to_eur_rate,
+                    };
+                } else {
+                    this.creditsError = data.message || 'تعذر جلب الرصيد';
+                }
+            } catch (e) {
+                console.error('[fetchCredits] error:', e);
+                this.creditsError = 'خطأ في الاتصال';
+            } finally {
+                this.creditsLoading = false;
+            }
+        },
+
+        formatEur(v) {
+            if (v == null || isNaN(v)) return '—';
+            return '€' + Number(v).toFixed(4);
+        },
+
+        formatUsd(v) {
+            if (v == null || isNaN(v)) return '—';
+            return '$' + Number(v).toFixed(4);
+        },
+
+        totalGenerations() {
+            return this.scenes.reduce((sum, s) => sum + s.generations.length, 0);
+        },
+
+        completedGenerations() {
+            return this.scenes.reduce(
+                (sum, s) => sum + s.generations.filter(g => g.status === 'completed').length,
+                0
+            );
+        },
+
+        pendingGenerations() {
+            const pending = ['pending', 'in_progress', 'processing', 'queued'];
+            return this.scenes.reduce(
+                (sum, s) => sum + s.generations.filter(g => pending.includes(g.status)).length,
+                0
+            );
         },
 
         async checkDriveStatus() {
@@ -122,20 +193,13 @@ function videoSection() {
                 });
                 const data = await resp.json();
                 if (data.success) {
-                    this.scenes.push({
+                    const newScene = {
                         id: data.scene.id,
                         number: data.scene.number,
-                        open: true,
                         generations: [],
-                        newPrompt: '',
-                        newModel: '',
-                        newResolution: '',
-                        newAspectRatio: '',
-                        newAudio: true,
-                        availableResolutions: [],
-                        availableAspectRatios: [],
-                        submitting: false,
-                    });
+                    };
+                    this._initScene(newScene, true);
+                    this.scenes.push(newScene);
                 } else {
                     alert(data.message || 'فشل إنشاء المشهد');
                 }
@@ -188,16 +252,11 @@ function videoSection() {
                         drive_file_id: null,
                         drive_view_url: null,
                         local_path: null,
-                        showPlayer: false,
-                        downloading: false,
-                        saving: false,
                     };
+                    this._initGeneration(gen);
                     scene.generations.unshift(gen);
+                    // Keep model + params for quick re-tries with tweaks; clear prompt only.
                     scene.newPrompt = '';
-                    scene.newModel = '';
-                    scene.newResolution = '';
-                    scene.newAspectRatio = '';
-                    scene.newAudio = true;
                     this.startPolling(gen);
                 } else {
                     alert(data.message || 'فشل إنشاء عملية التوليد');
@@ -226,6 +285,7 @@ function videoSection() {
                             console.log('[poll] gen', gen.id, 'reached terminal status:', freshStatus, 'stopping polling');
                             clearInterval(this.pollIntervals[gen.id]);
                             delete this.pollIntervals[gen.id];
+                            this.fetchCredits();
                         }
                     }
                 } catch (e) {

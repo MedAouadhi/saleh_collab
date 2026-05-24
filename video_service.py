@@ -20,9 +20,20 @@ _models_cache = None
 _models_cache_timestamp = None
 _MODELS_CACHE_TTL = timedelta(hours=6)
 
+# In-memory cache for USD->EUR FX rate (TTL 12 hours)
+_fx_cache = None
+_fx_cache_timestamp = None
+_FX_CACHE_TTL = timedelta(hours=12)
+_FX_FALLBACK_RATE = 0.92  # used only if frankfurter.app is unreachable
+
 
 def _get_openrouter_api_key():
     return os.environ.get("OPENROUTER_API_KEY", "")
+
+
+def _get_openrouter_management_key():
+    # Falls back to inference key if management key not set.
+    return os.environ.get("OPENROUTER_MANAGEMENT_KEY") or _get_openrouter_api_key()
 
 
 def _get_drive_credentials_path():
@@ -42,6 +53,13 @@ class VideoService:
     def _get_headers():
         return {
             "Authorization": f"Bearer {_get_openrouter_api_key()}",
+            "Content-Type": "application/json",
+        }
+
+    @staticmethod
+    def _get_management_headers():
+        return {
+            "Authorization": f"Bearer {_get_openrouter_management_key()}",
             "Content-Type": "application/json",
         }
 
@@ -70,6 +88,46 @@ class VideoService:
     def get_cached_models():
         models = VideoService.fetch_models()
         return models
+
+    # --- Credits & FX ---
+    @staticmethod
+    def get_usd_to_eur_rate():
+        global _fx_cache, _fx_cache_timestamp
+        if _fx_cache and _fx_cache_timestamp:
+            if datetime.utcnow() - _fx_cache_timestamp < _FX_CACHE_TTL:
+                return _fx_cache
+        try:
+            resp = requests.get(
+                "https://api.frankfurter.app/latest",
+                params={"from": "USD", "to": "EUR"},
+                timeout=10,
+            )
+            resp.raise_for_status()
+            rate = float(resp.json()["rates"]["EUR"])
+            _fx_cache = rate
+            _fx_cache_timestamp = datetime.utcnow()
+            return rate
+        except Exception as e:
+            print(f"[VideoService] FX fetch failed, using fallback {_FX_FALLBACK_RATE}: {e}")
+            return _FX_FALLBACK_RATE
+
+    @staticmethod
+    def get_credits():
+        url = f"{OPENROUTER_BASE_URL}/credits"
+        resp = requests.get(url, headers=VideoService._get_management_headers(), timeout=15)
+        resp.raise_for_status()
+        data = resp.json().get("data", {})
+        total = float(data.get("total_credits", 0))
+        used = float(data.get("total_usage", 0))
+        remaining = max(0.0, total - used)
+        rate = VideoService.get_usd_to_eur_rate()
+        return {
+            "total_credits_usd": total,
+            "total_usage_usd": used,
+            "remaining_usd": remaining,
+            "remaining_eur": remaining * rate,
+            "usd_to_eur_rate": rate,
+        }
 
     # --- Generation ---
     @staticmethod
@@ -327,6 +385,71 @@ class VideoService:
         ).execute()
 
         return drive_file_id, drive_view_url
+
+    @staticmethod
+    def get_drive_file_metadata(file_id):
+        service = VideoService._get_drive_service()
+        return (
+            service.files()
+            .get(fileId=file_id, fields="id,size,mimeType,name", supportsAllDrives=True)
+            .execute()
+        )
+
+    @staticmethod
+    def stream_drive_file(file_id, range_header=None):
+        """Stream a Drive file via alt=media with optional Range header.
+        Returns (iterator, status_code, response_headers, content_length, total_size, mime_type).
+        """
+        oauth_creds = VideoService._load_oauth_credentials()
+        if oauth_creds:
+            token = oauth_creds.token
+        else:
+            # service account fallback
+            creds_path = _get_drive_credentials_path()
+            with open(creds_path) as f:
+                data = json.load(f)
+            if data.get("type") != "service_account":
+                raise RuntimeError("No usable Drive credentials for streaming.")
+            sa_creds = service_account.Credentials.from_service_account_file(
+                creds_path,
+                scopes=["https://www.googleapis.com/auth/drive"],
+            )
+            sa_creds.refresh(Request())
+            token = sa_creds.token
+
+        meta = VideoService.get_drive_file_metadata(file_id)
+        total_size = int(meta.get("size", 0))
+        mime_type = meta.get("mimeType", "video/mp4")
+
+        url = f"https://www.googleapis.com/drive/v3/files/{file_id}?alt=media&supportsAllDrives=true"
+        headers = {"Authorization": f"Bearer {token}"}
+        if range_header:
+            headers["Range"] = range_header
+
+        upstream = requests.get(url, headers=headers, stream=True, timeout=60)
+        upstream.raise_for_status()
+
+        def generate():
+            try:
+                for chunk in upstream.iter_content(chunk_size=65536):
+                    if chunk:
+                        yield chunk
+            finally:
+                upstream.close()
+
+        status = upstream.status_code  # 200 or 206
+        out_headers = {
+            "Content-Type": mime_type,
+            "Accept-Ranges": "bytes",
+        }
+        if "Content-Range" in upstream.headers:
+            out_headers["Content-Range"] = upstream.headers["Content-Range"]
+        if "Content-Length" in upstream.headers:
+            out_headers["Content-Length"] = upstream.headers["Content-Length"]
+        elif total_size and not range_header:
+            out_headers["Content-Length"] = str(total_size)
+
+        return generate(), status, out_headers
 
     @staticmethod
     def delete_from_drive(file_id):

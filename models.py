@@ -195,6 +195,7 @@ class Scene(db.Model):
 class VideoGeneration(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     scene_id = db.Column(db.Integer, db.ForeignKey("scene.id", ondelete="CASCADE"), nullable=False)
+    attempt_number = db.Column(db.Integer, nullable=False, default=1)
     prompt = db.Column(db.Text, nullable=False)
     model = db.Column(db.String(100), nullable=False)
     resolution = db.Column(db.String(20), nullable=True)

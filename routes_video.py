@@ -1,5 +1,5 @@
 # routes_video.py
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, Response, stream_with_context
 from flask_login import login_required, current_user
 from datetime import datetime
 from models import db, Episode, Scene, VideoGeneration, Assignment
@@ -28,6 +28,18 @@ def get_video_models():
     if not models:
         return jsonify({"success": False, "message": "OpenRouter غير متاح حالياً."}), 503
     return jsonify({"success": True, "models": models})
+
+
+# --- Credits ---
+@video_bp.route("/credits", methods=["GET"])
+@login_required
+def get_credits():
+    try:
+        credits = VideoService.get_credits()
+        return jsonify({"success": True, **credits})
+    except Exception as e:
+        current_app.logger.error(f"Credits fetch error: {e}", exc_info=True)
+        return jsonify({"success": False, "message": f"تعذر جلب الرصيد: {e}"}), 502
 
 
 # --- Scenes ---
@@ -92,8 +104,13 @@ def create_generation(scene_id):
         current_app.logger.error(f"OpenRouter submit error: {e}", exc_info=True)
         return jsonify({"success": False, "message": f"خطأ في إرسال الطلب: {e}"}), 500
 
+    max_attempt = db.session.query(
+        db.func.max(VideoGeneration.attempt_number)
+    ).filter_by(scene_id=scene_id).scalar() or 0
+
     gen = VideoGeneration(
         scene_id=scene_id,
+        attempt_number=max_attempt + 1,
         prompt=prompt,
         model=model,
         resolution=data.get("resolution"),
@@ -108,7 +125,10 @@ def create_generation(scene_id):
     db.session.add(gen)
     db.session.commit()
 
-    return jsonify({"success": True, "generation": {"id": gen.id, "status": gen.status}}), 201
+    return jsonify({
+        "success": True,
+        "generation": {"id": gen.id, "status": gen.status, "attempt_number": gen.attempt_number}
+    }), 201
 
 
 @video_bp.route("/generations/<int:gen_id>/status", methods=["GET"])
@@ -141,6 +161,7 @@ def get_generation_status(gen_id):
         "success": True,
         "generation": {
             "id": gen.id,
+            "attempt_number": gen.attempt_number,
             "status": gen.status,
             "unsigned_url": gen.unsigned_url,
             "drive_file_id": gen.drive_file_id,
@@ -216,6 +237,33 @@ def save_generation_to_drive(gen_id):
     except Exception as e:
         current_app.logger.error(f"Drive upload error for gen {gen_id}: {e}", exc_info=True)
         return jsonify({"success": False, "message": f"خطأ في الرفع: {e}"}), 500
+
+
+@video_bp.route("/generations/<int:gen_id>/stream", methods=["GET"])
+@login_required
+def stream_generation_video(gen_id):
+    """Proxy-stream a Drive-hosted generation video for HTML5 <video> playback."""
+    gen = VideoGeneration.query.get_or_404(gen_id)
+    if not _is_assigned_or_admin(gen.scene.episode_id):
+        return jsonify({"success": False, "message": "غير مصرح لك."}), 403
+    if not gen.drive_file_id:
+        return jsonify({"success": False, "message": "الفيديو غير موجود على Drive."}), 404
+
+    range_header = request.headers.get("Range")
+    try:
+        iterator, status, headers = VideoService.stream_drive_file(
+            gen.drive_file_id, range_header=range_header
+        )
+    except Exception as e:
+        current_app.logger.error(f"Stream error for gen {gen_id}: {e}", exc_info=True)
+        return jsonify({"success": False, "message": f"خطأ في البث: {e}"}), 500
+
+    return Response(
+        stream_with_context(iterator),
+        status=status,
+        headers=headers,
+        direct_passthrough=True,
+    )
 
 
 # --- Google Drive OAuth ---

@@ -1,8 +1,18 @@
 <!-- templates/video_section.html -->
 <div x-data="videoSection()" x-init="initVideoSection()" class="bg-white p-6 rounded-lg shadow-md mt-6">
     <div class="flex justify-between items-center mb-4 border-b pb-2 cursor-pointer" @click="open = !open">
-        <h2 class="text-xl font-semibold text-gray-700">🎬 فيديوهات الحلقة</h2>
-        <span x-text="open ? '▲' : '▼'" class="text-gray-500"></span>
+        <div>
+            <h2 class="text-xl font-semibold text-gray-700">🎬 فيديوهات الحلقة</h2>
+            <p class="text-sm text-gray-500 mt-1">
+                <span x-text="scenes.length"></span> مشهد ·
+                <span x-text="totalGenerations()"></span> توليد ·
+                <span class="text-green-600" x-text="completedGenerations()"></span> مكتمل
+                <template x-if="pendingGenerations() > 0">
+                    <span class="text-blue-600">· <span x-text="pendingGenerations()"></span> قيد التوليد</span>
+                </template>
+            </p>
+        </div>
+        <span x-text="open ? '▼' : '◄'" class="text-gray-500 text-lg"></span>
     </div>
 
     <div x-show="open" x-transition>
@@ -12,6 +22,26 @@
         </div>
         <div x-show="modelsError" class="text-center py-4 text-red-500">
             <span x-text="modelsError"></span>
+        </div>
+
+        <!-- OpenRouter remaining credit -->
+        <div class="mb-4 rounded-lg border border-indigo-200 bg-gradient-to-l from-indigo-50 to-white p-4 flex items-center justify-between flex-wrap gap-3">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">💶</span>
+                <div>
+                    <div class="text-xs text-gray-500">الرصيد المتبقي في OpenRouter</div>
+                    <div x-show="creditsLoading" class="text-sm text-gray-400">جاري التحميل...</div>
+                    <div x-show="creditsError" class="text-sm text-red-600" x-text="creditsError"></div>
+                    <div x-show="!creditsLoading && !creditsError && credits" class="flex items-baseline gap-2">
+                        <span class="text-2xl font-bold text-indigo-700" x-text="formatEur(credits && credits.remaining_eur)"></span>
+                    </div>
+                </div>
+            </div>
+            <button
+                @click="fetchCredits()"
+                :disabled="creditsLoading"
+                class="text-xs bg-indigo-500 hover:bg-indigo-600 text-white py-1 px-3 rounded disabled:opacity-50"
+            >🔄 تحديث</button>
         </div>
 
         <!-- Google Drive connection status -->
@@ -35,7 +65,10 @@
         <template x-for="scene in scenes" :key="scene.id">
             <div class="mb-4 border rounded-lg overflow-hidden">
                 <div class="bg-gray-50 px-4 py-2 flex justify-between items-center cursor-pointer" @click="scene.open = !scene.open">
-                    <h3 class="font-semibold text-gray-700" x-text="'مشهد ' + scene.number"></h3>
+                    <div class="flex items-center gap-3">
+                        <h3 class="font-semibold text-gray-700" x-text="'مشهد ' + scene.number"></h3>
+                        <span class="text-xs text-gray-500" x-text="scene.generations.length + ' محاولة'"></span>
+                    </div>
                     <div class="flex items-center gap-2">
                         <button
                             x-show="isAssigned || isAdmin"
@@ -43,14 +76,16 @@
                             class="text-red-500 hover:text-red-700 text-sm"
                             title="حذف المشهد"
                         >🗑️</button>
-                        <span x-text="scene.open ? '▲' : '▼'" class="text-gray-500"></span>
+                        <span x-text="scene.open ? '▼' : '◄'" class="text-gray-500"></span>
                     </div>
                 </div>
 
                 <div x-show="scene.open" x-transition class="p-4 space-y-4">
                     <!-- Generation Form -->
                     <div x-show="isAssigned || isAdmin" class="bg-gray-50 p-4 rounded">
-                        <h4 class="text-sm font-semibold text-gray-600 mb-2">توليد فيديو جديد</h4>
+                        <h4 class="text-sm font-semibold text-gray-600 mb-2">
+                            <span x-text="scene.generations.length > 0 ? 'إنشاء محاولة جديدة' : 'توليد فيديو'"></span>
+                        </h4>
                         <div class="space-y-2">
                             <textarea
                                 x-model="scene.newPrompt"
@@ -79,57 +114,104 @@
                                 </select>
                             </div>
                             <div class="flex items-center gap-2">
-                                <input type="checkbox" x-model="scene.newAudio" id="audio-toggle" class="rounded">
-                                <label for="audio-toggle" class="text-sm text-gray-600">مع صوت</label>
+                                <input type="checkbox" x-model="scene.newAudio" :id="'audio-toggle-' + scene.id" class="rounded">
+                                <label :for="'audio-toggle-' + scene.id" class="text-sm text-gray-600">مع صوت</label>
                             </div>
                             <button
                                 @click="submitGeneration(scene)"
                                 :disabled="!scene.newPrompt || !scene.newModel || scene.submitting"
-                                class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded disabled:opacity-50"
+                                class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                <span x-show="!scene.submitting">توليد</span>
+                                <span x-show="!scene.submitting" x-text="scene.generations.length > 0 ? 'توليد محاولة جديدة' : 'توليد'"></span>
                                 <span x-show="scene.submitting">جاري الإرسال...</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Generations list -->
-                    <div class="space-y-2">
+                    <!-- Generations grid -->
+                    <div x-show="scene.generations.length > 0" class="grid grid-cols-1 lg:grid-cols-2 gap-3">
                         <template x-for="gen in scene.generations" :key="gen.id">
-                            <div class="border rounded p-3 bg-gray-50">
-                                <div class="flex justify-between items-start mb-2">
-                                    <div>
+                            <div class="border rounded-lg p-3 bg-white shadow-sm flex flex-col">
+                                <!-- Card header -->
+                                <div class="flex justify-between items-start mb-2 pb-2 border-b">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="text-sm font-bold text-indigo-700" x-text="'محاولة ' + gen.attempt_number"></span>
                                         <span class="text-xs font-mono bg-gray-200 px-2 py-0.5 rounded" x-text="gen.model"></span>
-                                        <span class="text-xs text-gray-500 mr-2" x-text="gen.status"></span>
+                                        <span
+                                            class="text-xs px-2 py-0.5 rounded"
+                                            :class="{
+                                                'bg-green-100 text-green-700': gen.status === 'completed',
+                                                'bg-red-100 text-red-700': gen.status === 'failed',
+                                                'bg-blue-100 text-blue-700': ['pending','in_progress','processing','queued'].includes(gen.status),
+                                                'bg-gray-100 text-gray-600': !['completed','failed','pending','in_progress','processing','queued'].includes(gen.status),
+                                            }"
+                                            x-text="gen.status"
+                                        ></span>
                                     </div>
                                     <button
                                         x-show="(isAssigned || isAdmin) && gen.status !== 'pending' && gen.status !== 'in_progress'"
                                         @click="deleteGeneration(gen.id)"
                                         class="text-red-400 hover:text-red-600 text-sm"
+                                        title="حذف"
                                     >🗑️</button>
                                 </div>
-                                <p class="text-sm text-gray-700 mb-2 line-clamp-2" x-text="gen.prompt"></p>
+
+                                <!-- Params -->
+                                <div class="flex flex-wrap gap-1 mb-2 text-xs text-gray-500">
+                                    <template x-if="gen.resolution">
+                                        <span class="bg-gray-100 px-2 py-0.5 rounded" x-text="gen.resolution"></span>
+                                    </template>
+                                    <template x-if="gen.aspect_ratio">
+                                        <span class="bg-gray-100 px-2 py-0.5 rounded" x-text="gen.aspect_ratio"></span>
+                                    </template>
+                                    <template x-if="gen.generate_audio">
+                                        <span class="bg-gray-100 px-2 py-0.5 rounded">🔊 صوت</span>
+                                    </template>
+                                    <template x-if="gen.cost != null">
+                                        <span
+                                            class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-semibold"
+                                            :title="'$' + (gen.cost != null ? gen.cost.toFixed(4) : '')"
+                                            x-text="'💶 ' + formatEur(gen.cost * (credits ? credits.usd_to_eur_rate : 0.92))"
+                                        ></span>
+                                    </template>
+                                </div>
+
+                                <!-- Prompt with expand -->
+                                <div class="mb-2">
+                                    <p
+                                        class="text-sm text-gray-700 whitespace-pre-wrap"
+                                        :class="gen.promptExpanded ? '' : 'line-clamp-2'"
+                                        x-text="gen.prompt"
+                                    ></p>
+                                    <button
+                                        x-show="gen.prompt && gen.prompt.length > 80"
+                                        @click="gen.promptExpanded = !gen.promptExpanded"
+                                        class="text-xs text-blue-500 hover:text-blue-700 mt-1 flex items-center gap-1"
+                                    >
+                                        <span x-text="gen.promptExpanded ? '🔼 إخفاء النص' : '🔽 عرض النص كاملاً'"></span>
+                                    </button>
+                                </div>
 
                                 <!-- Status messages -->
-                                <div x-show="gen.status === 'pending' || gen.status === 'in_progress' || gen.status === 'processing' || gen.status === 'queued'" class="text-sm text-blue-600">
+                                <div x-show="['pending','in_progress','processing','queued'].includes(gen.status)" class="text-sm text-blue-600 mb-2">
                                     <span x-text="gen.status === 'pending' ? 'في الانتظار...' : 'جاري التوليد...'"></span>
                                     <button
                                         @click="checkStatus(gen)"
                                         class="mr-2 text-xs text-gray-500 hover:text-blue-500 underline"
                                     >تحديث الحالة يدوياً</button>
                                 </div>
-                                <div x-show="gen.status === 'failed'" class="text-sm text-red-600" x-text="gen.error_message || 'فشل التوليد'"></div>
+                                <div x-show="gen.status === 'failed'" class="text-sm text-red-600 mb-2" x-text="gen.error_message || 'فشل التوليد'"></div>
 
                                 <!-- Actions for completed -->
-                                <div x-show="gen.status === 'completed'" class="flex gap-2 mt-2 flex-wrap">
+                                <div x-show="gen.status === 'completed'" class="flex gap-2 flex-wrap mt-auto pt-2">
                                     <button
                                         x-show="!gen.drive_file_id && !gen.local_path"
                                         type="button"
                                         @click="downloadVideo(gen.id)"
                                         :disabled="gen.downloading"
-                                        class="bg-green-500 hover:bg-green-600 text-white text-xs py-1 px-3 rounded"
+                                        class="bg-green-500 hover:bg-green-600 text-white text-xs py-1 px-3 rounded disabled:opacity-50"
                                     >
-                                        <span x-show="!gen.downloading">تحميل</span>
+                                        <span x-show="!gen.downloading">⬇️ تحميل</span>
                                         <span x-show="gen.downloading">جاري التحميل...</span>
                                     </button>
                                     <button
@@ -137,9 +219,9 @@
                                         type="button"
                                         @click="saveToDrive(gen.id)"
                                         :disabled="gen.saving"
-                                        class="bg-indigo-500 hover:bg-indigo-600 text-white text-xs py-1 px-3 rounded"
+                                        class="bg-indigo-500 hover:bg-indigo-600 text-white text-xs py-1 px-3 rounded disabled:opacity-50"
                                     >
-                                        <span x-show="!gen.saving">حفظ في Drive</span>
+                                        <span x-show="!gen.saving">☁️ حفظ في Drive</span>
                                         <span x-show="gen.saving">جاري الرفع...</span>
                                     </button>
                                     <button
@@ -148,25 +230,27 @@
                                         @click="playVideo(gen)"
                                         class="bg-purple-500 hover:bg-purple-600 text-white text-xs py-1 px-3 rounded"
                                     >
-                                        ▶️ تشغيل
+                                        <span x-text="gen.showPlayer ? '⏸️ إخفاء' : '▶️ تشغيل'"></span>
                                     </button>
                                 </div>
 
                                 <!-- Video Player -->
                                 <template x-if="gen.showPlayer && gen.drive_file_id">
                                     <div class="mt-2">
-                                        <iframe
-                                            :src="'https://drive.google.com/file/d/' + gen.drive_file_id + '/preview'"
-                                            class="w-full aspect-video rounded"
-                                            allow="autoplay"
-                                        ></iframe>
+                                        <video
+                                            :src="'/api/generations/' + gen.id + '/stream'"
+                                            class="w-full aspect-video rounded bg-black"
+                                            controls
+                                            preload="metadata"
+                                            playsinline
+                                        ></video>
                                     </div>
                                 </template>
                             </div>
                         </template>
-                        <div x-show="scene.generations.length === 0" class="text-center text-gray-400 text-sm py-4">
-                            لا توجد عمليات توليد بعد.
-                        </div>
+                    </div>
+                    <div x-show="scene.generations.length === 0" class="text-center text-gray-400 text-sm py-4">
+                        لا توجد عمليات توليد بعد.
                     </div>
                 </div>
             </div>

@@ -10,16 +10,7 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
-# --- Configuration ---
-OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
-
-GOOGLE_DRIVE_CREDENTIALS_PATH = os.environ.get(
-    "GOOGLE_DRIVE_CREDENTIALS_PATH", "instance/service-account.json"
-)
-GOOGLE_DRIVE_ROOT_FOLDER_NAME = os.environ.get(
-    "GOOGLE_DRIVE_ROOT_FOLDER_NAME", "صالح - الكراسة الحمراء 📕"
-)
 
 # In-memory cache for video models (TTL 6 hours)
 _models_cache = None
@@ -27,11 +18,23 @@ _models_cache_timestamp = None
 _MODELS_CACHE_TTL = timedelta(hours=6)
 
 
+def _get_openrouter_api_key():
+    return os.environ.get("OPENROUTER_API_KEY", "")
+
+
+def _get_drive_credentials_path():
+    return os.environ.get("GOOGLE_DRIVE_CREDENTIALS_PATH", "instance/service-account.json")
+
+
+def _get_drive_root_folder_name():
+    return os.environ.get("GOOGLE_DRIVE_ROOT_FOLDER_NAME", "صالح - الكراسة الحمراء 📕")
+
+
 class VideoService:
     @staticmethod
     def _get_headers():
         return {
-            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+            "Authorization": f"Bearer {_get_openrouter_api_key()}",
             "Content-Type": "application/json",
         }
 
@@ -107,13 +110,14 @@ class VideoService:
     # --- Google Drive ---
     @staticmethod
     def _get_drive_service():
-        if not os.path.exists(GOOGLE_DRIVE_CREDENTIALS_PATH):
+        creds_path = _get_drive_credentials_path()
+        if not os.path.exists(creds_path):
             raise FileNotFoundError(
-                f"Google Drive service account file not found: {GOOGLE_DRIVE_CREDENTIALS_PATH}. "
+                f"Google Drive service account file not found: {creds_path}. "
                 f"Please set GOOGLE_DRIVE_CREDENTIALS_PATH in your .env file."
             )
         credentials = service_account.Credentials.from_service_account_file(
-            GOOGLE_DRIVE_CREDENTIALS_PATH,
+            creds_path,
             scopes=["https://www.googleapis.com/auth/drive"],
         )
         return build("drive", "v3", credentials=credentials, cache_discovery=False)
@@ -143,7 +147,7 @@ class VideoService:
         service = VideoService._get_drive_service()
 
         # Build hierarchy
-        root_id = VideoService._find_or_create_folder(service, GOOGLE_DRIVE_ROOT_FOLDER_NAME)
+        root_id = VideoService._find_or_create_folder(service, _get_drive_root_folder_name())
         episodes_id = VideoService._find_or_create_folder(service, "Episodes", parent_id=root_id)
         ep_folder_name = f"Episode_{episode_id} - {episode_title}"
         ep_id = VideoService._find_or_create_folder(service, ep_folder_name, parent_id=episodes_id)

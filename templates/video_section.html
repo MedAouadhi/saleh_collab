@@ -1,4 +1,22 @@
 <!-- templates/video_section.html -->
+<style>
+    .vg-shimmer {
+        background: linear-gradient(110deg, transparent 25%, rgba(99,102,241,0.18) 50%, transparent 75%);
+        background-size: 200% 100%;
+        animation: vg-shimmer-slide 1.8s linear infinite;
+    }
+    @keyframes vg-shimmer-slide {
+        0%   { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+    .vg-dot {
+        animation: vg-dot-pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes vg-dot-pulse {
+        0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+        40%           { transform: scale(1.2); opacity: 1;   }
+    }
+</style>
 <div x-data="videoSection()" x-init="initVideoSection()" class="bg-white p-6 rounded-lg shadow-md mt-6">
     <div class="flex justify-between items-center mb-4 border-b pb-2 cursor-pointer" @click="open = !open">
         <div>
@@ -213,12 +231,30 @@
                                     </button>
                                 </div>
 
-                                <!-- Status messages -->
-                                <div x-show="['pending','in_progress','processing','queued'].includes(gen.status)" class="text-sm text-blue-600 mb-2">
-                                    <span x-text="gen.status === 'pending' ? 'في الانتظار...' : 'جاري التوليد...'"></span>
+                                <!-- Generation in-progress: animated placeholder -->
+                                <div x-show="['pending','in_progress','processing','queued'].includes(gen.status)" class="mb-2">
+                                    <div class="relative aspect-video rounded-lg overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 border border-indigo-100">
+                                        <div class="absolute inset-0 vg-shimmer"></div>
+                                        <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 text-indigo-700">
+                                            <div class="text-5xl animate-bounce">🎬</div>
+                                            <div class="flex items-center gap-2">
+                                                <svg class="animate-spin h-5 w-5 text-indigo-600" viewBox="0 0 24 24" fill="none">
+                                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/>
+                                                    <path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" class="opacity-75"/>
+                                                </svg>
+                                                <span class="text-sm font-semibold" x-text="gen.status === 'pending' ? 'في الانتظار...' : 'جاري التوليد...'"></span>
+                                            </div>
+                                            <div class="flex gap-1">
+                                                <span class="w-2 h-2 rounded-full bg-indigo-400 vg-dot"></span>
+                                                <span class="w-2 h-2 rounded-full bg-indigo-400 vg-dot" style="animation-delay:0.2s"></span>
+                                                <span class="w-2 h-2 rounded-full bg-indigo-400 vg-dot" style="animation-delay:0.4s"></span>
+                                            </div>
+                                            <div class="text-xs text-indigo-500/80 mt-1">قد يستغرق هذا عدة دقائق</div>
+                                        </div>
+                                    </div>
                                     <button
                                         @click="checkStatus(gen)"
-                                        class="mr-2 text-xs text-gray-500 hover:text-blue-500 underline"
+                                        class="mt-2 text-xs text-gray-500 hover:text-blue-500 underline"
                                     >تحديث الحالة يدوياً</button>
                                 </div>
                                 <div x-show="gen.status === 'failed'" class="text-sm text-red-600 mb-2" x-text="gen.error_message || 'فشل التوليد'"></div>

@@ -15,8 +15,6 @@ function videoSection() {
         pollIntervals: {},
 
         initVideoSection() {
-            // Expose this component to window for plain onclick handlers
-            window.videoSectionScope = this;
             // Open first scene by default
             this.scenes.forEach((s, i) => { s.open = i === 0; });
             this.fetchModels();
@@ -167,18 +165,7 @@ function videoSection() {
                     const data = await resp.json();
                     console.log('[poll] gen', gen.id, 'response:', data);
                     if (data.success && data.generation) {
-                        const g = data.generation;
-                        // Explicitly update each property to ensure Alpine reactivity
-                        if (g.status !== undefined) gen.status = g.status;
-                        if (g.unsigned_url !== undefined) gen.unsigned_url = g.unsigned_url;
-                        if (g.drive_file_id !== undefined) gen.drive_file_id = g.drive_file_id;
-                        if (g.drive_view_url !== undefined) gen.drive_view_url = g.drive_view_url;
-                        if (g.local_path !== undefined) gen.local_path = g.local_path;
-                        if (g.error_message !== undefined) gen.error_message = g.error_message;
-                        if (g.cost !== undefined) gen.cost = g.cost;
-                        if (g.created_at !== undefined) gen.created_at = g.created_at;
-                        if (g.completed_at !== undefined) gen.completed_at = g.completed_at;
-
+                        this._updateGeneration(gen, data.generation);
                         if (['completed', 'failed', 'cancelled', 'expired'].includes(gen.status)) {
                             console.log('[poll] gen', gen.id, 'reached terminal status:', gen.status, 'stopping polling');
                             clearInterval(this.pollIntervals[gen.id]);
@@ -189,6 +176,18 @@ function videoSection() {
                     console.error('Polling error:', e);
                 }
             }, 10000); // 10 seconds
+        },
+
+        // Replace the generation object in its array so Alpine.js detects the change
+        _updateGeneration(gen, updates) {
+            for (const scene of this.scenes) {
+                const idx = scene.generations.findIndex(g => g.id === gen.id);
+                if (idx !== -1) {
+                    scene.generations[idx] = { ...scene.generations[idx], ...updates };
+                    console.log('[updateGeneration] replaced gen at scene', scene.number, 'index', idx, 'new status:', updates.status);
+                    return;
+                }
+            }
         },
 
         async downloadVideo(genId) {
@@ -208,7 +207,7 @@ function videoSection() {
                 const data = await resp.json();
                 console.log('[downloadVideo] response data:', data);
                 if (data.success) {
-                    gen.local_path = data.local_path;
+                    this._updateGeneration(gen, { local_path: data.local_path });
                 } else {
                     alert(data.message || 'فشل التحميل');
                 }
@@ -234,9 +233,11 @@ function videoSection() {
                 const data = await resp.json();
                 console.log('[saveToDrive] response:', data);
                 if (data.success) {
-                    gen.drive_file_id = data.drive_file_id;
-                    gen.drive_view_url = data.drive_view_url;
-                    gen.local_path = null;
+                    this._updateGeneration(gen, {
+                        drive_file_id: data.drive_file_id,
+                        drive_view_url: data.drive_view_url,
+                        local_path: null,
+                    });
                 } else {
                     alert(data.message || 'فشل الرفع إلى Drive');
                 }
@@ -256,16 +257,7 @@ function videoSection() {
                 const data = await resp.json();
                 console.log('[checkStatus] response:', data);
                 if (data.success && data.generation) {
-                    const g = data.generation;
-                    if (g.status !== undefined) gen.status = g.status;
-                    if (g.unsigned_url !== undefined) gen.unsigned_url = g.unsigned_url;
-                    if (g.drive_file_id !== undefined) gen.drive_file_id = g.drive_file_id;
-                    if (g.drive_view_url !== undefined) gen.drive_view_url = g.drive_view_url;
-                    if (g.local_path !== undefined) gen.local_path = g.local_path;
-                    if (g.error_message !== undefined) gen.error_message = g.error_message;
-                    if (g.cost !== undefined) gen.cost = g.cost;
-                    if (g.created_at !== undefined) gen.created_at = g.created_at;
-                    if (g.completed_at !== undefined) gen.completed_at = g.completed_at;
+                    this._updateGeneration(gen, data.generation);
                 }
             } catch (e) {
                 console.error('[checkStatus] error:', e);

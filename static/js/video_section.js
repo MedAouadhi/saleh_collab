@@ -15,13 +15,20 @@ function videoSection() {
         pollIntervals: {},
 
         initVideoSection() {
-            // Open first scene by default
-            this.scenes.forEach((s, i) => { s.open = i === 0; });
+            // Ensure client-only reactive properties exist on server-loaded generations
+            this.scenes.forEach((scene, i) => {
+                scene.open = i === 0;
+                scene.generations.forEach(gen => {
+                    gen.saving = gen.saving || false;
+                    gen.downloading = gen.downloading || false;
+                    gen.showPlayer = gen.showPlayer || false;
+                });
+            });
             this.fetchModels();
-            // Resume polling for any in-progress generations
+            // Resume polling for non-terminal generations
             this.scenes.forEach(scene => {
                 scene.generations.forEach(gen => {
-                    if (gen.status === 'pending' || gen.status === 'in_progress' || gen.status === 'processing' || gen.status === 'queued') {
+                    if (this._shouldPoll(gen)) {
                         this.startPolling(gen);
                     }
                 });

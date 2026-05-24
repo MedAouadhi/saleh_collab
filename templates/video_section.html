@@ -107,6 +107,7 @@
                                 <div x-show="gen.status === 'completed'" class="flex gap-2 mt-2 flex-wrap">
                                     <button
                                         x-show="!gen.drive_file_id && !gen.local_path"
+                                        type="button"
                                         @click="downloadVideo(gen.id)"
                                         :disabled="gen.downloading"
                                         class="bg-green-500 hover:bg-green-600 text-white text-xs py-1 px-3 rounded"
@@ -116,6 +117,7 @@
                                     </button>
                                     <button
                                         x-show="gen.local_path && !gen.drive_file_id"
+                                        type="button"
                                         @click="saveToDrive(gen.id)"
                                         :disabled="gen.saving"
                                         class="bg-indigo-500 hover:bg-indigo-600 text-white text-xs py-1 px-3 rounded"
@@ -125,6 +127,7 @@
                                     </button>
                                     <button
                                         x-show="gen.drive_file_id"
+                                        type="button"
                                         @click="playVideo(gen)"
                                         class="bg-purple-500 hover:bg-purple-600 text-white text-xs py-1 px-3 rounded"
                                     >

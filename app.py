@@ -942,6 +942,7 @@ def view_episode(episode_id):
                 "aspect_ratio": gen.aspect_ratio,
                 "generate_audio": gen.generate_audio,
                 "status": gen.status,
+                "unsigned_url": gen.unsigned_url,
                 "drive_file_id": gen.drive_file_id,
                 "drive_view_url": gen.drive_view_url,
                 "local_path": gen.local_path,

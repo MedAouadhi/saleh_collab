@@ -107,6 +107,11 @@ class VideoService:
     # --- Google Drive ---
     @staticmethod
     def _get_drive_service():
+        if not os.path.exists(GOOGLE_DRIVE_CREDENTIALS_PATH):
+            raise FileNotFoundError(
+                f"Google Drive service account file not found: {GOOGLE_DRIVE_CREDENTIALS_PATH}. "
+                f"Please set GOOGLE_DRIVE_CREDENTIALS_PATH in your .env file."
+            )
         credentials = service_account.Credentials.from_service_account_file(
             GOOGLE_DRIVE_CREDENTIALS_PATH,
             scopes=["https://www.googleapis.com/auth/drive"],

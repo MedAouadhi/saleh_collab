@@ -107,7 +107,7 @@
                                 <div x-show="gen.status === 'completed'" class="flex gap-2 mt-2 flex-wrap">
                                     <button
                                         x-show="!gen.drive_file_id && !gen.local_path"
-                                        @click="downloadVideo(gen.id)"
+                                        @click="console.log('DOWNLOAD CLICK gen.id=', gen.id, 'type=', typeof gen.id); downloadVideo(gen.id)"
                                         :disabled="gen.downloading"
                                         class="bg-green-500 hover:bg-green-600 text-white text-xs py-1 px-3 rounded"
                                     >
@@ -133,13 +133,15 @@
                                 </div>
 
                                 <!-- Video Player -->
-                                <div x-show="gen.showPlayer && gen.drive_file_id" class="mt-2">
-                                    <iframe
-                                        :src="'https://drive.google.com/file/d/' + gen.drive_file_id + '/preview'"
-                                        class="w-full aspect-video rounded"
-                                        allow="autoplay"
-                                    ></iframe>
-                                </div>
+                                <template x-if="gen.showPlayer && gen.drive_file_id">
+                                    <div class="mt-2">
+                                        <iframe
+                                            :src="'https://drive.google.com/file/d/' + gen.drive_file_id + '/preview'"
+                                            class="w-full aspect-video rounded"
+                                            allow="autoplay"
+                                        ></iframe>
+                                    </div>
+                                </template>
                             </div>
                         </template>
                         <div x-show="scene.generations.length === 0" class="text-center text-gray-400 text-sm py-4">

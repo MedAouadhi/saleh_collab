@@ -100,7 +100,12 @@ class VideoService:
     @staticmethod
     def download_video(unsigned_url, local_path):
         os.makedirs(os.path.dirname(local_path), exist_ok=True)
-        resp = requests.get(unsigned_url, stream=True, timeout=60)
+        resp = requests.get(
+            unsigned_url,
+            headers=VideoService._get_headers(),
+            stream=True,
+            timeout=60,
+        )
         resp.raise_for_status()
         with open(local_path, "wb") as f:
             for chunk in resp.iter_content(chunk_size=8192):

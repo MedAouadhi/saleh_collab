@@ -166,8 +166,10 @@ function videoSection() {
                     console.log('[poll] gen', gen.id, 'response:', data);
                     if (data.success && data.generation) {
                         this._updateGeneration(gen, data.generation);
-                        if (['completed', 'failed', 'cancelled', 'expired'].includes(gen.status)) {
-                            console.log('[poll] gen', gen.id, 'reached terminal status:', gen.status, 'stopping polling');
+                        // Check the FRESH status from the API response — gen is stale after _updateGeneration
+                        const freshStatus = data.generation.status;
+                        if (['completed', 'failed', 'cancelled', 'expired'].includes(freshStatus)) {
+                            console.log('[poll] gen', gen.id, 'reached terminal status:', freshStatus, 'stopping polling');
                             clearInterval(this.pollIntervals[gen.id]);
                             delete this.pollIntervals[gen.id];
                         }

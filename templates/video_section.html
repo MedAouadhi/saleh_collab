@@ -114,7 +114,7 @@
                                 class="w-full p-2 border rounded text-right"
                                 placeholder="أدخل وصف الفيديو..."
                             ></textarea>
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
                                 <select x-model="scene.newModel" @change="updateModelOptions(scene)" class="border rounded p-2">
                                     <option value="">-- اختر الموديل --</option>
                                     <template x-for="model in availableModels" :key="model.id">
@@ -131,6 +131,12 @@
                                     <option value="">-- الأبعاد --</option>
                                     <template x-for="ar in scene.availableAspectRatios" :key="ar">
                                         <option :value="ar" x-text="ar"></option>
+                                    </template>
+                                </select>
+                                <select x-model="scene.newDuration" class="border rounded p-2" :title="'مدة الفيديو بالثواني'">
+                                    <option value="">-- المدة (افتراضي) --</option>
+                                    <template x-for="d in scene.availableDurations" :key="d">
+                                        <option :value="d" x-text="d + ' ثانية'"></option>
                                     </template>
                                 </select>
                             </div>
@@ -205,6 +211,9 @@
                                     </template>
                                     <template x-if="gen.generate_audio">
                                         <span class="bg-gray-100 px-2 py-0.5 rounded">🔊 صوت</span>
+                                    </template>
+                                    <template x-if="gen.duration">
+                                        <span class="bg-gray-100 px-2 py-0.5 rounded" x-text="'⏱️ ' + gen.duration + 'ث'"></span>
                                     </template>
                                     <template x-if="gen.cost != null">
                                         <span

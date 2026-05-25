@@ -200,6 +200,7 @@ def get_generation_status(gen_id):
             "local_path": gen.local_path,
             "error_message": gen.error_message,
             "cost": gen.cost,
+            "duration": gen.duration,
             "created_at": gen.created_at.isoformat() if gen.created_at else None,
             "completed_at": gen.completed_at.isoformat() if gen.completed_at else None,
         }

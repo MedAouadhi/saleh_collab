@@ -27,8 +27,10 @@ function videoSection() {
             if (typeof scene.newResolution === 'undefined') scene.newResolution = scene.draft_resolution || '';
             if (typeof scene.newAspectRatio === 'undefined') scene.newAspectRatio = scene.draft_aspect_ratio || '';
             if (typeof scene.newAudio === 'undefined') scene.newAudio = scene.draft_generate_audio == null ? true : scene.draft_generate_audio;
+            if (typeof scene.newDuration === 'undefined') scene.newDuration = scene.draft_duration || '';
             if (typeof scene.availableResolutions === 'undefined') scene.availableResolutions = [];
             if (typeof scene.availableAspectRatios === 'undefined') scene.availableAspectRatios = [];
+            if (typeof scene.availableDurations === 'undefined') scene.availableDurations = [];
             if (typeof scene.submitting === 'undefined') scene.submitting = false;
             if (typeof scene.savingDraft === 'undefined') scene.savingDraft = false;
             if (typeof scene.draftSaved === 'undefined') scene.draftSaved = false;
@@ -50,6 +52,7 @@ function videoSection() {
                         resolution: scene.newResolution,
                         aspect_ratio: scene.newAspectRatio,
                         generate_audio: scene.newAudio,
+                        duration: scene.newDuration ? Number(scene.newDuration) : null,
                     }),
                 });
                 const data = await resp.json();
@@ -59,6 +62,7 @@ function videoSection() {
                     scene.draft_resolution = data.draft.resolution;
                     scene.draft_aspect_ratio = data.draft.aspect_ratio;
                     scene.draft_generate_audio = data.draft.generate_audio;
+                    scene.draft_duration = data.draft.duration;
                     scene.hasDraft = !!(data.draft.prompt || data.draft.model);
                     scene.draftSaved = true;
                     setTimeout(() => { scene.draftSaved = false; }, 2000);
@@ -80,6 +84,7 @@ function videoSection() {
             scene.newResolution = '';
             scene.newAspectRatio = '';
             scene.newAudio = true;
+            scene.newDuration = '';
             await this.saveDraft(scene);
         },
 
@@ -270,6 +275,7 @@ function videoSection() {
             if (model) {
                 scene.availableResolutions = model.supported_resolutions || [];
                 scene.availableAspectRatios = model.supported_aspect_ratios || [];
+                scene.availableDurations = this._extractDurations(model);
             }
         },
 
@@ -278,12 +284,35 @@ function videoSection() {
             if (model) {
                 scene.availableResolutions = model.supported_resolutions || [];
                 scene.availableAspectRatios = model.supported_aspect_ratios || [];
+                scene.availableDurations = this._extractDurations(model);
             } else {
                 scene.availableResolutions = [];
                 scene.availableAspectRatios = [];
+                scene.availableDurations = [];
             }
             scene.newResolution = '';
             scene.newAspectRatio = '';
+            scene.newDuration = '';
+        },
+
+        _extractDurations(model) {
+            // Try a few field names — OpenRouter has not committed to one shape.
+            const candidates = ['supported_durations', 'durations', 'supported_lengths', 'duration_options'];
+            for (const key of candidates) {
+                if (Array.isArray(model[key]) && model[key].length > 0) {
+                    return model[key].map(v => Number(v)).filter(n => !isNaN(n));
+                }
+            }
+            // Min/max range → enumerate every 2s
+            const min = Number(model.min_duration);
+            const max = Number(model.max_duration);
+            if (!isNaN(min) && !isNaN(max) && max >= min) {
+                const out = [];
+                for (let v = min; v <= max; v += 2) out.push(v);
+                return out;
+            }
+            // Fallback set commonly supported by current video models
+            return [4, 5, 8, 10];
         },
 
         async addScene() {
@@ -339,6 +368,7 @@ function videoSection() {
                         resolution: scene.newResolution,
                         aspect_ratio: scene.newAspectRatio,
                         generate_audio: scene.newAudio,
+                        duration: scene.newDuration ? Number(scene.newDuration) : null,
                     }),
                 });
                 const data = await resp.json();
@@ -351,6 +381,7 @@ function videoSection() {
                         resolution: scene.newResolution,
                         aspect_ratio: scene.newAspectRatio,
                         generate_audio: scene.newAudio,
+                        duration: scene.newDuration ? Number(scene.newDuration) : null,
                         drive_file_id: null,
                         drive_view_url: null,
                         local_path: null,
